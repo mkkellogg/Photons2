@@ -1,0 +1,50 @@
+@font-face {
+    font-family: 'Roboto';
+    src: url(../fonts/Roboto-Regular.ttf);
+}
+
+@import 'variables';
+
+html {
+    font-size: $root-font-size;
+    font-family: $font-family;
+    max-width: $page-width;
+}
+
+body {
+    margin: 0;
+}
+
+canvas:focus {
+    outline: none;
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#content-wrapper {
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    & h1 {
+        margin: 0;
+    }
+}
+
+#logo-wrapper {
+    display: flex;
+
+    & img {
+        display: block;
+        height: 100px;
+    }
+}
+
+p {
+    font-size: $paragraph-font-size;
+}
