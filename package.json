@@ -9,8 +9,11 @@
     "author": "Mark Kellogg",
     "type": "module",
     "scripts": {
-        "start": "mkdir -p ./build && mkdir -p ./build/server && cp -r ./server/assets ./build/server/assets && npx parcel serve ./server/*.html --dist-dir ./build/server/ --no-hmr",
-        "build": "npx rollup -c",
+        "build-server": "mkdir -p ./build && mkdir -p ./build/server && cp -r ./server/assets ./build/server/assets",
+        "build-library": "npx rollup -c",
+        "build": "npm run build-library && npm run build-server",
+        "watch": "npx rollup -c --watch --watch.buildDelay 100",
+        "start-server": "npx parcel serve ./server/*.html --dist-dir ./build/server/ --no-hmr",
         "fix-styling": "npx stylelint **/*.scss --fix",
         "fix-js": "npx eslint src --fix",
         "lint": "npx eslint 'src/**/*.js' || true",
@@ -32,7 +35,7 @@
         "eslint": "8.47.0",
         "eslint-config-google": "0.14.0",
         "file-loader": "6.2.0",
-        "parcel": "^2.0.0",
+        "parcel": "2.0.0",
         "prettier": "3.0.2",
         "prettier-eslint": "15.0.1",
         "url-loader": "4.1.1"
