@@ -7,10 +7,10 @@
     "description": "Three.js Particle System",
     "main": "index.js",
     "author": "Mark Kellogg",
+    "type": "module",
     "scripts": {
-        "build": "rm -rf dist && npx webpack --config ./webpack.config.js --mode production",
-        "build:debug": "rm -rf dist && npx webpack --config ./webpack.config.js --mode development",
-        "start": "npx webpack serve --config ./webpack.config.js --mode development",
+        "start": "mkdir -p ./build && mkdir -p ./build/server && cp -r ./server/assets ./build/server/assets && npx parcel serve ./server/*.html --dist-dir ./build/server/ --no-hmr",
+        "build": "npx rollup -c",
         "fix-styling": "npx stylelint **/*.scss --fix",
         "fix-js": "npx eslint src --fix",
         "lint": "npx eslint 'src/**/*.js' || true",
@@ -29,19 +29,16 @@
         "@babel/plugin-proposal-class-properties": "7.18.6",
         "@babel/preset-env": "7.22.10",
         "babel-loader": "9.1.3",
-        "copy-webpack-plugin": "11.0.0",
         "eslint": "8.47.0",
         "eslint-config-google": "0.14.0",
         "file-loader": "6.2.0",
-        "html-webpack-plugin": "5.5.3",
+        "parcel": "^2.0.0",
         "prettier": "3.0.2",
         "prettier-eslint": "15.0.1",
-        "url-loader": "4.1.1",
-        "webpack": "5.72.0",
-        "webpack-cli": "4.9.2",
-        "webpack-dev-server": "4.8.1"
+        "url-loader": "4.1.1"
     },
     "dependencies": {
+        "rollup": "3.28.1",
         "three": "0.155.0"
     }
 }
