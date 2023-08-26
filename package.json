@@ -12,7 +12,7 @@
         "build-server": "mkdir -p ./build && mkdir -p ./build/server && cp -r ./server/assets ./build/server/assets",
         "build-library": "npx rollup -c",
         "build": "npm run build-library && npm run build-server",
-        "watch": "npx rollup -c --watch --watch.buildDelay 100",
+        "watch": "npx rollup -c --watch --watch.include ./src/**/*.js",
         "start-server": "npx parcel serve ./server/*.html --dist-dir ./build/server/ --no-hmr",
         "fix-styling": "npx stylelint **/*.scss --fix",
         "fix-js": "npx eslint src --fix",

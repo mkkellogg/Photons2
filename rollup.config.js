@@ -1,35 +1,42 @@
 
 export default [
-	{
-		input: './src/index.js',
-		treeshake: false,
-		external: p => /^three/.test( p ),
+    {
+        input: './src/index.js',
+        treeshake: false,
+        external: p => /^three/.test( p ),
 
-		output: {
+        watch: {
+            include: './src/**'
+        },
 
-			name: 'Photons',
-			extend: true,
-			format: 'umd',
-			file: './build/index.umd.cjs',
-			sourcemap: true,
+        output: {
 
-			globals: p => /^three/.test( p ) ? 'THREE' : null,
+            name: 'Photons',
+            extend: true,
+            format: 'umd',
+            file: './build/index.umd.cjs',
+            sourcemap: true,
 
-		},
+            globals: p => /^three/.test( p ) ? 'THREE' : null,
 
-	},
-	{
-		input: './src/index.js',
-		treeshake: false,
-		external: p => /^three/.test( p ),
+        },
 
-		output: {
+    },
+    {
+        input: './src/index.js',
+        treeshake: false,
+        external: p => /^three/.test( p ),
+        watch: {
+            include: './src/**'
+        },
 
-			format: 'esm',
-			file: './build/index.module.js',
-			sourcemap: true,
+        output: {
 
-		},
+            format: 'esm',
+            file: './build/index.module.js',
+            sourcemap: true,
 
-	}
+        },
+
+    }
 ];
