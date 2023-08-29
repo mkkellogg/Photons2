@@ -1,40 +1,53 @@
-import { Generator } from "./Generator.js"
+import { Generator, GeneratorType } from './Generator.js';
 
-class RandomGenerator extends Generator {
+export class RandomGenerator extends Generator {
 
-    constructor(range, offset, uniformRange, uniformOffset, normalize) {
-        this->range = range;
-        this->offset = offset;
-        this->uniformRange = uniformRange;
-        this->uniformOffset = uniformOffset;
-        this->normalize = normalize;
+    constructor(outType, range, offset, uniformRange, uniformOffset, normalize) {
+        super(outType);
+        this.range = range;
+        this.offset = offset;
+        this.uniformRange = uniformRange;
+        this.uniformOffset = uniformOffset;
+        this.normalize = normalize;
     }
 
     generate(out) {
+        const uniformRange = Math.random() * this.uniformRange;
+        switch (this.type) {
+            case GeneratorType.Scalar:
+                out = Math.random() * this.range + this.offset;
+                if (this.normalize) out = out < 0 ? -1.0 : 1.0;
+                return 0;
+            break;
+            case GeneratorType.Vector2:
+                out.set(generateForElement(uniformRange, 'x'),
+                        generateForElement(uniformRange, 'y'));
+            break;
+            case GeneratorType.Vector3:
+                out.set(generateForElement(uniformRange, 'x'),
+                        generateForElement(uniformRange, 'y'),
+                        generateForElement(uniformRange, 'z'));
+            break;
+            case GeneratorType.Vector4:
+                out.set(generateForElement(uniformRange, 'x'),
+                        generateForElement(uniformRange, 'y'),
+                        generateForElement(uniformRange, 'z'),
+                        generateForElement(uniformRange, 'w'));
+            break;
+        }
 
+        if (this.normalize) out.normalize();
+        return out;
+    }
+
+    generateForElement(uniformRange, e) {
+        return uniformRange + Math.random() * this.range[e] + this.offset[e] + this.uniformOffset;
     }
 
     clone() {
-        Generator<T>* clone = new(std::nothrow) RandomGenerator<T>(this->range, this->offset, this->uniformRange, this->uniformOffset, this->normalize);
-        if (clone == nullptr) {
-            throw AllocationException("RandomGenerator::clone() -> Unable to allocate clone object.");
-        }
+        const clone = new RandomGenerator<T>(this.range, this.offset, this.uniformRange,
+                                             this.uniformOffset, this.normalize);
         return clone;
     }
-
-    template <typename V>
-    void generateForThreeElementVector(V& out) {
-        Real uniformRange = Math::random() * this->uniformRange;
-        out.set(uniformRange + Math::random() * this->range.x + this->offset.x + this->uniformOffset,
-                uniformRange + Math::random() * this->range.y + this->offset.y + this->uniformOffset,
-                uniformRange + Math::random() * this->range.z + this->offset.z + this->uniformOffset);
-        if (this->normalize) out.normalize();
-    }
-
-    T range;
-    T offset;
-    Real uniformRange;
-    Real uniformOffset;
-    Bool normalize;
 
 }

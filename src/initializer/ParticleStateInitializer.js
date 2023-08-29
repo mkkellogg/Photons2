@@ -2,7 +2,7 @@ import { ParticleStateProgressType } from '../ParticleState.js';
 
 export class ParticleStateInitializer {
 
-    constructor() {   
+    constructor() {
     }
 
     initializeState(state) {
