@@ -1,4 +1,4 @@
-import { ParticleStateInitializer } from 'ParticleStateInitializer.js';
+import { ParticleStateInitializer } from './ParticleStateInitializer.js';
 
 export class BasicParticleStateInitializer extends ParticleStateInitializer {
 
