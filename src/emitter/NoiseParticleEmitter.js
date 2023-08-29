@@ -1,4 +1,4 @@
-import { ContinuousParticleEmitter } from '../ContinuousParticleEmitter.js';
+import { ContinuousParticleEmitter } from './ContinuousParticleEmitter.js';
 
 export class NoiseParticleEmitter extends ContinuousParticleEmitter {
 
