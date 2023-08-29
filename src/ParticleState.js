@@ -154,9 +154,9 @@ export class ParticleStateAttributeArray extends ParticleStateArrayBase {
         this.flushParticleStateToBuffers(destIndex);
     }
 
-    getParticleStatePointer(index) {
+    getState(index) {
         if (index >= this.particleCount) {
-            throw new Error("ParticleStateAttributeArray::getParticleStatePtr() -> 'index' is out of range.");
+            throw new Error("ParticleStateAttributeArray::getParticleState() -> 'index' is out of range.");
         }
         return this.particleStatePointers.get()[index];
     }

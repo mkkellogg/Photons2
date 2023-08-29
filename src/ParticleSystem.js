@@ -19,25 +19,38 @@ export class ParticleSystem {
     constructor(owner, maxAxtiveParticles) {
         this.owner = owner;
         this.maxAxtiveParticles = maxAxtiveParticles;
-
-        this.particlesStates = new ParticleStateAttributeArray(this.maxAxtiveParticles);
-        this.particlesStates.setParticleCount(this.maxAxtiveParticles);
-
-        const particleSequences= new ParticleSequenceGroup();
-
+        this.activeParticleCount = 0;
+        this.simulateInWorldSpace = true;
+        this.emitterInitialized = false;
+        this.emitter = null;
+        this.particleStateInitializers = [];
+        this.particleStateOperators = [];
+        this.particleStates = new ParticleStateAttributeArray(this.maxAxtiveParticles);
+        this.particleStates.setParticleCount(this.maxAxtiveParticles);
         this.systemState = ParticleSystemState.NotStarted;
+        this.particleSequences = new ParticleSequenceGroup();
     }
 
     update(timeDelta){
-
+        if (this.emitterInitialized && this.systemState == ParticleSystemState.Running) {
+            const particlesToEmit = this.particleEmitter.update(timeDelta);
+            if (particlesToEmit > 0) this.activateParticles(particlesToEmit);
+            this.advanceActiveParticles(timeDelta);
+        }
     }
 
     start() {
-
+        if (this.systemState == ParticleSystemState.NotStarted || this.systemState == ParticleSystemState.Paused) {
+            this.systemState = ParticleSystemState.Running;
+        } else {
+            // TODO: Decide how to handle this case
+        }
     }
 
     pause() {
-
+        if (this.systemState == ParticleSystemState.Running) {
+            this.systemState = ParticleSystemState.Paused;
+        }
     }
 
     stop() {
@@ -48,59 +61,75 @@ export class ParticleSystem {
         return this.systemState;
     }
 
-    setEmitter(...args) {
-
+    setEmitter(emitterClass, ...args) {
+        this.particleEmitter = new emitterClass(...args);
+        this.particleEmitter.maxActiveParticles = this.maximumActiveParticles;
+        this.emitterInitialized = true;
+        return this.particleEmitter;
     }
 
-    addParticleStateInitializer(...args) {
-
+    addParticleStateInitializer(initializerClass, ...args) {
+        const initializer = new initializerClass(...args);
+        this.particleStateInitializers.push(initializer);
+        return initializer;
     }
 
-    getParticleStateInitializer() {
-
+    getParticleStateInitializer(index) {
+        if (index >= this.particleStateInitializers.length) {
+            throw new Error("ParticleSystem::getParticleStateInitializer() -> 'index' is out of range.");
+        }
+        return this.particleStateInitializers[index];
     }
 
-    addParticleStateOperator(...args) {
-
+    addParticleStateOperator(operatorClass, ...args) {
+        const operator = new operatorClass(...args);
+        this.particleStateOperators.push(operator);
+        return operator;
     }
 
-    getParticleStateOperator() {
-
+    getParticleStateOperator(index) {
+        if (index >= this.articleStateOperators.length) {
+            throw new Error("ParticleSystem::getParticleStateOperator() -> 'index' is out of range.");
+        }
+        return this.particleStateOperators[index];
     }
 
     getMaximumActiveParticles() {
-
+        return this.maximumActiveParticles;
     }
 
     getActiveParticleCount() {
-
+        return this.activeParticleCount;
     }
 
-    getParticleStatePointer(index) {
-
+    getParticleState(index) {
+        if (index >= this.activeParticleCount) {
+            throw new Error("ParticleSystem::getParticleState() -> 'index' is out of range.");
+        }
+        return this.particleStates.getState(index);
     }
 
     getParticleStates() {
-
+        return this.particleStates;
     }
 
     getSimulateInWorldSpace() {
-
+        return this.simulateInWorldSpace;
     }
 
     setSimulateInWorldSpace(simulateInWorldSpace) {
-
+        this.simulateInWorldSpace = simulateInWorldSpace;
     }
 
     addParticleSequence(start, length, id = 0) {
-
+        this.particleSequences.addSequence(start, length, id);
     }
     
     getParticleSequences() {
-
+        return this.particleSequences;
     }
 
     getEmitter() {
-
+        return this.emitter;
     }
 };
