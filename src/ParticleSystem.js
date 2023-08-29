@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { ParticleStateAttributeArray } from './ParticleState.js'
+import { ParticleSequenceGroup } from './ParticleSequenceGroup.js';
 
 export class ParticleSystemState {
 
@@ -17,6 +19,11 @@ export class ParticleSystem {
     constructor(owner, maxAxtiveParticles) {
         this.owner = owner;
         this.maxAxtiveParticles = maxAxtiveParticles;
+
+        this.particlesStates = new ParticleStateAttributeArray(this.maxAxtiveParticles);
+        this.particlesStates.setParticleCount(this.maxAxtiveParticles);
+
+        const particleSequences= new ParticleSequenceGroup();
 
         this.systemState = ParticleSystemState.NotStarted;
     }
