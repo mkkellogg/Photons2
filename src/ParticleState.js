@@ -4,9 +4,9 @@ export class ParticleStateProgressType {
 
     static Time = new ParticleSystemState('Time');
     static Sequence = new ParticleSystemState('Sequence');
-  
+
     constructor(name) {
-      this.name = name;
+        this.name = name;
     }
 }
 
@@ -16,7 +16,7 @@ export class ParticleState {
                 normal, rotation, rotationalSpeed, size, color, alpha, initialSize, initialColor, initialAlpha) {
         this.init();
         this.setAll(progressType, lifetime, age, sequenceElement, position, velocity, acceleration,
-                    normal, rotation, rotationalSpeed, size, color,  alpha, initialSize, initialColor, initialAlpha);
+                    normal, rotation, rotationalSpeed, size, color, alpha, initialSize, initialColor, initialAlpha);
     }
 
     init() {
@@ -55,7 +55,7 @@ export class ParticleState {
         this.alpha = alpha;
         this.initialSize.copy(initialSize);
         this.initialColor.copy(initialColor);
-        this.initialAlpha = initialAlpha; 
+        this.initialAlpha = initialAlpha;
     }
 
     coptTo(dest) {
@@ -117,7 +117,7 @@ export class ParticleStateAttributeArray extends ParticleStateArrayBase {
 
     flushParticleStateToBuffers(index) {
         if (index >= this.particleCount) {
-            throw new Error("ParticleStateAttributeArray::flushParticleStateToBuffers() -> 'index' is out of range.");
+            throw new Error('ParticleStateAttributeArray::flushParticleStateToBuffers() -> "index" is out of range.');
         }
         particleState = this.particleStates[index];
 
@@ -128,7 +128,8 @@ export class ParticleStateAttributeArray extends ParticleStateArrayBase {
                                              particleState.sequenceElement.z, particleState.sequenceElement.w);
         this.positions.setXYZ(index, particleState.position.x, particleState.position.y, particleState.position.z);
         this.velocities.setXYZ(index, particleState.velocity.x, particleState.velocity.y, particleState.velocity.z);
-        this.accelerations.setXYZ(index, particleState.acceleration.x, particleState.acceleration.y, particleState.acceleration.z);
+        this.accelerations.setXYZ(index, particleState.acceleration.x,
+                                  particleState.acceleration.y, particleState.acceleration.z);
         this.normals.setXYZ(index, particleState.normal.x, particleState.normal.y, particleState.normal.z);
         this.rotations.setX(index, particleState.rotation);
         this.rotationalSpeeds.setX(index, particleState.rotationalSpeed);
@@ -136,15 +137,15 @@ export class ParticleStateAttributeArray extends ParticleStateArrayBase {
         this.color.setXYZ(index, particleState.color.r, particleState.color.g, particleState.color.b);
         this.alphas.setX(index, particleState.alpha);
         this.initialSizes.setXY(index, particleState.initialSize.x, particleState.initialSize.y);
-        this.initialAlphas.setX(index, particleState.initialAlpha);     
+        this.initialAlphas.setX(index, particleState.initialAlpha);
     }
 
     copyParticleState(srcIndex, destIndex) {
         if (srcIndex >= this.particleCount) {
-            throw new Error("ParticleStateAttributeArray::copyParticleState() -> 'srcIndex' is out of range.");
+            throw new Error('ParticleStateAttributeArray::copyParticleState() -> "srcIndex" is out of range.');
         }
         if (destIndex >= this.particleCount) {
-            throw new Error("ParticleStateAttributeArray::copyParticleState() -> 'destIndex' is out of range.");
+            throw new Error('ParticleStateAttributeArray::copyParticleState() -> "destIndex" is out of range.');
         }
 
         srcParticleState = this.particleStates[srcIndex];
@@ -156,7 +157,7 @@ export class ParticleStateAttributeArray extends ParticleStateArrayBase {
 
     getState(index) {
         if (index >= this.particleCount) {
-            throw new Error("ParticleStateAttributeArray::getParticleState() -> 'index' is out of range.");
+            throw new Error('ParticleStateAttributeArray::getParticleState() -> "index" is out of range.');
         }
         return this.particleStatePointers.get()[index];
     }
@@ -207,68 +208,68 @@ export class ParticleStateAttributeArray extends ParticleStateArrayBase {
         const initialAlphasArray = new Float32Array(this.vertexCount);
 
         this.progressTypes = new THREE.BufferAttribute(progressTypesArray, 1);
-		this.progressTypes.dynamic = true;
-		this.particleGeometry.setAttribute('progressType', this.progressTypes);
+        this.progressTypes.dynamic = true;
+        this.particleGeometry.setAttribute('progressType', this.progressTypes);
 
         this.lifetimes = new THREE.BufferAttribute(lifetimesArray, 1);
-		this.lifetimes.dynamic = true;
-		this.particleGeometry.setAttribute('lifetime', this.lifetimes);
+        this.lifetimes.dynamic = true;
+        this.particleGeometry.setAttribute('lifetime', this.lifetimes);
 
         this.ages = new THREE.BufferAttribute(agesArray, 1);
-		this.ages.dynamic = true;
-		this.particleGeometry.setAttribute('age', this.ages);
-        
+        this.ages.dynamic = true;
+        this.particleGeometry.setAttribute('age', this.ages);
+
         this.sequenceElements = new THREE.BufferAttribute(sequenceElementsArray, 4);
-		this.sequenceElements.dynamic = true;
-		this.particleGeometry.setAttribute('sequenceElement', this.sequenceElements);
+        this.sequenceElements.dynamic = true;
+        this.particleGeometry.setAttribute('sequenceElement', this.sequenceElements);
 
         this.positions = new THREE.BufferAttribute(positionsArray, 3);
-		this.positions.dynamic = true;
-		this.particleGeometry.setAttribute('position', this.positions);
+        this.positions.dynamic = true;
+        this.particleGeometry.setAttribute('position', this.positions);
 
         this.velocities = new THREE.BufferAttribute(velocitiesArray, 3);
-		this.velocities.dynamic = true;
-		this.particleGeometry.setAttribute('velocity', this.velocities);
+        this.velocities.dynamic = true;
+        this.particleGeometry.setAttribute('velocity', this.velocities);
 
         this.accelerations = new THREE.BufferAttribute(accelerationsArray, 3);
-		this.accelerations.dynamic = true;
-		this.particleGeometry.setAttribute('acceleration', this.accelerations);
+        this.accelerations.dynamic = true;
+        this.particleGeometry.setAttribute('acceleration', this.accelerations);
 
         this.normals = new THREE.BufferAttribute(normalsArray, 3);
-		this.normals.dynamic = true;
-		this.particleGeometry.setAttribute('normal', this.normals);
+        this.normals.dynamic = true;
+        this.particleGeometry.setAttribute('normal', this.normals);
 
         this.rotations = new THREE.BufferAttribute(rotationsArray, 1);
-		this.rotations.dynamic = true;
-		this.particleGeometry.setAttribute('rotation', this.rotations);
+        this.rotations.dynamic = true;
+        this.particleGeometry.setAttribute('rotation', this.rotations);
 
         this.rotationalSpeeds = new THREE.BufferAttribute(rotationalSpeedsArray, 1);
-		this.rotationalSpeeds.dynamic = true;
-		this.particleGeometry.setAttribute('rotationalSpeed', this.rotationalSpeeds);
+        this.rotationalSpeeds.dynamic = true;
+        this.particleGeometry.setAttribute('rotationalSpeed', this.rotationalSpeeds);
 
         this.sizes = new THREE.BufferAttribute(sizesArray, 2);
-		this.sizes.dynamic = true;
-		this.particleGeometry.setAttribute('size', sizes);
+        this.sizes.dynamic = true;
+        this.particleGeometry.setAttribute('size', sizes);
 
         this.colors = new THREE.BufferAttribute(colorsArray, 3);
-		this.colors.dynamic = true;
-		this.particleGeometry.setAttribute('color', colors);
+        this.colors.dynamic = true;
+        this.particleGeometry.setAttribute('color', colors);
 
         this.alphas = new THREE.BufferAttribute(alphasArray, 1);
-		this.alphas.dynamic = true;
-		this.particleGeometry.setAttribute('alpha', alphas);
+        this.alphas.dynamic = true;
+        this.particleGeometry.setAttribute('alpha', alphas);
 
         this.initialSizes = new THREE.BufferAttribute(initialSizesArray, 2);
-		this.initialSizes.dynamic = true;
-		this.particleGeometry.setAttribute('initialSize', initialSizes);
+        this.initialSizes.dynamic = true;
+        this.particleGeometry.setAttribute('initialSize', initialSizes);
 
         this.initialColors = new THREE.BufferAttribute(initialColorsArray, 3);
-		this.initialColors.dynamic = true;
-		this.particleGeometry.setAttribute('initialColor', initialColors);
+        this.initialColors.dynamic = true;
+        this.particleGeometry.setAttribute('initialColor', initialColors);
 
         this.initialAlphas = new THREE.BufferAttribute(initialAlphasArray, 1);
-		this.initialAlphas.dynamic = true;
-		this.particleGeometry.setAttribute('initialAlpha', initialAlphas);
+        this.initialAlphas.dynamic = true;
+        this.particleGeometry.setAttribute('initialAlpha', initialAlphas);
     }
 
     deallocate() {

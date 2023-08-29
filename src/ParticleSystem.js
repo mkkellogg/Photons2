@@ -1,5 +1,4 @@
-import * as THREE from 'three';
-import { ParticleStateAttributeArray } from './ParticleState.js'
+import { ParticleStateAttributeArray } from './ParticleState.js';
 import { ParticleSequenceGroup } from './ParticleSequenceGroup.js';
 
 export class ParticleSystemState {
@@ -8,7 +7,7 @@ export class ParticleSystemState {
     static Running = new ParticleSystemState('Running');
     static Paused = new ParticleSystemState('Paused');
     static Done = new ParticleSystemState('Done');
-  
+
     constructor(name) {
       this.name = name;
     }
@@ -31,7 +30,7 @@ export class ParticleSystem {
         this.particleSequences = new ParticleSequenceGroup();
     }
 
-    update(timeDelta){
+    update(timeDelta) {
         if (this.emitterInitialized && this.systemState == ParticleSystemState.Running) {
             const particlesToEmit = this.particleEmitter.update(timeDelta);
             if (particlesToEmit > 0) this.activateParticles(particlesToEmit);
@@ -61,35 +60,35 @@ export class ParticleSystem {
         return this.systemState;
     }
 
-    setEmitter(emitterClass, ...args) {
-        this.particleEmitter = new emitterClass(...args);
+    setEmitter(EmitterClass, ...args) {
+        this.particleEmitter = new EmitterClass(...args);
         this.particleEmitter.maxActiveParticles = this.maximumActiveParticles;
         this.emitterInitialized = true;
         return this.particleEmitter;
     }
 
-    addParticleStateInitializer(initializerClass, ...args) {
-        const initializer = new initializerClass(...args);
+    addParticleStateInitializer(InitializerClass, ...args) {
+        const initializer = new InitializerClass(...args);
         this.particleStateInitializers.push(initializer);
         return initializer;
     }
 
     getParticleStateInitializer(index) {
         if (index >= this.particleStateInitializers.length) {
-            throw new Error("ParticleSystem::getParticleStateInitializer() -> 'index' is out of range.");
+            throw new Error('ParticleSystem::getParticleStateInitializer() -> "index" is out of range.');
         }
         return this.particleStateInitializers[index];
     }
 
-    addParticleStateOperator(operatorClass, ...args) {
-        const operator = new operatorClass(...args);
+    addParticleStateOperator(OperatorClass, ...args) {
+        const operator = new OperatorClass(...args);
         this.particleStateOperators.push(operator);
         return operator;
     }
 
     getParticleStateOperator(index) {
         if (index >= this.articleStateOperators.length) {
-            throw new Error("ParticleSystem::getParticleStateOperator() -> 'index' is out of range.");
+            throw new Error('ParticleSystem::getParticleStateOperator() -> "index" is out of range.');
         }
         return this.particleStateOperators[index];
     }
@@ -104,7 +103,7 @@ export class ParticleSystem {
 
     getParticleState(index) {
         if (index >= this.activeParticleCount) {
-            throw new Error("ParticleSystem::getParticleState() -> 'index' is out of range.");
+            throw new Error('ParticleSystem::getParticleState() -> "index" is out of range.');
         }
         return this.particleStates.getState(index);
     }
@@ -124,7 +123,7 @@ export class ParticleSystem {
     addParticleSequence(start, length, id = 0) {
         this.particleSequences.addSequence(start, length, id);
     }
-    
+
     getParticleSequences() {
         return this.particleSequences;
     }
@@ -132,4 +131,4 @@ export class ParticleSystem {
     getEmitter() {
         return this.emitter;
     }
-};
+}

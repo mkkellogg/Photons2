@@ -26,6 +26,9 @@ module.exports = {
     "max-len": ["error", 120],
     "object-curly-spacing": ["off"],
     "comma-dangle": ["off"],
-    "prefer-const": ["off"]
+    "prefer-const": ["off"],
+    'require-jsdoc': ["off"],
+    "padded-blocks": ["off"],
+    "indent": ["off"]
   },
 };

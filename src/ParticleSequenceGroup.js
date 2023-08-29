@@ -1,4 +1,4 @@
-import { ParticleSequence  } from "./ParticleSequence.js";
+import { ParticleSequence } from './ParticleSequence.js';
 
 export class ParticleSequenceGroup {
 
@@ -9,7 +9,7 @@ export class ParticleSequenceGroup {
 
     addSequence(id, start, length) {
         if (this.hasID(id)) {
-            throw Exception("ParticleSequenceGroup::addParticleSequence -> Tried to add sequence with duplicate ID.");
+            throw new Error('ParticleSequenceGroup::addParticleSequence -> Tried to add sequence with duplicate ID.');
         }
 
         const sequence = new ParticleSequence(start, length, id);
@@ -20,7 +20,7 @@ export class ParticleSequenceGroup {
 
     getSequence(id) {
         if (!this.hasID(id)) {
-            throw InvalidArgumentException("ParticleSequenceGroup::getSequence -> Invalid ID.");
+            throw new Error('ParticleSequenceGroup::getSequence -> Invalid ID.');
         }
         return this.particleSequences[id];
     }
