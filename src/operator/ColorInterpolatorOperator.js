@@ -4,7 +4,7 @@ import { InterpolatorOperator } from './InterpolatorOperator.js';
 export class ColorInterpolatorOperator extends InterpolatorOperator {
 
     constructor(relativeToInitialValue) {
-        super(THREE.Color, relativeToInitialValue);
+        super(new THREE.Color(), relativeToInitialValue);
     }
 
     updateState = function() {
@@ -14,9 +14,9 @@ export class ColorInterpolatorOperator extends InterpolatorOperator {
         return function(state) {
             this.getInterpolatedValue(state, tempColor);
             if (this.relativeToInitialValue) {
-                state.color.r = state.initialColor.r * tempColor.r;
-                state.color.g = state.initialColor.g * tempColor.g;
-                state.color.b = state.initialColor.b * tempColor.b;
+                state.color.setRGB(state.initialColor.r * tempColor.r,
+                                   state.initialColor.g * tempColor.g,
+                                   state.initialColor.b * tempColor.b);
             } else {
                 state.color.setRGB(c.r, c.g, c.b);
             }
