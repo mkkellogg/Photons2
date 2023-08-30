@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { Generator, GeneratorType } from './Generator.js';
+import { Generator } from './Generator.js';
+import { BuiltinType } from './BuiltIn.js';
 
 export class SphereRandomGenerator extends Generator {
 
@@ -24,17 +25,17 @@ export class SphereRandomGenerator extends Generator {
 
     generate(out) {
 
-        switch (this.type) {
-            case GeneratorType.Scalar:
+        switch (this.outTypeID) {
+            case BuiltinType.Scalar:
                 // TODO: implement
             break;
-            case GeneratorType.Vector2:
+            case BuiltinType.Vector2:
                 // TODO: implement
             break;
-            case GeneratorType.Vector3:
+            case BuiltinType.Vector3:
                 return generateForVector3(out);
             break;
-            case GeneratorType.Vector4:
+            case BuiltinType.Vector4:
                 // TODO: implement
             break;
         }

@@ -1,6 +1,9 @@
-export class SizeInitializer {
+import { ParticleStateInitializer } from './ParticleStateInitializer.js';
+
+export class SizeInitializer extends ParticleStateInitializer {
 
     constructor(generator) {
+        super();
         this.generator = generator.clone();
     }
 

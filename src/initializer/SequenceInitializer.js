@@ -1,8 +1,10 @@
 import { ParticleStateProgressType } from '../ParticleState.js';
+import { ParticleStateInitializer } from './ParticleStateInitializer.js';
 
-export class SequenceInitializer {
+export class SequenceInitializer extends ParticleStateInitializer {
 
     constructor(particleSequences, reverse) {
+        super();
         this.setParticleSequences(particleSequences);
         this.reverse = reverse;
     }

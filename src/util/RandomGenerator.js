@@ -1,4 +1,5 @@
-import { Generator, GeneratorType } from './Generator.js';
+import { Generator } from './Generator.js';
+import { BuiltinType } from './BuiltIn.js';
 
 export class RandomGenerator extends Generator {
 
@@ -13,22 +14,22 @@ export class RandomGenerator extends Generator {
 
     generate(out) {
         const uniformRange = Math.random() * this.uniformRange;
-        switch (this.type) {
-            case GeneratorType.Scalar:
+        switch (this.outTypeID) {
+            case BuiltinType.Scalar:
                 out = Math.random() * this.range + this.offset;
                 if (this.normalize) out = out < 0 ? -1.0 : 1.0;
                 return 0;
             break;
-            case GeneratorType.Vector2:
+            case BuiltinType.Vector2:
                 out.set(generateForElement(uniformRange, 'x'),
                         generateForElement(uniformRange, 'y'));
             break;
-            case GeneratorType.Vector3:
+            case BuiltinType.Vector3:
                 out.set(generateForElement(uniformRange, 'x'),
                         generateForElement(uniformRange, 'y'),
                         generateForElement(uniformRange, 'z'));
             break;
-            case GeneratorType.Vector4:
+            case BuiltinType.Vector4:
                 out.set(generateForElement(uniformRange, 'x'),
                         generateForElement(uniformRange, 'y'),
                         generateForElement(uniformRange, 'z'),
