@@ -15,18 +15,29 @@ export class ParticleSystemState {
 
 export class ParticleSystem {
 
-    constructor(owner, maxAxtiveParticles) {
+    constructor(owner, ParticleStateArrayClass) {
+        ParticleStateArrayClass = ParticleStateArrayClass || ParticleStateArray;
         this.owner = owner;
-        this.maxAxtiveParticles = maxAxtiveParticles;
+        this.maxActiveParticles = 0;
         this.activeParticleCount = 0;
         this.simulateInWorldSpace = true;
         this.emitterInitialized = false;
         this.emitter = null;
         this.particleStateInitializers = [];
         this.particleStateOperators = [];
-        this.particleStates = new ParticleStateArray(this.maxAxtiveParticles);
+        this.particleStates = new ParticleStateArrayClass();
         this.systemState = ParticleSystemState.NotStarted;
         this.particleSequences = new ParticleSequenceGroup();
+        this.onUpdateCallback = null;
+    }
+
+    init(maxActiveParticles) {
+        this.maxActiveParticles = maxActiveParticles;
+        this.particleStates.init(this.maxActiveParticles);
+    }
+
+    onUpdate(callback) {
+        this.onUpdateCallback = callback;
     }
 
     update(timeDelta) {
@@ -34,6 +45,7 @@ export class ParticleSystem {
             const particlesToEmit = this.particleEmitter.update(timeDelta);
             if (particlesToEmit > 0) this.activateParticles(particlesToEmit);
             this.advanceActiveParticles(timeDelta);
+            if (this.onUpdateCallback) this.onUpdateCallback(this.activeParticleCount);
         }
     }
 
@@ -129,5 +141,9 @@ export class ParticleSystem {
 
     getEmitter() {
         return this.emitter;
+    }
+
+    advanceActiveParticles(timeDelta) {
+
     }
 }

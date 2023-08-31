@@ -58,30 +58,36 @@ export class ParticleState {
         this.initialAlpha = initialAlpha;
     }
 
-    coptTo(dest) {
+    copyTo(dest) {
         dest.setAll(this.progressType, this.lifetime, this.age, this.sequenceElement, this.position,
                     this.velocity, this.acceleration, this.normal, this.rotation, this.rotationalSpeed,
                     this.size, this.color, this.alpha, this.initialSize, this.initialColor, this.initialAlpha);
+    }
+
+    copy(src) {
+        this.setAll(src.progressType, src.lifetime, src.age, src.sequenceElement, src.position,
+                    src.velocity, src.acceleration, src.normal, src.rotation, src.rotationalSpeed,
+                    src.size, src.color, src.alpha, src.initialSize, src.initialColor, src.initialAlpha);
     }
 }
 
 export class ParticleStateArray {
 
-    constructor(particleCount) {
+    constructor() {
         this.particleCount = 0;
         this.particleStates = [];
-        this.onParticleCountChangedCallback = null;
-        this.onParticleStateCopiedCallback = null;
+    }
 
+    init(particleCount) {
         this.setParticleCount(particleCount);
     }
 
-    onParticleCountChanged(callback) {
-        this.onParticleCountChangedCallback = callback;
-    }
-
-    onParticleStateCopied(callback) {
-        this.onParticleStateCopiedCallback = callback;
+    setParticleCount(particleCount) {
+        if (this.particleCount != particleCount) {
+            this.dispose();
+            this.allocate(particleCount);
+        }
+        this.particleCount = particleCount;
     }
 
     allocate(particleCount) {
@@ -91,18 +97,6 @@ export class ParticleStateArray {
     }
 
     dispose() {
-    }
-
-    setParticleCount(particleCount) {
-        if (this.particleCount != particleCount) {
-            const oldParticleCount = this.particleCount;
-            this.dispose();
-            this.allocate(particleCount);
-            if (this.onParticleCountChangedCallback) {
-                this.onParticleCountChangedCallback(oldParticleCount, particleCount);
-            }
-        }
-        this.particleCount = particleCount;
     }
 
     getParticleCount() {
@@ -121,15 +115,18 @@ export class ParticleStateArray {
         destParticleState = this.particleStates[destIndex];
 
         srcParticleState.copyTo(destParticleState);
-
-        if (this.onParticleStateCopiedCallback) {
-            this.onParticleStateCopiedCallback(srcIndex, destIndex);
-        }
     }
 
-    getState(index) {
+    setParticleState(index, state) {
         if (index >= this.particleCount) {
-            throw new Error('ParticleStateArrayBase::getState() -> "index" is out of range.');
+            throw new Error('ParticleStateArrayBase::setParticleState() -> "index" is out of range.');
+        }
+        return this.particleStates[index].copy(state);
+    }
+
+    getParticleState(index) {
+        if (index >= this.particleCount) {
+            throw new Error('ParticleStateArrayBase::getParticleState() -> "index" is out of range.');
         }
         return this.particleStates[index];
     }

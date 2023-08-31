@@ -1,9 +1,9 @@
-export class ParticleStateAttributeArray {
+import { ParticleStateArray } from '../ParticleState.js';
 
-    constructor(stateArray) {
-        this.stateArray = stateArray;
-        this.stateArray.onParticleCountChanged(this.onParticleCountChanged.bind(this));
-        this.stateArray.onParticleStateCopied(this.onParticleStateCopied.bind(this));
+export class ParticleStateAttributeArray extends ParticleStateArray {
+
+    constructor() {
+        super();
         this.verticesPerParticles = 6;
         this.vertexCount = 0;
         this.geometry = null;
@@ -21,18 +21,15 @@ export class ParticleStateAttributeArray {
         this.colors = null;
         this.initialSizes = null;
         this.initialColors = null;
-
-        this.onParticleCountChanged(0, this.stateArray.particleCount);
     }
 
-    onParticleCountChanged(oldCount, newCount) {
-        this.deallocate();
+    init(particleCount) {
+        super.init(particleCount);
+    }
+
+    setParticleCount(particleCount) {
+        super.setParticleCount(particleCount);
         this.vertexCount = newCount * this.verticesPerParticles;
-        this.allocate();
-    }
-
-    onParticleStateCopied(srcIndex, destIndex) {
-        this.copyParticleState(srcIndex, destIndex);
     }
 
     flushParticleStateToBuffers(index) {
@@ -41,27 +38,42 @@ export class ParticleStateAttributeArray {
         }
         particleState = this.stateArray.getState(index);
 
-        this.progressTypes.setX(index, particleState.progressType);
-        this.lifetimes.setX(index, particleState.lifetime);
-        this.ages.setX(index, particleState.age);
-        this.sequenceElements.setXYZW(index, particleState.sequenceElement.x, particleState.sequenceElement.y,
-                                             particleState.sequenceElement.z, particleState.sequenceElement.w);
-        this.positions.setXYZ(index, particleState.position.x, particleState.position.y, particleState.position.z);
-        this.velocities.setXYZ(index, particleState.velocity.x, particleState.velocity.y, particleState.velocity.z);
-        this.accelerations.setXYZ(index, particleState.acceleration.x,
-                                  particleState.acceleration.y, particleState.acceleration.z);
-        this.normals.setXYZ(index, particleState.normal.x, particleState.normal.y, particleState.normal.z);
-        this.rotations.setX(index, particleState.rotation);
-        this.rotationalSpeeds.setX(index, particleState.rotationalSpeed);
-        this.sizes.setXY(index, particleState.size.x, particleState.size.y);
-        this.color.setXYZ(index, particleState.color.r, particleState.color.g, particleState.color.b);
-        this.alphas.setX(index, particleState.alpha);
-        this.initialSizes.setXY(index, particleState.initialSize.x, particleState.initialSize.y);
-        this.initialAlphas.setX(index, particleState.initialAlpha);
+        const offset = index * this.verticesPerParticles;
+
+        for (let i = 0; i < this.vertexCount; i++) {
+            this.progressTypes.setX(offset + i, particleState.progressType);
+            this.lifetimes.setX(offset + i, particleState.lifetime);
+            this.ages.setX(offset + i, particleState.age);
+            this.sequenceElements.setXYZW(offset + i, particleState.sequenceElement.x, particleState.sequenceElement.y,
+                                                      particleState.sequenceElement.z, particleState.sequenceElement.w);
+            this.positions.setXYZ(offset + i, particleState.position.x,
+                                  particleState.position.y, particleState.position.z);
+            this.velocities.setXYZ(offset + i, particleState.velocity.x,
+                                   particleState.velocity.y, particleState.velocity.z);
+            this.accelerations.setXYZ(offset + i, particleState.acceleration.x,
+                                                  particleState.acceleration.y, particleState.acceleration.z);
+            this.normals.setXYZ(offset + i, particleState.normal.x, particleState.normal.y, particleState.normal.z);
+            this.rotations.setX(offset + i, particleState.rotation);
+            this.rotationalSpeeds.setX(offset + i, particleState.rotationalSpeed);
+            this.sizes.setXY(offset + i, particleState.size.x, particleState.size.y);
+            this.color.setXYZ(offset + i, particleState.color.r, particleState.color.g, particleState.color.b);
+            this.alphas.setX(offset + i, particleState.alpha);
+            this.initialSizes.setXY(offset + i, particleState.initialSize.x, particleState.initialSize.y);
+            this.initialAlphas.setX(offset + i, particleState.initialAlpha);
+        }
     }
 
     copyParticleState(srcIndex, destIndex) {
+        super.copyParticleState(srcIndex, destIndex);
         this.flushParticleStateToBuffers(destIndex);
+    }
+
+    setParticleState(index, state) {
+        if (index >= this.particleCount) {
+            throw new Error('ParticleStateAttributeArray::setParticleState() -> "index" is out of range.');
+        }
+        super.setParticleState(index, state);
+        this.flushParticleStateToBuffers(index);
     }
 
     getPositions() {
@@ -84,7 +96,9 @@ export class ParticleStateAttributeArray {
         return this.colors;
     }
 
-    allocate() {
+    allocate(particleCount) {
+
+        super.allocate(particleCount);
 
         this.particleGeometry = new THREE.BufferGeometry();
 
@@ -171,6 +185,7 @@ export class ParticleStateAttributeArray {
     }
 
     deallocate() {
+        super.deallocate();
         this.particleGeometry.dispose();
         this.particleGeometry = null;
     }
