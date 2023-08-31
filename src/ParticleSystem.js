@@ -1,4 +1,4 @@
-import { ParticleStateAttributeArray } from './ParticleState.js';
+import { ParticleStateArray } from './ParticleState.js';
 import { ParticleSequenceGroup } from './ParticleSequenceGroup.js';
 
 export class ParticleSystemState {
@@ -24,8 +24,7 @@ export class ParticleSystem {
         this.emitter = null;
         this.particleStateInitializers = [];
         this.particleStateOperators = [];
-        this.particleStates = new ParticleStateAttributeArray(this.maxAxtiveParticles);
-        this.particleStates.setParticleCount(this.maxAxtiveParticles);
+        this.particleStates = new ParticleStateArray(this.maxAxtiveParticles);
         this.systemState = ParticleSystemState.NotStarted;
         this.particleSequences = new ParticleSequenceGroup();
     }
