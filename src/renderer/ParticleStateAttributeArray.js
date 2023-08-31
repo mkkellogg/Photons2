@@ -96,6 +96,10 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         return this.colors;
     }
 
+    getGeometry() {
+        return this.geometry;
+    }
+
     allocate(particleCount) {
 
         super.allocate(particleCount);
@@ -184,8 +188,8 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         this.particleGeometry.setAttribute('initialAlpha', initialAlphas);
     }
 
-    deallocate() {
-        super.deallocate();
+    dispose() {
+        super.dispose();
         this.particleGeometry.dispose();
         this.particleGeometry = null;
     }

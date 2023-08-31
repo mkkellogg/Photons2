@@ -15,9 +15,10 @@ export class ParticleSystemState {
 
 export class ParticleSystem {
 
-    constructor(owner, ParticleStateArrayClass) {
-        ParticleStateArrayClass = ParticleStateArrayClass || ParticleStateArray;
+    constructor(owner, renderer) {
         this.owner = owner;
+        this.renderer = renderer;
+        this.initialized = false;
         this.maxActiveParticles = 0;
         this.activeParticleCount = 0;
         this.simulateInWorldSpace = true;
@@ -25,15 +26,25 @@ export class ParticleSystem {
         this.emitter = null;
         this.particleStateInitializers = [];
         this.particleStateOperators = [];
-        this.particleStates = new ParticleStateArrayClass();
+        this.particleStates = null;
         this.systemState = ParticleSystemState.NotStarted;
         this.particleSequences = new ParticleSequenceGroup();
         this.onUpdateCallback = null;
     }
 
     init(maxActiveParticles) {
-        this.maxActiveParticles = maxActiveParticles;
-        this.particleStates.init(this.maxActiveParticles);
+        if (!this.initialized) {
+            this.maxActiveParticles = maxActiveParticles;
+            if (this.renderer) {
+                this.renderer.init(this.maxActiveParticles);
+                this.particleStates = this.renderer.getParticleStateArray();
+            } else {
+                this.particleStates = new ParticleStateArray();
+                this.particleStates.init(this.maxActiveParticles);
+            }
+        } else {
+            throw new Error('ParticleSystem::init() -> trying to intialize more than once.');
+        }
     }
 
     onUpdate(callback) {
