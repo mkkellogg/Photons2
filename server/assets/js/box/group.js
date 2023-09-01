@@ -1,4 +1,4 @@
-import * as THREE from '../three.module.min.js';
+import * as THREE from 'three';
 import * as InnerBox from './inner/mesh.js';
 import * as InnerBoxWireframe from './wireframe/mesh.js';
 import * as OuterBox from './outer/mesh.js';

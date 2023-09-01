@@ -1,6 +1,6 @@
 import * as SceneSetup from './utils/sceneSetup.js';
 import * as ReactCube from './box/group.js';
-//import * as Photons from '../lib/photons.module.js';
+import * as Photons from '../lib/photons.module.js';
 import * as THREE from 'three';
 
 /* Define DOM elements */
@@ -104,7 +104,5 @@ const animate = () => {
     renderer.render(scene, camera);
 };
 
-export function main () {
-    appendContent();
-    initThreeJS().then(() => animate());
-}
+appendContent();
+initThreeJS().then(() => animate());

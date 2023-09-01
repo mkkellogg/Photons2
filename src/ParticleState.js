@@ -2,8 +2,8 @@ import * as THREE from 'three';
 
 export class ParticleStateProgressType {
 
-    static Time = new ParticleSystemState('Time');
-    static Sequence = new ParticleSystemState('Sequence');
+    static Time = new ParticleStateProgressType('Time');
+    static Sequence = new ParticleStateProgressType('Sequence');
 
     constructor(name) {
         this.name = name;
