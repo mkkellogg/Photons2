@@ -103,12 +103,12 @@ export class ParticleStateArray {
         return this.particleCount;
     }
 
-    copyParticleState(srcIndex, destIndex) {
+    copyState(srcIndex, destIndex) {
         if (srcIndex >= this.particleCount) {
-            throw new Error('ParticleStateAttributeArray::copyParticleState() -> "srcIndex" is out of range.');
+            throw new Error('ParticleStateAttributeArray::copyState() -> "srcIndex" is out of range.');
         }
         if (destIndex >= this.particleCount) {
-            throw new Error('ParticleStateAttributeArray::copyParticleState() -> "destIndex" is out of range.');
+            throw new Error('ParticleStateAttributeArray::copyState() -> "destIndex" is out of range.');
         }
 
         srcParticleState = this.particleStates[srcIndex];
@@ -117,16 +117,16 @@ export class ParticleStateArray {
         srcParticleState.copyTo(destParticleState);
     }
 
-    setParticleState(index, state) {
+    setState(index, state) {
         if (index >= this.particleCount) {
-            throw new Error('ParticleStateArrayBase::setParticleState() -> "index" is out of range.');
+            throw new Error('ParticleStateArrayBase::setState() -> "index" is out of range.');
         }
         return this.particleStates[index].copy(state);
     }
 
-    getParticleState(index) {
+    getState(index) {
         if (index >= this.particleCount) {
-            throw new Error('ParticleStateArrayBase::getParticleState() -> "index" is out of range.');
+            throw new Error('ParticleStateArrayBase::getState() -> "index" is out of range.');
         }
         return this.particleStates[index];
     }

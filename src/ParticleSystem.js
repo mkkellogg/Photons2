@@ -1,5 +1,6 @@
 import { ParticleStateArray } from './ParticleState.js';
 import { ParticleSequenceGroup } from './ParticleSequenceGroup.js';
+import * as Utils from './utils/utils.js';
 
 export class ParticleSystemState {
 
@@ -154,7 +155,64 @@ export class ParticleSystem {
         return this.emitter;
     }
 
-    advanceActiveParticles(timeDelta) {
-
+    activateParticles(particleCount) {
+        newActiveParticleCount = Utils.clamp(this.activeParticleCount + particleCount, 0, this.maximumActiveParticles);
+        for (let i = this.activeParticleCount; i < newActiveParticleCount; i++) {
+            this.activateParticle(i);
+        }
+        this.activeParticleCount = newActiveParticleCount;
     }
+
+    activateParticle = function() {
+
+        const worldPosition = new THREE.Vector4();
+        const worldPosition3 = new THREE.Vector3();
+
+        return function(index) {
+            const particleState = this.particleStates.getState(index);
+            particleState.age = 0.0;
+            for (let i = 0; i < this.particleStateInitializers.size(); i++) {
+                const particleStateInitializer = this.particleStateInitializers[i];
+                particleStateInitializer.initializeState(particleState);
+            }
+
+            worldPosition.set(0, 0, 0, 1).applyMatrix4(this.owner.matrixWorld);
+            worldPosition3.set(worldPosition.x, worldPosition.y, worldPosition.z);
+            if (this.simulateInWorldSpace) paricleState.position.add(worldPosition3);
+        };
+
+    }();
+
+    advanceActiveParticles(timeDelta) {
+        let i = 0;
+        while (i < this.activeParticleCount) {
+            const particleIsActive = this.advanceActiveParticle(i, timeDelta);
+            if (!particleIsActive) {
+                if (i < this.activeParticleCount - 1) {
+                    this.copyParticleInArray(this.activeParticleCount - 1, i);
+                }
+                this.activeParticleCount--;
+                continue;
+            }
+            i++;
+        }
+    }
+
+    advanceActiveParticle(index, timeDelta) {
+        const particleState = this.particleStates.getState(index);
+        for (let i = 0; i < this.particleStateOperators.length; i++) {
+            const particleStateOperator = this.particleStateOperators[i];
+            const stillAlive = particleStateOperator.updateState(statePtr, timeDelta);
+            const particleLifeTime = particleState.lifetime;
+            if (!stillAlive || particleLifeTime != 0.0 && particleState.age >= particleLifeTime) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    copyParticleInArray(srcIndex, destIndex) {
+        this.particleStates.copyState(srcIndex, destIndex);
+    }
+
 }

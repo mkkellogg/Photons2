@@ -63,16 +63,16 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         }
     }
 
-    copyParticleState(srcIndex, destIndex) {
-        super.copyParticleState(srcIndex, destIndex);
+    copyState(srcIndex, destIndex) {
+        super.copyState(srcIndex, destIndex);
         this.flushParticleStateToBuffers(destIndex);
     }
 
-    setParticleState(index, state) {
+    setState(index, state) {
         if (index >= this.particleCount) {
-            throw new Error('ParticleStateAttributeArray::setParticleState() -> "index" is out of range.');
+            throw new Error('ParticleStateAttributeArray::setState() -> "index" is out of range.');
         }
-        super.setParticleState(index, state);
+        super.setState(index, state);
         this.flushParticleStateToBuffers(index);
     }
 
