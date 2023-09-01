@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { BuiltinType } from './BuiltIn.js';
-import { Utils } from '../Utils.js';
+import { Utils } from '../util/Utils.js';
 
 export class ContinuousArray {
 

@@ -1,6 +1,6 @@
 import { ParticleStateArray } from './ParticleState.js';
 import { ParticleSequenceGroup } from './ParticleSequenceGroup.js';
-import * as Utils from './utils/utils.js';
+import { Utils } from './util/Utils.js';
 
 export class ParticleSystemState {
 

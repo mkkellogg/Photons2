@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Renderer } from '../Renderer.js';
+import { Renderer } from './Renderer.js';
 import { ParticleStateAttributeArray } from './ParticleStateAttributeArray.js';
 
 export class AnimatedSpriteRenderer extends Renderer {

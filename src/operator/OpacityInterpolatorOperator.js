@@ -1,4 +1,4 @@
-import { InterpolatorOperator } from 'InterpolatorOperator.js';
+import { InterpolatorOperator } from './InterpolatorOperator.js';
 
 export class OpacityInterpolatorOperator extends InterpolatorOperator {
 
