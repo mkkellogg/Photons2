@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { ParticleStateArray } from '../ParticleState.js';
 
 export class ParticleStateAttributeArray extends ParticleStateArray {
@@ -25,11 +26,12 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
 
     init(particleCount) {
         super.init(particleCount);
+        this.allocate(particleCount);
     }
 
     setParticleCount(particleCount) {
         super.setParticleCount(particleCount);
-        this.vertexCount = newCount * this.verticesPerParticles;
+        this.vertexCount = particleCount * this.verticesPerParticles;
     }
 
     flushParticleStateToBuffers(index) {
@@ -104,7 +106,7 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
 
         super.allocate(particleCount);
 
-        this.particleGeometry = new THREE.BufferGeometry();
+        this.geometry = new THREE.BufferGeometry();
 
         const progressTypesArray = new Float32Array(this.vertexCount);
         const lifetimesArray = new Float32Array(this.vertexCount);
@@ -125,72 +127,74 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
 
         this.progressTypes = new THREE.BufferAttribute(progressTypesArray, 1);
         this.progressTypes.dynamic = true;
-        this.particleGeometry.setAttribute('progressType', this.progressTypes);
+        this.geometry.setAttribute('progressType', this.progressTypes);
 
         this.lifetimes = new THREE.BufferAttribute(lifetimesArray, 1);
         this.lifetimes.dynamic = true;
-        this.particleGeometry.setAttribute('lifetime', this.lifetimes);
+        this.geometry.setAttribute('lifetime', this.lifetimes);
 
         this.ages = new THREE.BufferAttribute(agesArray, 1);
         this.ages.dynamic = true;
-        this.particleGeometry.setAttribute('age', this.ages);
+        this.geometry.setAttribute('age', this.ages);
 
         this.sequenceElements = new THREE.BufferAttribute(sequenceElementsArray, 4);
         this.sequenceElements.dynamic = true;
-        this.particleGeometry.setAttribute('sequenceElement', this.sequenceElements);
+        this.geometry.setAttribute('sequenceElement', this.sequenceElements);
 
         this.positions = new THREE.BufferAttribute(positionsArray, 3);
         this.positions.dynamic = true;
-        this.particleGeometry.setAttribute('position', this.positions);
+        this.geometry.setAttribute('position', this.positions);
 
         this.velocities = new THREE.BufferAttribute(velocitiesArray, 3);
         this.velocities.dynamic = true;
-        this.particleGeometry.setAttribute('velocity', this.velocities);
+        this.geometry.setAttribute('velocity', this.velocities);
 
         this.accelerations = new THREE.BufferAttribute(accelerationsArray, 3);
         this.accelerations.dynamic = true;
-        this.particleGeometry.setAttribute('acceleration', this.accelerations);
+        this.geometry.setAttribute('acceleration', this.accelerations);
 
         this.normals = new THREE.BufferAttribute(normalsArray, 3);
         this.normals.dynamic = true;
-        this.particleGeometry.setAttribute('normal', this.normals);
+        this.geometry.setAttribute('normal', this.normals);
 
         this.rotations = new THREE.BufferAttribute(rotationsArray, 1);
         this.rotations.dynamic = true;
-        this.particleGeometry.setAttribute('rotation', this.rotations);
+        this.geometry.setAttribute('rotation', this.rotations);
 
         this.rotationalSpeeds = new THREE.BufferAttribute(rotationalSpeedsArray, 1);
         this.rotationalSpeeds.dynamic = true;
-        this.particleGeometry.setAttribute('rotationalSpeed', this.rotationalSpeeds);
+        this.geometry.setAttribute('rotationalSpeed', this.rotationalSpeeds);
 
         this.sizes = new THREE.BufferAttribute(sizesArray, 2);
         this.sizes.dynamic = true;
-        this.particleGeometry.setAttribute('size', sizes);
+        this.geometry.setAttribute('size', this.sizes);
 
         this.colors = new THREE.BufferAttribute(colorsArray, 3);
         this.colors.dynamic = true;
-        this.particleGeometry.setAttribute('color', colors);
+        this.geometry.setAttribute('color', this.colors);
 
         this.alphas = new THREE.BufferAttribute(alphasArray, 1);
         this.alphas.dynamic = true;
-        this.particleGeometry.setAttribute('alpha', alphas);
+        this.geometry.setAttribute('alpha', this.alphas);
 
         this.initialSizes = new THREE.BufferAttribute(initialSizesArray, 2);
         this.initialSizes.dynamic = true;
-        this.particleGeometry.setAttribute('initialSize', initialSizes);
+        this.geometry.setAttribute('initialSize', this.initialSizes);
 
         this.initialColors = new THREE.BufferAttribute(initialColorsArray, 3);
         this.initialColors.dynamic = true;
-        this.particleGeometry.setAttribute('initialColor', initialColors);
+        this.geometry.setAttribute('initialColor', this.initialColors);
 
         this.initialAlphas = new THREE.BufferAttribute(initialAlphasArray, 1);
         this.initialAlphas.dynamic = true;
-        this.particleGeometry.setAttribute('initialAlpha', initialAlphas);
+        this.geometry.setAttribute('initialAlpha', this.initialAlphas);
     }
 
     dispose() {
         super.dispose();
-        this.particleGeometry.dispose();
-        this.particleGeometry = null;
+        if (this.geometry) {
+            this.geometry.dispose();
+            this.geometry = null;
+        }
     }
 }

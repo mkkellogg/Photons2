@@ -90,6 +90,11 @@ const initThreeJS = async () => {
 
     /* Append canvas to DOM */
     rootElement.appendChild(renderer.domElement);
+
+    let flameRoot = new THREE.Object3D();
+    let flameRenderer = new Photons.AnimatedSpriteRenderer();
+    let flame = new Photons.ParticleSystem(flameRoot, flameRenderer, renderer);
+    flame.init(250);
 };
 
 const animate = () => {

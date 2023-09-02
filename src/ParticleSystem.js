@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { ParticleStateArray } from './ParticleState.js';
 import { ParticleSequenceGroup } from './ParticleSequenceGroup.js';
 import { Utils } from './util/Utils.js';
@@ -16,9 +17,10 @@ export class ParticleSystemState {
 
 export class ParticleSystem {
 
-    constructor(owner, renderer) {
+    constructor(owner, particleSystemRenderer, threeRenderer) {
         this.owner = owner;
-        this.renderer = renderer;
+        this.particleSystemRenderer = particleSystemRenderer;
+        this.threeRenderer = threeRenderer;
         this.initialized = false;
         this.maxActiveParticles = 0;
         this.activeParticleCount = 0;
@@ -36,9 +38,9 @@ export class ParticleSystem {
     init(maxActiveParticles) {
         if (!this.initialized) {
             this.maxActiveParticles = maxActiveParticles;
-            if (this.renderer) {
-                this.renderer.init(this.maxActiveParticles);
-                this.particleStates = this.renderer.getParticleStateArray();
+            if (this.particleSystemRenderer) {
+                this.particleSystemRenderer.init(this.maxActiveParticles);
+                this.particleStates = this.particleSystemRenderer.getParticleStateArray();
             } else {
                 this.particleStates = new ParticleStateArray();
                 this.particleStates.init(this.maxActiveParticles);

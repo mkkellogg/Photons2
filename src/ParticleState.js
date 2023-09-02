@@ -12,11 +12,8 @@ export class ParticleStateProgressType {
 
 export class ParticleState {
 
-    constructor(progressType, lifetime, age, sequenceElement, position, velocity, acceleration,
-                normal, rotation, rotationalSpeed, size, color, alpha, initialSize, initialColor, initialAlpha) {
+    constructor() {
         this.init();
-        this.setAll(progressType, lifetime, age, sequenceElement, position, velocity, acceleration,
-                    normal, rotation, rotationalSpeed, size, color, alpha, initialSize, initialColor, initialAlpha);
     }
 
     init() {
