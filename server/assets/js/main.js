@@ -5,7 +5,6 @@ import * as THREE from 'three';
 
 /* Define DOM elements */
 const rootElement = document.querySelector('#root');
-const contentElement = document.querySelector('#content-wrapper');
 
 /* Define Three variables */
 let camera;
@@ -15,28 +14,11 @@ let renderer;
 let aspectHeight;
 let aspectWidth;
 let gridHelper;
-
-const appendContent = () => {
-    // Create Webpack SVG logo node
-    const webpackLogo = document.createElement('img');
-    webpackLogo.src = 'assets/images/logos/webpack-logo.svg';
-
-    // Create Three.js PNG logo node
-    const threeLogo = document.createElement('img');
-    threeLogo.src = 'assets/images/logos/three-icon.png';
-
-    // Create heading node
-    const greeting = document.createElement('h1');
-    greeting.textContent = 'Three.js Webpack boilerplate';
-
-    // Append logos and heading nodes to the content DOM element
-    contentElement.querySelector('#logo-wrapper').append(threeLogo, webpackLogo);
-    contentElement.append(greeting);
-};
+let flame;
 
 const onResize = () => {
     aspectWidth = window.innerWidth;
-    aspectHeight = window.innerHeight - contentElement.getBoundingClientRect().bottom;
+    aspectHeight = window.innerHeight - rootElement.getBoundingClientRect().bottom;
     camera.aspect = aspectWidth / aspectHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(aspectWidth, aspectHeight);
@@ -45,7 +27,7 @@ const onResize = () => {
 const initThreeJS = async () => {
     /* Define aspect */
     aspectWidth = window.innerWidth;
-    aspectHeight = window.innerHeight - contentElement.getBoundingClientRect().bottom;
+    aspectHeight = window.innerHeight - rootElement.getBoundingClientRect().bottom;
 
     /* Define camera */
     camera = SceneSetup.camera(aspectWidth, aspectHeight);
@@ -67,7 +49,7 @@ const initThreeJS = async () => {
     scene.add(gridHelper);
 
     /* Add react cube to scene */
-    scene.add(await ReactCube.group());
+   // scene.add(await ReactCube.group());
 
     /* Define renderer */
     renderer = SceneSetup.renderer({
@@ -93,7 +75,7 @@ const initThreeJS = async () => {
 
     let flameRoot = new THREE.Object3D();
     let flameRenderer = new Photons.AnimatedSpriteRenderer();
-    let flame = new Photons.ParticleSystem(flameRoot, flameRenderer, renderer);
+    flame = new Photons.ParticleSystem(flameRoot, flameRenderer, renderer);
     flame.init(250);
 };
 
@@ -105,9 +87,12 @@ const animate = () => {
     /* Update controls when damping */
     controls.update();
 
+    flame.update();
+
     /* Render scene */
     renderer.render(scene, camera);
+
+    flame.render(renderer, camera);
 };
 
-appendContent();
 initThreeJS().then(() => animate());

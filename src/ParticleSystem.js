@@ -17,10 +17,10 @@ export class ParticleSystemState {
 
 export class ParticleSystem {
 
-    constructor(owner, particleSystemRenderer, threeRenderer) {
+    constructor(owner, particleSystemRenderer) {
         this.owner = owner;
+        this.owner.visible = false;
         this.particleSystemRenderer = particleSystemRenderer;
-        this.threeRenderer = threeRenderer;
         this.initialized = false;
         this.maxActiveParticles = 0;
         this.activeParticleCount = 0;
@@ -39,6 +39,7 @@ export class ParticleSystem {
         if (!this.initialized) {
             this.maxActiveParticles = maxActiveParticles;
             if (this.particleSystemRenderer) {
+                this.particleSystemRenderer.setOwner(this.owner);
                 this.particleSystemRenderer.init(this.maxActiveParticles);
                 this.particleStates = this.particleSystemRenderer.getParticleStateArray();
             } else {
@@ -61,6 +62,15 @@ export class ParticleSystem {
             this.advanceActiveParticles(timeDelta);
             if (this.onUpdateCallback) this.onUpdateCallback(this.activeParticleCount);
         }
+    }
+
+    render(threeRenderer, camera) {
+        const saveAutoClear = threeRenderer.autoClear;
+        threeRenderer.autoClear = false;
+        this.owner.visible = true;
+        threeRenderer.render(this.owner, camera);
+        this.owner.visible = false;
+        threeRenderer.autoClear = saveAutoClear;
     }
 
     start() {

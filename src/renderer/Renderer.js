@@ -3,9 +3,14 @@ export class Renderer {
     constructor() {
         this.initialized = false;
         this.particleCount = 0;
+        this.owner = null;
     }
 
     getParticleStateArray() {
+    }
+
+    setOwner(owner) {
+        this.owner = owner;
     }
 
     init(particleCount) {

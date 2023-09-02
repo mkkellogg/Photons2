@@ -11,6 +11,10 @@ export class AnimatedSpriteRenderer extends Renderer {
         this.mesh = null;
     }
 
+    setOwner(owner) {
+        super.setOwner(owner);
+    }
+
     getParticleStateArray() {
         return this.particleStateArray;
     }
@@ -21,6 +25,7 @@ export class AnimatedSpriteRenderer extends Renderer {
             this.particleStateArray.init(particleCount);
             this.material = AnimatedSpriteRenderer.createMaterial(null, null, null, true, false);
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
+            this.owner.add(this.mesh);
         }
     }
 
