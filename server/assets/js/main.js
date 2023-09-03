@@ -82,10 +82,10 @@ const initThreeJS = async () => {
     flameParticleSystem.addParticleStateOperator(Photons.BaseParticleStateOperator);
     flameParticleSystem.addParticleStateInitializer(Photons.BaseParticleStateInitializer);
 
-    flameParticleSystem.init(250);
+    flameParticleSystem.init(50);
 
     const flameEmitter = flameParticleSystem.setEmitter(Photons.ConstantParticleEmitter);
-    flameEmitter.emissionRate = 5;
+    flameEmitter.emissionRate = 15;
 
     flameParticleSystem.addParticleSequence(0, 18);
     const flameParticleSequences = flameParticleSystem.getParticleSequences();
@@ -93,8 +93,13 @@ const initThreeJS = async () => {
     const lifetimeInitializerGenerator = new Photons.RandomGenerator(0, 0.0, 0.0, 0.0, 0.0, false);
     flameParticleSystem.addParticleStateInitializer(Photons.LifetimeInitializer, lifetimeInitializerGenerator);
 
+    const rotationInitializerGenerator = new Photons.RandomGenerator(0, Math.PI / 2.0, -Math.PI / 2.0, 0.0, 0.0, false);
+    flameParticleSystem.addParticleStateInitializer(Photons.RotationInitializer, rotationInitializerGenerator);
+
     const rotationalSpeedInitializerGenerator = new Photons.RandomGenerator(0, 1.0, -1.0, 0.0, 0.0, false);
     flameParticleSystem.addParticleStateInitializer(Photons.RotationalSpeedInitializer, rotationalSpeedInitializerGenerator);
+
+    //fire4FlatParticleSystem->addParticleStateInitializer<Core::RotationInitializer>(Core::RandomGenerator<Core::Real>(Core::Math::PI / 2.0f, -Core::Math::PI / 4.0f, false));
 
     const sizeInitializerGenerator = new Photons.RandomGenerator(THREE.Vector2, new THREE.Vector2(0.25  * scale, 0.25 * scale), new THREE.Vector2(0.5 * scale, 0.5 * scale), 0.0, 0.0, false);
     flameParticleSystem.addParticleStateInitializer(Photons.SizeInitializer, sizeInitializerGenerator);

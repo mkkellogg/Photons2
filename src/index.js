@@ -9,6 +9,7 @@ import { ConstantParticleEmitter } from './emitter/ConstantParticleEmitter.js';
 
 import { BaseParticleStateInitializer } from './initializer/BaseParticleStateInitializer.js';
 import { LifetimeInitializer } from './initializer/LifetimeInitializer.js';
+import { RotationInitializer } from './initializer/RotationInitializer.js';
 import { RotationalSpeedInitializer } from './initializer/RotationalSpeedInitializer.js';
 import { BoxPositionInitializer } from './initializer/BoxPositionInitializer.js';
 import { SizeInitializer } from './initializer/SizeInitializer.js';
@@ -33,6 +34,7 @@ export {
     ConstantParticleEmitter,
     BaseParticleStateInitializer,
     LifetimeInitializer,
+    RotationInitializer,
     RotationalSpeedInitializer,
     BoxPositionInitializer,
     SizeInitializer,

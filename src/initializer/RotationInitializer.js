@@ -8,7 +8,7 @@ export class RotationInitializer extends ParticleStateInitializer {
     }
 
     initializeState(state) {
-        this.generator.generate(state.rotation);
+        state.rotation = this.generator.generate(state.rotation);
     }
 
 }
