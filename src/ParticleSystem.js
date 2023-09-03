@@ -22,7 +22,7 @@ export class ParticleSystem {
         this.owner.visible = false;
         this.particleSystemRenderer = particleSystemRenderer;
         this.initialized = false;
-        this.maxActiveParticles = 0;
+        this.maximumActiveParticles = 0;
         this.activeParticleCount = 0;
         this.simulateInWorldSpace = true;
         this.emitterInitialized = false;
@@ -35,33 +35,40 @@ export class ParticleSystem {
         this.onUpdateCallback = null;
     }
 
-    init(maxActiveParticles) {
+    init(maximumActiveParticles) {
         if (!this.initialized) {
-            this.maxActiveParticles = maxActiveParticles;
+            this.maximumActiveParticles = maximumActiveParticles;
             if (this.particleSystemRenderer) {
                 this.particleSystemRenderer.setOwner(this.owner);
-                this.particleSystemRenderer.init(this.maxActiveParticles);
+                this.particleSystemRenderer.init(this.maximumActiveParticles);
                 this.particleStates = this.particleSystemRenderer.getParticleStateArray();
             } else {
                 this.particleStates = new ParticleStateArray();
-                this.particleStates.init(this.maxActiveParticles);
+                this.particleStates.init(this.maximumActiveParticles);
             }
         } else {
             throw new Error('ParticleSystem::init() -> trying to intialize more than once.');
         }
     }
 
+    currentTime() {
+        return performance.now() / 1000;
+    }
+
     onUpdate(callback) {
         this.onUpdateCallback = callback;
     }
 
-    update(timeDelta) {
+    update() {
+        const curTime = this.currentTime();
+        const timeDelta = curTime - this.lastUpdateTime;
         if (this.emitterInitialized && this.systemState == ParticleSystemState.Running) {
             const particlesToEmit = this.particleEmitter.update(timeDelta);
             if (particlesToEmit > 0) this.activateParticles(particlesToEmit);
             this.advanceActiveParticles(timeDelta);
             if (this.onUpdateCallback) this.onUpdateCallback(this.activeParticleCount);
         }
+        this.lastUpdateTime = curTime;
     }
 
     render(threeRenderer, camera) {
@@ -76,6 +83,8 @@ export class ParticleSystem {
     start() {
         if (this.systemState == ParticleSystemState.NotStarted || this.systemState == ParticleSystemState.Paused) {
             this.systemState = ParticleSystemState.Running;
+            this.startTime = this.currentTime();
+            this.lastUpdateTime = this.startTime;
         } else {
             // TODO: Decide how to handle this case
         }
@@ -97,7 +106,7 @@ export class ParticleSystem {
 
     setEmitter(EmitterClass, ...args) {
         this.particleEmitter = new EmitterClass(...args);
-        this.particleEmitter.maxActiveParticles = this.maximumActiveParticles;
+        this.particleEmitter.maximumActiveParticles = this.maximumActiveParticles;
         this.emitterInitialized = true;
         return this.particleEmitter;
     }
@@ -168,11 +177,12 @@ export class ParticleSystem {
     }
 
     activateParticles(particleCount) {
-        newActiveParticleCount = Utils.clamp(this.activeParticleCount + particleCount, 0, this.maximumActiveParticles);
+        const newActiveParticleCount = Utils.clamp(this.activeParticleCount + particleCount, 0, this.maximumActiveParticles);
         for (let i = this.activeParticleCount; i < newActiveParticleCount; i++) {
             this.activateParticle(i);
         }
         this.activeParticleCount = newActiveParticleCount;
+        this.particleStates.setActiveParticleCount(this.activeParticleCount);
     }
 
     activateParticle = function() {
@@ -183,14 +193,15 @@ export class ParticleSystem {
         return function(index) {
             const particleState = this.particleStates.getState(index);
             particleState.age = 0.0;
-            for (let i = 0; i < this.particleStateInitializers.size(); i++) {
+            for (let i = 0; i < this.particleStateInitializers.length; i++) {
                 const particleStateInitializer = this.particleStateInitializers[i];
                 particleStateInitializer.initializeState(particleState);
             }
+            this.particleStates.flushParticleStateToBuffers(index);
 
             worldPosition.set(0, 0, 0, 1).applyMatrix4(this.owner.matrixWorld);
             worldPosition3.set(worldPosition.x, worldPosition.y, worldPosition.z);
-            if (this.simulateInWorldSpace) paricleState.position.add(worldPosition3);
+            if (this.simulateInWorldSpace) particleState.position.add(worldPosition3);
         };
 
     }();
@@ -208,23 +219,26 @@ export class ParticleSystem {
             }
             i++;
         }
+        this.particleStates.setActiveParticleCount(this.activeParticleCount);
     }
 
     advanceActiveParticle(index, timeDelta) {
         const particleState = this.particleStates.getState(index);
         for (let i = 0; i < this.particleStateOperators.length; i++) {
             const particleStateOperator = this.particleStateOperators[i];
-            const stillAlive = particleStateOperator.updateState(statePtr, timeDelta);
+            const stillAlive = particleStateOperator.updateState(particleState, timeDelta);
             const particleLifeTime = particleState.lifetime;
             if (!stillAlive || particleLifeTime != 0.0 && particleState.age >= particleLifeTime) {
                 return false;
             }
         }
+        this.particleStates.flushParticleStateToBuffers(index);
         return true;
     }
 
     copyParticleInArray(srcIndex, destIndex) {
         this.particleStates.copyState(srcIndex, destIndex);
+        this.particleStates.flushParticleStateToBuffers(destIndex);
     }
 
 }

@@ -1,6 +1,6 @@
 import { ParticleStateInitializer } from './ParticleStateInitializer.js';
 
-export class BasicParticleStateInitializer extends ParticleStateInitializer {
+export class BaseParticleStateInitializer extends ParticleStateInitializer {
 
     constructor() {
         super();

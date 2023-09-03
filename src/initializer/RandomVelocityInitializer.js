@@ -6,13 +6,13 @@ export class RandomVelocityInitializer extends ParticleStateInitializer {
 
     constructor(range, offset, speedRange, speedOffset) {
         super();
-        this.directionGenerator = new RandomGenerator(new THREE.Vector3(), range, offset, 0.0, 0.0, true);
+        this.directionGenerator = new RandomGenerator(THREE.Vector3, range, offset, 0.0, 0.0, true);
         this.speedGenerator = new RandomGenerator(0, speedRange, speedOffset, 0.0, 0.0, false);
     }
 
     initializeState(state) {
-        directionGenerator.generate(state.velocity);
-        state.velocity.multiplyScalar(speedGenerator.generate());
+        this.directionGenerator.generate(state.velocity);
+        state.velocity.multiplyScalar(this.speedGenerator.generate());
     }
 
 }

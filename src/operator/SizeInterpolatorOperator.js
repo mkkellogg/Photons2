@@ -4,7 +4,7 @@ import { InterpolatorOperator } from './InterpolatorOperator.js';
 export class SizeInterpolatorOperator extends InterpolatorOperator {
 
     constructor(relativeToInitialValue) {
-        super(new THREE.Vector2(), relativeToInitialValue);
+        super(THREE.Vector2, relativeToInitialValue);
     }
 
     updateState = function() {
@@ -14,8 +14,8 @@ export class SizeInterpolatorOperator extends InterpolatorOperator {
         return function(state) {
             this.getInterpolatedValue(state, tempSize);
             if (this.relativeToInitialValue) {
-                state.size.set(state.initialSize.x * tempSize.r,
-                               state.initialSize.y * tempSize.g);
+                state.size.set(state.initialSize.x * tempSize.x,
+                               state.initialSize.y * tempSize.y);
             } else {
                 state.size.copy(tempSize);
             }

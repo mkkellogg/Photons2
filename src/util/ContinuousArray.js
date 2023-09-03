@@ -96,8 +96,8 @@ export class ContinuousArray {
             return;
         }
         let tValue = 0.0;
-        lowerIndex = -1;
-        upperIndex = 0;
+        let lowerIndex = -1;
+        let upperIndex = 0;
         for (let i = 0; i < tValueCount; i++) {
             tValue = this.tValues[i];
             if (tValue > t) break;

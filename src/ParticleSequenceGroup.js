@@ -7,7 +7,7 @@ export class ParticleSequenceGroup {
         this.ids = [];
     }
 
-    addSequence(id, start, length) {
+    addSequence(start, length, id) {
         if (this.hasID(id)) {
             throw new Error('ParticleSequenceGroup::addParticleSequence -> Tried to add sequence with duplicate ID.');
         }
@@ -22,10 +22,10 @@ export class ParticleSequenceGroup {
         if (!this.hasID(id)) {
             throw new Error('ParticleSequenceGroup::getSequence -> Invalid ID.');
         }
-        return this.particleSequences[id];
+        return this.sequences[id];
     }
 
-    getIDs() {
+    getSequenceIDs() {
         return this.ids;
     }
 

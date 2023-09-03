@@ -1,6 +1,7 @@
+import * as THREE from 'three';
 import { ParticleStateOperator } from './ParticleStateOperator.js';
 
-export class BasicParticleStateOperator extends ParticleStateOperator {
+export class BaseParticleStateOperator extends ParticleStateOperator {
 
     constructor() {
         super();
@@ -14,12 +15,12 @@ export class BasicParticleStateOperator extends ParticleStateOperator {
         super.updateState(state, timeDelta);
         this.stateAcceleration.copy(state.acceleration);
         this.timeScaledAcceleration.copy(this.stateAcceleration);
-        this.timeScaledAcceleration.scale(timeDelta);
+        this.timeScaledAcceleration.multiplyScalar(timeDelta);
         state.velocity.add(this.timeScaledAcceleration);
 
         this.stateVelocity.copy(state.velocity);
         this.timeScaledVelocity.copy(this.stateVelocity);
-        this.timeScaledVelocity.scale(timeDelta);
+        this.timeScaledVelocity.multiplyScalar(timeDelta);
 
         state.position.add(this.timeScaledVelocity);
 

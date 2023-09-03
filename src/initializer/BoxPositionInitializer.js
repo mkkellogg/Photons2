@@ -6,10 +6,10 @@ export class BoxPositionInitializer extends ParticleStateInitializer {
 
     constructor(range, offset) {
         super();
-        this.randomGenerator = new RandomGenerator(new THREE.Vector3(), range, offset, 0.0, 0.0, false);
+        this.randomGenerator = new RandomGenerator(THREE.Vector3, range, offset, 0.0, 0.0, false);
     }
 
     initializeState(state) {
-        randomGenerator.generate(state.position);
+        this.randomGenerator.generate(state.position);
     }
 }

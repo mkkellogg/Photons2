@@ -18,7 +18,7 @@ export class InstantaneousParticleEmitter extends ParticleEmitter {
                 if (this.timeSinceLastBurst >= this.waitTimetBetweenBursts) {
                     this.timeSinceLastBurst -= this.waitTimetBetweenBursts;
                     this.burstCount++;
-                    const toEmitThisFrame = this.burstSize;
+                    const toEmitThisFrame = Math.floor(this.burstSize);
                     this.updateEmitCount(toEmitThisFrame);
                     return toEmitThisFrame;
                 }

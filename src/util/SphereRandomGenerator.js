@@ -4,9 +4,9 @@ import { BuiltinType } from './BuiltIn.js';
 
 export class SphereRandomGenerator extends Generator {
 
-    constructor(rangeTheta, offsetTheta, rangePhi, offsetPhi, rangeRadius, offsetRadius,
+    constructor(outType, rangeTheta, offsetTheta, rangePhi, offsetPhi, rangeRadius, offsetRadius,
                 scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ) {
-        super();
+        super(outType);
         this.rangeTheta = rangeTheta;
         this.offsetTheta = offsetTheta;
         this.rangePhi = rangePhi;
@@ -68,7 +68,7 @@ export class SphereRandomGenerator extends Generator {
     }
 
     clone() {
-        const clone = new SphereRandomGenerator(this.rangeTheta, this.offsetTheta, this.rangePhi, this.offsetPhi,
+        const clone = new SphereRandomGenerator(this.outType, this.rangeTheta, this.offsetTheta, this.rangePhi, this.offsetPhi,
                                                 this.rangeRadius, this.offsetRadius, this.scaleX, this.scaleY,
                                                 this.scaleZ, this.offsetX, this.offsetY, this.offsetZ);
         return clone;

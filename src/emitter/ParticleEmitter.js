@@ -7,7 +7,7 @@ export class ParticleEmitter {
         this.age = 0.0;
         this.timeActive = 0.0;
         this.activeCount = 0;
-        this.maxActiveParticles = 0;
+        this.maximumActiveParticles = 0;
     }
 
     update(timeDelta) {

@@ -13,8 +13,8 @@ export class SequenceOperator extends ParticleStateOperator {
    updateState(state, timeDelta) {
         const sequenceElement = state.sequenceElement;
         const activeSequence = this.particleSequences.getSequence(sequenceElement.y);
-        tdOverS = timeDelta / this.speed;
-        if (reverse) {
+        const tdOverS = timeDelta / this.speed;
+        if (this.reverse) {
             sequenceElement.x -= tdOverS;
             if (sequenceElement.x < activeSequence.start) {
                 sequenceElement.x = activeSequence.start + activeSequence.length;

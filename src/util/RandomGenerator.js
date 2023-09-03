@@ -18,22 +18,21 @@ export class RandomGenerator extends Generator {
             case BuiltinType.Scalar:
                 out = Math.random() * this.range + this.offset;
                 if (this.normalize) out = out < 0 ? -1.0 : 1.0;
-                return 0;
             break;
             case BuiltinType.Vector2:
-                out.set(generateForElement(uniformRange, 'x'),
-                        generateForElement(uniformRange, 'y'));
+                out.set(this.generateForElement(uniformRange, 'x'),
+                        this.generateForElement(uniformRange, 'y'));
             break;
             case BuiltinType.Vector3:
-                out.set(generateForElement(uniformRange, 'x'),
-                        generateForElement(uniformRange, 'y'),
-                        generateForElement(uniformRange, 'z'));
+                out.set(this.generateForElement(uniformRange, 'x'),
+                        this.generateForElement(uniformRange, 'y'),
+                        this.generateForElement(uniformRange, 'z'));
             break;
             case BuiltinType.Vector4:
-                out.set(generateForElement(uniformRange, 'x'),
-                        generateForElement(uniformRange, 'y'),
-                        generateForElement(uniformRange, 'z'),
-                        generateForElement(uniformRange, 'w'));
+                out.set(this.generateForElement(uniformRange, 'x'),
+                        this.generateForElement(uniformRange, 'y'),
+                        this.generateForElement(uniformRange, 'z'),
+                        this.generateForElement(uniformRange, 'w'));
             break;
         }
 
@@ -46,8 +45,8 @@ export class RandomGenerator extends Generator {
     }
 
     clone() {
-        const clone = new RandomGenerator<T>(this.range, this.offset, this.uniformRange,
-                                             this.uniformOffset, this.normalize);
+        const clone = new RandomGenerator(this.outType, this.range, this.offset, this.uniformRange,
+                                          this.uniformOffset, this.normalize);
         return clone;
     }
 

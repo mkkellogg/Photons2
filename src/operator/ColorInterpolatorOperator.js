@@ -4,7 +4,7 @@ import { InterpolatorOperator } from './InterpolatorOperator.js';
 export class ColorInterpolatorOperator extends InterpolatorOperator {
 
     constructor(relativeToInitialValue) {
-        super(new THREE.Color(), relativeToInitialValue);
+        super(THREE.Color, relativeToInitialValue);
     }
 
     updateState = function() {

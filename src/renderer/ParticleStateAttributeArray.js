@@ -34,34 +34,71 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         this.vertexCount = particleCount * this.verticesPerParticles;
     }
 
+    setActiveParticleCount(activeParticleCount) {
+        super.setActiveParticleCount(activeParticleCount);
+        if (activeParticleCount > 0 ) 
+            this.geometry.setDrawRange(0, this.verticesPerParticles * activeParticleCount);
+        else
+            this.geometry.setDrawRange(0, 0);
+    }
+
     flushParticleStateToBuffers(index) {
-        if (index >= this.stateArray.particleCount) {
+        if (index >= this.particleCount) {
             throw new Error('ParticleStateAttributeArray::flushParticleStateToBuffers() -> "index" is out of range.');
         }
-        particleState = this.stateArray.getState(index);
+        const particleState = this.getState(index);
 
         const offset = index * this.verticesPerParticles;
 
-        for (let i = 0; i < this.vertexCount; i++) {
-            this.progressTypes.setX(offset + i, particleState.progressType);
+        for (let i = 0; i < this.verticesPerParticles; i++) {
+            //this.progressTypes.setX(offset + i, particleState.progressType);
+           // this.progressTypes.needsUpdate = true;
+
             this.lifetimes.setX(offset + i, particleState.lifetime);
+            this.lifetimes.needsUpdate = true;
+
             this.ages.setX(offset + i, particleState.age);
+            this.ages.needsUpdate = true;
+
             this.sequenceElements.setXYZW(offset + i, particleState.sequenceElement.x, particleState.sequenceElement.y,
                                                       particleState.sequenceElement.z, particleState.sequenceElement.w);
+            this.sequenceElements.needsUpdate = true;
+
             this.positions.setXYZ(offset + i, particleState.position.x,
                                   particleState.position.y, particleState.position.z);
+            this.positions.needsUpdate = true;
+
             this.velocities.setXYZ(offset + i, particleState.velocity.x,
                                    particleState.velocity.y, particleState.velocity.z);
+            this.velocities.needsUpdate = true;
+
             this.accelerations.setXYZ(offset + i, particleState.acceleration.x,
-                                                  particleState.acceleration.y, particleState.acceleration.z);
+                                      particleState.acceleration.y, particleState.acceleration.z);
+            this.accelerations.needsUpdate = true;
+
             this.normals.setXYZ(offset + i, particleState.normal.x, particleState.normal.y, particleState.normal.z);
+            this.normals.needsUpdate = true;
+
             this.rotations.setX(offset + i, particleState.rotation);
+            this.rotations.needsUpdate = true;
+
             this.rotationalSpeeds.setX(offset + i, particleState.rotationalSpeed);
+            this.rotationalSpeeds.needsUpdate = true;
+
             this.sizes.setXY(offset + i, particleState.size.x, particleState.size.y);
-            this.color.setXYZ(offset + i, particleState.color.r, particleState.color.g, particleState.color.b);
+            this.sizes.needsUpdate = true;
+
+            this.colors.setXYZ(offset + i, particleState.color.r, particleState.color.g, particleState.color.b);
+            this.colors.needsUpdate = true;
+
             this.alphas.setX(offset + i, particleState.alpha);
+            this.alphas.needsUpdate = true;
+
             this.initialSizes.setXY(offset + i, particleState.initialSize.x, particleState.initialSize.y);
+            this.initialSizes.needsUpdate = true;
+
             this.initialAlphas.setX(offset + i, particleState.initialAlpha);
+            this.initialAlphas.needsUpdate = true;
         }
     }
 
@@ -107,6 +144,9 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         super.allocate(particleCount);
 
         this.geometry = new THREE.BufferGeometry();
+        this.geometry.onUploadCallback = () => {
+            console.log("updated")
+        };
 
         const progressTypesArray = new Float32Array(this.vertexCount);
         const lifetimesArray = new Float32Array(this.vertexCount);
@@ -124,10 +164,11 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         const initialSizesArray = new Float32Array(this.vertexCount * 2);
         const initialColorsArray = new Float32Array(this.vertexCount * 3);
         const initialAlphasArray = new Float32Array(this.vertexCount);
+        const customIndexesArray = new Float32Array(this.vertexCount);
 
-        this.progressTypes = new THREE.BufferAttribute(progressTypesArray, 1);
-        this.progressTypes.dynamic = true;
-        this.geometry.setAttribute('progressType', this.progressTypes);
+        //this.progressTypes = new THREE.BufferAttribute(progressTypesArray, 1);
+        //this.progressTypes.dynamic = true;
+        //this.geometry.setAttribute('progressType', this.progressTypes);
 
         this.lifetimes = new THREE.BufferAttribute(lifetimesArray, 1);
         this.lifetimes.dynamic = true;
@@ -188,6 +229,34 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         this.initialAlphas = new THREE.BufferAttribute(initialAlphasArray, 1);
         this.initialAlphas.dynamic = true;
         this.geometry.setAttribute('initialAlpha', this.initialAlphas);
+
+        this.customIndexes = new THREE.BufferAttribute(customIndexesArray, 1);
+        this.customIndexes.dynamic = true;
+        this.geometry.setAttribute('customIndex', this.customIndexes);
+        this.customIndexes.needsUpdate = true;
+
+        /*
+
+        Billboard vertex order
+
+        0    3
+        *----*
+        |    |
+        |    |
+        *----*
+        1    2
+
+        */
+
+        for (let p = 0; p < this.particleCount; p++) {
+            const offset = p * this.verticesPerParticles;
+            this.customIndexes.setX(offset, 0);
+            this.customIndexes.setX(offset + 1, 1);
+            this.customIndexes.setX(offset + 2, 3);
+            this.customIndexes.setX(offset + 3, 1);
+            this.customIndexes.setX(offset + 4, 2);
+            this.customIndexes.setX(offset + 5, 3);
+        }
     }
 
     dispose() {

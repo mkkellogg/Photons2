@@ -10,7 +10,7 @@
     "author": "Mark Kellogg",
     "type": "module",
     "scripts": {
-        "build-server": "mkdir -p ./build/server && cp -r ./server ./build/ && cp ./node_modules/three/build/three.module.min.js ./build/server/assets/lib/",
+        "build-server": "mkdir -p ./build/server && cp -r ./server ./build/ && cp ./node_modules/three/build/three.module.js ./build/server/assets/lib/three.module.js",
         "build-library": "npx rollup -c && mkdir -p ./build/server/assets/lib && cp ./build/photons* ./build/server/assets/lib/",
         "build": "npm run build-library && npm run build-server",
         "watch": "npx npm-watch ",

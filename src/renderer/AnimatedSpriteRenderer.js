@@ -4,11 +4,13 @@ import { ParticleStateAttributeArray } from './ParticleStateAttributeArray.js';
 
 export class AnimatedSpriteRenderer extends Renderer {
 
-    constructor() {
+    constructor(atlas, interpolateAtlasFrames) {
         super();
         this.particleStateArray = null;
         this.material = null;
         this.mesh = null;
+        this.atlas = atlas;
+        this.interpolateAtlasFrames = !!interpolateAtlasFrames;
     }
 
     setOwner(owner) {
@@ -23,7 +25,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         if (super.init(particleCount)) {
             this.particleStateArray = new ParticleStateAttributeArray();
             this.particleStateArray.init(particleCount);
-            this.material = AnimatedSpriteRenderer.createMaterial(null, null, null, true, false);
+            this.material = this.createMaterial(null, null, null, true, false);
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
             this.owner.add(this.mesh);
         }
@@ -33,13 +35,39 @@ export class AnimatedSpriteRenderer extends Renderer {
         this.particleStateArray.dispose();
     }
 
-    static createMaterial(vertexShader, fragmentShader, customUniforms, useWebGL2, useLogarithmicDepth) {
+    createMaterial(vertexShader, fragmentShader, customUniforms, useWebGL2, useLogarithmicDepth) {
+
+        let shaderAtlas = [...Array(16).keys()].map(i => new THREE.Vector4());
+        if (this.atlas) {
+            for (let i = 0; i < this.atlas.getTileArrayCount(); i++) {
+                const tileArray = this.atlas.getTileArray(i);
+                shaderAtlas[i] = new THREE.Vector4(tileArray.x, tileArray.y, tileArray.width, tileArray.height);
+            }
+        }
+
+        const atlasTexture = this.atlas ? this.atlas.getTexture() : null;
+        const interpolateAtlasFrames = this.interpolateAtlasFrames;
+
+        const baseUniforms = {
+            'atlasTileArray': {
+                'type': 'v4v',
+                'value': shaderAtlas
+            },
+            'atlasTexture': {
+                'type': 't',
+                'value': atlasTexture
+            },
+            'interpolateAtlasFrames': {
+                'value': interpolateAtlasFrames
+            },
+            'uvOffset': { 
+                'type': 'v2',
+                'value': new THREE.Vector2()
+            },
+        }
 
         customUniforms = customUniforms || {};
-        customUniforms.particleTexture = { type: 't', value: null };
-        customUniforms.cameraaxisx = {type: 'v3', value: new THREE.Vector3()};
-        customUniforms.cameraaxisy = {type: 'v3', value: new THREE.Vector3()};
-        customUniforms.cameraaxisz = {type: 'v3', value: new THREE.Vector3()};
+        Object.assign(customUniforms, baseUniforms);
 
         vertexShader = vertexShader || AnimatedSpriteRenderer.Shader.getVertexShader(useLogarithmicDepth);
         fragmentShader = fragmentShader ||
@@ -62,51 +90,34 @@ export class AnimatedSpriteRenderer extends Renderer {
 
         get VertexVars() {
             return [
-                'attribute vec4 customColor;',
-                'attribute vec2 size;',
-                'attribute float rotation;',
-                'attribute float customIndex;',
-                'varying vec2 vUV;',
-                'varying vec4 vColor;',
-                'uniform vec3 cameraaxisx;',
-                'uniform vec3 cameraaxisy;',
-                'uniform vec3 cameraaxisz;',
+                'const int MAX_ATLAS_TILE_ARRAYS = 16; \n',
+                'uniform vec4 atlasTileArray[MAX_ATLAS_TILE_ARRAYS]; \n',
+                'uniform int interpolateAtlasFrames; \n',
+                'attribute float customIndex;\n',
+                'attribute vec4 worldPosition;\n',
+                'attribute float rotation;\n',
+                'attribute vec2 size;\n',
+                'attribute vec4 sequenceElement;\n',
+                'attribute vec3 color;\n',
+                'attribute float alpha;\n',
+                'varying vec2 vUV1;\n',
+                'varying vec2 vUV2;\n',
+                'varying vec3 vFragColor;\n',
+                'varying float vFragAlpha;\n',
+                'varying float vSequenceElementT; \n',
             ].join('\n');
         },
 
         get FragmentVars() {
             return [
-                'varying vec2 vUV;',
-                'varying vec4 vColor;',
-                'uniform sampler2D particleTexture;',
-            ].join('\n');
-        },
-
-        get ParticleVertexQuadPositionFunction() {
-            return [
-                'vec4 getQuadPosition() {',
-                    'vec3 axisX = cameraaxisx;',
-                    'vec3 axisY = cameraaxisy;',
-                    'vec3 axisZ = cameraaxisz;',
-
-                    'axisX *= cos( rotation );',
-                    'axisY *= sin( rotation );',
-
-                    'axisX += axisY;',
-                    'axisY = cross( axisZ, axisX );',
-
-                    'vec3 edge = vec3( 2.0, customIndex, 3.0 );',
-                    'vec3 test = vec3( customIndex, 0.5, customIndex );',
-                    'vec3 result = step( edge, test );',
-
-                    'float xFactor = -1.0 + ( result.x * 2.0 );',
-                    'float yFactor = -1.0 + ( result.y * 2.0 ) + ( result.z * 2.0 );',
-
-                    'axisX *= size.x * xFactor;',
-                    'axisY *= size.y * yFactor;',
-
-                    'return ( modelMatrix * vec4( position, 1.0 ) ) + vec4( axisX + axisY, 0.0 );',
-                '}',
+                'uniform int interpolateAtlasFrames; \n',
+                'uniform sampler2D atlasTexture;\n',
+                'uniform vec2 uvOffset;\n',
+                'varying vec2 vUV1;\n',
+                'varying vec2 vUV2;\n',
+                'varying vec3 vFragColor;\n',
+                'varying float vFragAlpha;\n',
+                'varying float vSequenceElementT;\n',
             ].join('\n');
         },
 
@@ -114,17 +125,104 @@ export class AnimatedSpriteRenderer extends Renderer {
             let shader = [
                 '#include <common>',
                 this.VertexVars,
-                this.ParticleVertexQuadPositionFunction,
             ].join('\n');
 
             if (useLogarithmicDepth) shader += '  \n #include <logdepthbuf_pars_vertex> \n';
 
             shader += [
-                'void main() { ',
-                    'vColor = customColor;',
-                    'vUV = uv;',
-                    'vec4 quadPos = getQuadPosition();',
-                    'gl_Position = projectionMatrix * viewMatrix * quadPos;',
+
+                'void getUV(in int sequenceElement, in int sequenceNumber, in vec4 atlasTiles, out vec2 uv) { \n',
+                '   float atlasTileWidth = atlasTiles.z; \n',
+                '   float atlasTileHeight = atlasTiles.w; \n',
+                '   float atlasTileX = atlasTiles.x; \n',
+                '   float atlasTileY = atlasTiles.y; \n',
+                '   int firstRowSections = int((1.0 - atlasTileX) / atlasTileWidth); \n',
+                '   int maxRowSections = int(1.0 / atlasTileWidth); \n',
+    
+                '   float firstRowX = atlasTileX + atlasTileWidth * float(sequenceElement); \n',
+                '   float firstRowY = 1.0 - (atlasTileY + atlasTileHeight); \n',
+    
+                '   int nRowSequenceElement = sequenceElement - firstRowSections; \n',
+                '   float SNOverHS = float(nRowSequenceElement) / float(maxRowSections);\n',
+                '   int nRowYTile = int(SNOverHS);\n',
+                '   int nRowXTile = int((SNOverHS - float(nRowYTile)) * float(maxRowSections));\n',
+                '   float nRowX = float(nRowXTile) * atlasTileWidth;\n',
+                '   float nRowY = 1.0 - ((float(nRowYTile) + 1.0) * (atlasTileHeight) + atlasTileY + atlasTileHeight);\n',
+    
+                '   float nRow = step(float(firstRowSections), float(sequenceElement)); \n',
+                '   uv.x = nRow * nRowX + (1.0 - nRow) * firstRowX; \n',
+                '   uv.y = nRow * nRowY + (1.0 - nRow) * firstRowY; \n',
+                '} \n',
+
+                'void main()\n',
+                '{\n',
+
+                '   const vec2 right = vec2(1.0, 0.0);\n',
+                '   const vec2 up = vec2(0.0, 1.0);\n',
+                '   const vec2 left = vec2(-1.0, 0.0);\n',
+                '   const vec2 down = vec2(0.0, -1.0);\n',
+    
+                '   const vec2 uRight = vec2(1.0, 1.0);\n',
+                '   const vec2 uLeft = vec2(-1.0, 1.0);\n',
+                '   const vec2 dLeft = vec2(-1.0, -1.0);\n',
+                '   const vec2 dRight = vec2(1.0, -1.0);\n',
+                
+                '   vec4 viewPosition = viewMatrix * worldPosition;\n',
+                '   float sequenceElementF = sequenceElement.x;\n',
+                '   int sequenceNumber = int(sequenceElement.y);\n',
+                '   int sequenceStart = int(sequenceElement.z);\n',
+                '   int sequenceLength = int(sequenceElement.w);\n',
+                '   vec4 atlasTiles = atlasTileArray[sequenceNumber]; \n',
+
+                '   vec2 uv1; \n',
+                '   vec2 uv2; \n',
+                '   vSequenceElementT = sequenceElementF - float(int(sequenceElementF)); \n',
+                '   int firstSequenceElement = int(sequenceElementF); \n',
+                '   int secondSequenceElement = clamp(firstSequenceElement + 1, sequenceStart, sequenceStart + sequenceLength - 1); \n',
+                '   getUV(firstSequenceElement, sequenceNumber, atlasTiles, uv1); \n',
+                '   if (interpolateAtlasFrames == 1 && firstSequenceElement != secondSequenceElement) getUV(secondSequenceElement, sequenceNumber, atlasTiles, uv2); \n',
+                '   float atlasTileWidth = atlasTiles.z; \n',
+                '   float atlasTileHeight = atlasTiles.w; \n',
+
+                '   float rotMag = rotation; \n',
+                '   mat2 rotMat = mat2(cos(rotMag), -sin(rotMag), sin(rotMag), cos(rotMag)) * mat2(size.x, 0.0, 0.0, size.y);\n',
+
+                // Lower left, vertex 1
+                '   if (customIndex == 1.0) { \n',
+                '       gl_Position = projectionMatrix * (vec4(rotMat * dLeft, 0.0, 0.0) + viewPosition);\n',
+                '       vUV1 = vec2(uv1.x, uv1.y);\n',
+                '       vUV2 = vec2(uv2.x, uv2.y);\n',
+                '       vFragColor = color; \n',
+                '       vFragAlpha = alpha; \n',
+                '   }\n',
+
+                // Upper left, vertex 0
+                '   if (customIndex == 0.0) { \n',
+                '       gl_Position = projectionMatrix * (vec4(rotMat * uLeft, 0.0, 0.0) + viewPosition);\n',
+                '       vUV1 = vec2(uv1.x, uv1.y + atlasTileHeight);\n',
+                '       vUV2 = vec2(uv2.x, uv2.y + atlasTileHeight);\n',
+                '       vFragColor = color; \n',
+                '       vFragAlpha = alpha; \n',
+                '   }\n',
+
+                // Lower right, vertex 2
+                '   if (customIndex == 2.0) { \n',
+                '       gl_Position = projectionMatrix * (vec4(rotMat * dRight, 0.0, 0.0) + viewPosition);\n',
+                '       vUV1 = vec2(uv1.x + atlasTileWidth, uv1.y);\n',
+                '       vUV2 = vec2(uv2.x + atlasTileWidth, uv2.y);\n',
+                '       vFragColor = color; \n',
+                '       vFragAlpha = alpha; \n',
+                '   }\n',
+
+                // Upper right, vertex 3
+                '   if (customIndex == 3.0) { \n',
+                '       gl_Position = projectionMatrix * (vec4(rotMat * uRight, 0.0, 0.0) + viewPosition);\n',
+                '       vUV1 = vec2(uv1.x + atlasTileWidth, uv1.y + atlasTileHeight);\n',
+                '       vUV2 = vec2(uv2.x + atlasTileWidth, uv2.y + atlasTileHeight);\n',
+                '       vFragColor = color; \n',
+                '       vFragAlpha = alpha; \n',
+                '   }\n',
+
             ].join('\n');
 
             if (useLogarithmicDepth) shader += '   \n  #include <logdepthbuf_vertex> \n';
@@ -145,15 +243,23 @@ export class AnimatedSpriteRenderer extends Renderer {
             if (useLogarithmicDepth) shader += '    \n  #include <logdepthbuf_fragment> \n';
 
             if (useWebGL2) {
-                shader += 'vec4 textureColor = texture( particleTexture,  vUV ); \n';
+                shader += [
+                    '   vec4 color1 = texture(atlasTexture, vUV1 + uvOffset) * vec4(vFragColor, 1.0);\n',
+                    '   vec4 color2 = color1; \n',
+                    '   if (interpolateAtlasFrames == 1) color2 = texture(atlasTexture, vUV2 + uvOffset) * vec4(vFragColor, 1.0);\n',
+                    '   gl_FragColor = mix(color1, color2, vSequenceElementT);\n',
+                ].join('\n');
             } else {
-                shader += 'vec4 textureColor = texture2D( particleTexture,  vUV ); \n';
+                shader += [
+                    '   vec4 color1 = texture2D(atlasTexture, vUV1 + uvOffset) * vec4(vFragColor, 1.0);\n',
+                    '   vec4 color2 = color1; \n',
+                    '   if (interpolateAtlasFrames == 1) color2 = texture(atlasTexture, vUV2 + uvOffset) * vec4(vFragColor, 1.0);\n',
+                    '   gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);// mix(color1, color2, vSequenceElementT);\n',
+                ].join('\n');
             }
 
-            shader += [
-                    'gl_FragColor = vColor * textureColor;',
-                '}'
-            ].join('\n');
+            shader += '}\n';
+
             return shader;
         }
     };
