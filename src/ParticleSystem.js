@@ -197,11 +197,10 @@ export class ParticleSystem {
                 const particleStateInitializer = this.particleStateInitializers[i];
                 particleStateInitializer.initializeState(particleState);
             }
-            this.particleStates.flushParticleStateToBuffers(index);
-
             worldPosition.set(0, 0, 0, 1).applyMatrix4(this.owner.matrixWorld);
             worldPosition3.set(worldPosition.x, worldPosition.y, worldPosition.z);
             if (this.simulateInWorldSpace) particleState.position.add(worldPosition3);
+            this.particleStates.flushParticleStateToBuffers(index);
         };
 
     }();

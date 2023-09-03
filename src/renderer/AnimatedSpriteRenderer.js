@@ -80,6 +80,8 @@ export class AnimatedSpriteRenderer extends Renderer {
             transparent: true,
             alphaTest: 0.5,
             blending: THREE.NormalBlending,
+            blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
+            blendSrcAlpha: THREE.SrcAlphaFactor,
             depthTest: true,
             depthWrite: false
         } );
@@ -248,13 +250,15 @@ export class AnimatedSpriteRenderer extends Renderer {
                     '   vec4 color2 = color1; \n',
                     '   if (interpolateAtlasFrames == 1) color2 = texture(atlasTexture, vUV2 + uvOffset) * vec4(vFragColor, 1.0);\n',
                     '   gl_FragColor = mix(color1, color2, vSequenceElementT);\n',
+                    '   gl_FragColor.a *= vFragAlpha; \n'
                 ].join('\n');
             } else {
                 shader += [
                     '   vec4 color1 = texture2D(atlasTexture, vUV1 + uvOffset) * vec4(vFragColor, 1.0);\n',
                     '   vec4 color2 = color1; \n',
                     '   if (interpolateAtlasFrames == 1) color2 = texture(atlasTexture, vUV2 + uvOffset) * vec4(vFragColor, 1.0);\n',
-                    '   gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);// mix(color1, color2, vSequenceElementT);\n',
+                    '   gl_FragColor = mix(color1, color2, vSequenceElementT);\n',
+                    '   gl_FragColor.a *= vFragAlpha; \n'
                 ].join('\n');
             }
 
