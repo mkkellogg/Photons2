@@ -21,6 +21,7 @@ import { SequenceOperator } from './operator/SequenceOperator.js';
 import { OpacityInterpolatorOperator } from './operator/OpacityInterpolatorOperator.js';
 import { SizeInterpolatorOperator } from './operator/SizeInterpolatorOperator.js';
 import { ColorInterpolatorOperator } from './operator/ColorInterpolatorOperator.js';
+import { AccelerationOperator } from './operator/AccelerationOperator.js';
 
 import { RandomGenerator } from './util/RandomGenerator.js';
 
@@ -42,6 +43,7 @@ export {
     SequenceInitializer,
     BaseParticleStateOperator,
     SequenceOperator,
+    AccelerationOperator,
     OpacityInterpolatorOperator,
     SizeInterpolatorOperator,
     ColorInterpolatorOperator,
