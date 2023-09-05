@@ -189,41 +189,27 @@ export class AnimatedSpriteRenderer extends Renderer {
                 '   float rotMag = rotation; \n',
                 '   mat2 rotMat = mat2(cos(rotMag), -sin(rotMag), sin(rotMag), cos(rotMag)) * mat2(size.x, 0.0, 0.0, size.y);\n',
 
-                // Lower left, vertex 1
-                '   if (customIndex == 1.0) { \n',
-                '       gl_Position = projectionMatrix * (vec4(rotMat * dLeft, 0.0, 0.0) + viewPosition);\n',
-                '       vUV1 = vec2(uv1.x, uv1.y);\n',
-                '       vUV2 = vec2(uv2.x, uv2.y);\n',
-                '       vFragColor = color; \n',
-                '       vFragAlpha = alpha; \n',
-                '   }\n',
+                '   float rightSide = step(2.0, customIndex); \n',
+                '   vec2 upperSideStep = step(vec2(customIndex, 3.0), vec2(0.0, customIndex));\n',
+                '   float upperSide = upperSideStep.x + upperSideStep.y;\n',
+                '   float uvXOffset = atlasTileWidth * rightSide; \n',
+                '   float uvYOffset = atlasTileHeight * upperSide; \n',
 
-                // Upper left, vertex 0
-                '   if (customIndex == 0.0) { \n',
-                '       gl_Position = projectionMatrix * (vec4(rotMat * uLeft, 0.0, 0.0) + viewPosition);\n',
-                '       vUV1 = vec2(uv1.x, uv1.y + atlasTileHeight);\n',
-                '       vUV2 = vec2(uv2.x, uv2.y + atlasTileHeight);\n',
-                '       vFragColor = color; \n',
-                '       vFragAlpha = alpha; \n',
-                '   }\n',
+                '   vec4 rotVecStep = step(vec4(customIndex, customIndex, 3.0, 2.0), vec4(0.0, 1.0, customIndex, customIndex)); \n',
 
-                // Lower right, vertex 2
-                '   if (customIndex == 2.0) { \n',
-                '       gl_Position = projectionMatrix * (vec4(rotMat * dRight, 0.0, 0.0) + viewPosition);\n',
-                '       vUV1 = vec2(uv1.x + atlasTileWidth, uv1.y);\n',
-                '       vUV2 = vec2(uv2.x + atlasTileWidth, uv2.y);\n',
-                '       vFragColor = color; \n',
-                '       vFragAlpha = alpha; \n',
-                '   }\n',
+                '   float uLeftV = rotVecStep.x; \n',
+                '   float dLeftV = rotVecStep.y - rotVecStep.x; \n',
+                '   float uRightV = rotVecStep.z; \n',
+                '   float dRightV = rotVecStep.w - rotVecStep.z; \n',
 
-                // Upper right, vertex 3
-                '   if (customIndex == 3.0) { \n',
-                '       gl_Position = projectionMatrix * (vec4(rotMat * uRight, 0.0, 0.0) + viewPosition);\n',
-                '       vUV1 = vec2(uv1.x + atlasTileWidth, uv1.y + atlasTileHeight);\n',
-                '       vUV2 = vec2(uv2.x + atlasTileWidth, uv2.y + atlasTileHeight);\n',
-                '       vFragColor = color; \n',
-                '       vFragAlpha = alpha; \n',
-                '   }\n',
+
+                '   vec2 rotVec = uLeft * uLeftV + dLeft * dLeftV + dRight * dRightV + uRight * uRightV; \n',
+
+                '   gl_Position = projectionMatrix * (vec4(rotMat * rotVec, 0.0, 0.0) + viewPosition);\n',
+                '   vUV1 = vec2(uv1.x + uvXOffset, uv1.y + uvYOffset);\n',
+                '   vUV2 = vec2(uv2.x + uvXOffset, uv2.y + uvYOffset);\n',
+                '   vFragColor = color; \n',
+                '   vFragAlpha = alpha; \n',
 
             ].join('\n');
 
