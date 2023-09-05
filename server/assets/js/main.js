@@ -99,10 +99,10 @@ const initThreeJS = async () => {
 
     flameParticleSystem.addParticleStateInitializer(Photons.BoxPositionInitializer, new THREE.Vector3(0.05 * scale, 0.0, 0.05 * scale), new THREE.Vector3(0.0, 0.0, 0.0));
     flameParticleSystem.addParticleStateInitializer(Photons.RandomVelocityInitializer, new THREE.Vector3(0.05 * scale, 0.4 * scale, 0.05 * scale),
-                                                    new THREE.Vector3(-0.025 * scale, 0.8 * scale, -0.025 * scale),  0.5 * scale, 1.0 * scale);
+                                                    new THREE.Vector3(-0.02 * scale, 0.8 * scale, -0.02 * scale),  0.7 * scale, 1.0 * scale);
     flameParticleSystem.addParticleStateInitializer(Photons.SequenceInitializer, flameParticleSequences);
 
-    flameParticleSystem.addParticleStateOperator(Photons.SequenceOperator, flameParticleSequences, 0.055, false);
+    flameParticleSystem.addParticleStateOperator(Photons.SequenceOperator, flameParticleSequences, 0.07, false);
 
     const flameOpacityInterpolatorOperator = flameParticleSystem.addParticleStateOperator(Photons.OpacityInterpolatorOperator);
     flameOpacityInterpolatorOperator.addElement(0.0, 0.0);
@@ -143,14 +143,14 @@ const initThreeJS = async () => {
     const flame2ParticleSequences = flame2ParticleSystem.getParticleSequences();
 
     flame2ParticleSystem.addParticleStateInitializer(Photons.LifetimeInitializer, new Photons.RandomGenerator(0, 0.0, 0.0, 0.0, 0.0, false));
-    flame2ParticleSystem.addParticleStateInitializer(Photons.RotationInitializer, new Photons.RandomGenerator(0, Math.PI / 2.0, -Math.PI / 2.0, 0.0, 0.0, false));
-    flame2ParticleSystem.addParticleStateInitializer(Photons.RotationalSpeedInitializer, new Photons.RandomGenerator(0, Math.PI, -Math.PI / 2.0, 0.0, 0.0, false));
+    flame2ParticleSystem.addParticleStateInitializer(Photons.RotationInitializer, new Photons.RandomGenerator(0, 2.0 * Math.PI, -Math.PI / 2, 0.0, 0.0, false));
+    flame2ParticleSystem.addParticleStateInitializer(Photons.RotationalSpeedInitializer, new Photons.RandomGenerator(0, Math.PI / 2, -Math.PI / 4.0, 0.0, 0.0, false));
     flame2ParticleSystem.addParticleStateInitializer(Photons.SizeInitializer,
                                                      new Photons.RandomGenerator(THREE.Vector2, new THREE.Vector2(0.0, 0.0),
                                                      new THREE.Vector2(0.0, 0.0), 0.2 * scale, 0.65 * scale, false));
     flame2ParticleSystem.addParticleStateInitializer(Photons.BoxPositionInitializer, new THREE.Vector3(0.1 * scale, 0.0, 0.1 * scale), new THREE.Vector3(0.0, 0.0, 0.0));
-    flame2ParticleSystem.addParticleStateInitializer(Photons.RandomVelocityInitializer, new THREE.Vector3(0.02 * scale, 0.4 * scale, 0.02 * scale),
-                                                     new THREE.Vector3(-0.01 * scale, 0.4 * scale, -0.01 * scale),  0.2 * scale, .6 * scale);
+    flame2ParticleSystem.addParticleStateInitializer(Photons.RandomVelocityInitializer, new THREE.Vector3(0.06 * scale, 0.4 * scale, 0.06 * scale),
+                                                     new THREE.Vector3(-0.02 * scale, 0.4 * scale, -0.02 * scale),  0.2 * scale, .4 * scale);
     flame2ParticleSystem.addParticleStateInitializer(Photons.SequenceInitializer, flame2ParticleSequences);
     
 
