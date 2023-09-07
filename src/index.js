@@ -1,5 +1,5 @@
 
-import { ParticleSystem } from './ParticleSystem.js';
+import { ParticleSystem, ParticleSystemState } from './ParticleSystem.js';
 import { ParticleSystemManager } from './ParticleSystemManager.js';
 import { ParticleStateArray } from './ParticleState.js';
 import { Renderer } from './renderer/Renderer.js';
@@ -30,6 +30,7 @@ import { FlickerLight } from './light/FlickerLight.js';
 
 export {
     ParticleSystem,
+    ParticleSystemState,
     ParticleSystemManager,
     ParticleStateArray,
     Renderer,

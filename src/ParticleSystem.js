@@ -20,6 +20,7 @@ export class ParticleSystem {
     constructor(owner, particleSystemRenderer) {
         this.owner = owner;
         this.owner.visible = false;
+        this.visible = true;
         this.particleSystemRenderer = particleSystemRenderer;
         this.initialized = false;
         this.maximumActiveParticles = 0;
@@ -52,6 +53,14 @@ export class ParticleSystem {
         }
     }
 
+    getVisibile() {
+        return this.visible;
+    }
+
+    setVisibile(visible) {
+        return this.visible = visible;
+    }
+
     currentTime() {
         return performance.now() / 1000;
     }
@@ -61,27 +70,31 @@ export class ParticleSystem {
     }
 
     update() {
-        const curTime = this.currentTime();
-        const timeDelta = curTime - this.lastUpdateTime;
-        if (this.emitterInitialized && this.systemState == ParticleSystemState.Running) {
-            const particlesToEmit = this.particleEmitter.update(timeDelta);
-            if (particlesToEmit > 0) this.activateParticles(particlesToEmit);
-            this.advanceActiveParticles(timeDelta);
-            if (this.onUpdateCallback) this.onUpdateCallback(this.activeParticleCount);
+        if (this.systemState == ParticleSystemState.Running) {
+            const curTime = this.currentTime();
+            const timeDelta = curTime - this.lastUpdateTime;
+            if (this.emitterInitialized && this.systemState == ParticleSystemState.Running) {
+                const particlesToEmit = this.particleEmitter.update(timeDelta);
+                if (particlesToEmit > 0) this.activateParticles(particlesToEmit);
+                this.advanceActiveParticles(timeDelta);
+                if (this.onUpdateCallback) this.onUpdateCallback(this.activeParticleCount);
+            }
+            for (let light of this.lights) {
+                light.update(curTime, timeDelta);
+            }
+            this.lastUpdateTime = curTime;
         }
-        for (let light of this.lights) {
-            light.update(curTime, timeDelta);
-        }
-        this.lastUpdateTime = curTime;
     }
 
     render(threeRenderer, camera) {
-        const saveAutoClear = threeRenderer.autoClear;
-        threeRenderer.autoClear = false;
-        this.owner.visible = true;
-        threeRenderer.render(this.owner, camera);
-        this.owner.visible = false;
-        threeRenderer.autoClear = saveAutoClear;
+        if (this.getVisibile()) {
+            const saveAutoClear = threeRenderer.autoClear;
+            threeRenderer.autoClear = false;
+            this.owner.visible = true;
+            threeRenderer.render(this.owner, camera);
+            this.owner.visible = false;
+            threeRenderer.autoClear = saveAutoClear;
+        }
     }
 
     start() {
@@ -194,13 +207,15 @@ export class ParticleSystem {
     }
 
     activateParticles(particleCount) {
-        const newActiveParticleCount = Utils.clamp(this.activeParticleCount + particleCount,
-                                                   0, this.maximumActiveParticles);
-        for (let i = this.activeParticleCount; i < newActiveParticleCount; i++) {
-            this.activateParticle(i);
+        if (this.systemState == ParticleSystemState.Running) {
+            const newActiveParticleCount = Utils.clamp(this.activeParticleCount + particleCount,
+                                                    0, this.maximumActiveParticles);
+            for (let i = this.activeParticleCount; i < newActiveParticleCount; i++) {
+                this.activateParticle(i);
+            }
+            this.activeParticleCount = newActiveParticleCount;
+            this.particleStates.setActiveParticleCount(this.activeParticleCount);
         }
-        this.activeParticleCount = newActiveParticleCount;
-        this.particleStates.setActiveParticleCount(this.activeParticleCount);
     }
 
     activateParticle = function() {
@@ -209,48 +224,55 @@ export class ParticleSystem {
         const worldPosition3 = new THREE.Vector3();
 
         return function(index) {
-            const particleState = this.particleStates.getState(index);
-            particleState.age = 0.0;
-            for (let i = 0; i < this.particleStateInitializers.length; i++) {
-                const particleStateInitializer = this.particleStateInitializers[i];
-                particleStateInitializer.initializeState(particleState);
+            if (this.systemState == ParticleSystemState.Running) {
+                const particleState = this.particleStates.getState(index);
+                particleState.age = 0.0;
+                for (let i = 0; i < this.particleStateInitializers.length; i++) {
+                    const particleStateInitializer = this.particleStateInitializers[i];
+                    particleStateInitializer.initializeState(particleState);
+                }
+                worldPosition.set(0, 0, 0, 1).applyMatrix4(this.owner.matrixWorld);
+                worldPosition3.set(worldPosition.x, worldPosition.y, worldPosition.z);
+                if (this.simulateInWorldSpace) particleState.position.add(worldPosition3);
+                this.particleStates.flushParticleStateToBuffers(index);
             }
-            worldPosition.set(0, 0, 0, 1).applyMatrix4(this.owner.matrixWorld);
-            worldPosition3.set(worldPosition.x, worldPosition.y, worldPosition.z);
-            if (this.simulateInWorldSpace) particleState.position.add(worldPosition3);
-            this.particleStates.flushParticleStateToBuffers(index);
         };
 
     }();
 
     advanceActiveParticles(timeDelta) {
-        let i = 0;
-        while (i < this.activeParticleCount) {
-            const particleIsActive = this.advanceActiveParticle(i, timeDelta);
-            if (!particleIsActive) {
-                if (i < this.activeParticleCount - 1) {
-                    this.copyParticleInArray(this.activeParticleCount - 1, i);
+        if (this.systemState == ParticleSystemState.Running) {
+            let i = 0;
+            while (i < this.activeParticleCount) {
+                const particleIsActive = this.advanceActiveParticle(i, timeDelta);
+                if (!particleIsActive) {
+                    if (i < this.activeParticleCount - 1) {
+                        this.copyParticleInArray(this.activeParticleCount - 1, i);
+                    }
+                    this.activeParticleCount--;
+                    continue;
                 }
-                this.activeParticleCount--;
-                continue;
+                i++;
             }
-            i++;
+            this.particleStates.setActiveParticleCount(this.activeParticleCount);
         }
-        this.particleStates.setActiveParticleCount(this.activeParticleCount);
     }
 
     advanceActiveParticle(index, timeDelta) {
-        const particleState = this.particleStates.getState(index);
-        for (let i = 0; i < this.particleStateOperators.length; i++) {
-            const particleStateOperator = this.particleStateOperators[i];
-            const stillAlive = particleStateOperator.updateState(particleState, timeDelta);
-            const particleLifeTime = particleState.lifetime;
-            if (!stillAlive || particleLifeTime != 0.0 && particleState.age >= particleLifeTime) {
-                return false;
+        if (this.systemState == ParticleSystemState.Running) {
+            const particleState = this.particleStates.getState(index);
+            for (let i = 0; i < this.particleStateOperators.length; i++) {
+                const particleStateOperator = this.particleStateOperators[i];
+                const stillAlive = particleStateOperator.updateState(particleState, timeDelta);
+                const particleLifeTime = particleState.lifetime;
+                if (!stillAlive || particleLifeTime != 0.0 && particleState.age >= particleLifeTime) {
+                    return false;
+                }
             }
+            this.particleStates.flushParticleStateToBuffers(index);
+            return true;
         }
-        this.particleStates.flushParticleStateToBuffers(index);
-        return true;
+        return false;
     }
 
     copyParticleInArray(srcIndex, destIndex) {
