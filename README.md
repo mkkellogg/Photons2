@@ -2,6 +2,8 @@
 
 Basic particle system for the Three.js 3D graphics library implemented in JavaScript. This is a sequel/complete rewrite of Photons (https://github.com/mkkellogg/Photons), my original particle system for Three.js.
 
+**This is very much a work in progress!**
+
 This implementation exposes typical physical attributes for each particle: 
 
   - Position
