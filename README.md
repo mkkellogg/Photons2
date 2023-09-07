@@ -65,7 +65,7 @@ const lifetimeInitializerGenerator = new Photons.RandomGenerator(0, 3.0, 1.0, 0.
 
 const sizeInitializerGenerator = new Photons.RandomGenerator(THREE.Vector2,
                                                              new THREE.Vector2(0.0, 0.0),
-                                                             new THREE.Vector2(scale * 0.15, scale  * 0.15),
+                                                             new THREE.Vector2(0.15, 0.15),
                                                              0.0, 0.0, false);
 
 embersParticleSystem.addParticleStateInitializer(Photons.LifetimeInitializer, lifetimeInitializerGenerator);
@@ -73,13 +73,13 @@ embersParticleSystem.addParticleStateInitializer(Photons.LifetimeInitializer, li
 embersParticleSystem.addParticleStateInitializer(Photons.SizeInitializer, sizeInitializerGenerator);
 
 embersParticleSystem.addParticleStateInitializer(Photons.BoxPositionInitializer,
-                                                 new THREE.Vector3(0.05 * scale, 0.0, 0.05 * scale),
-                                                 new THREE.Vector3(-0.025 * scale, 0.0, -0.025 * scale));
+                                                 new THREE.Vector3(0.05, 0.0, 0.05),
+                                                 new THREE.Vector3(-0.025, 0.0, -0.025));
 
 embersParticleSystem.addParticleStateInitializer(Photons.RandomVelocityInitializer,
-                                                 new THREE.Vector3(0.4 * scale, 0.5 * scale, 0.4 * scale),
-                                                 new THREE.Vector3(-0.2 * scale, 0.8 * scale, -0.2 * scale),
-                                                 0.6 * scale, 0.8 * scale);
+                                                 new THREE.Vector3(0.4, 0.5, 0.4),
+                                                 new THREE.Vector3(-0.2, 0.8, -0.2),
+                                                 0.6, 0.8);
 
 // Set up particle operators
 const embersOpacityInterpolatorOperator = embersParticleSystem.addParticleStateOperator(Photons.OpacityInterpolatorOperator);
@@ -94,10 +94,10 @@ embersColorInterpolatorOperator.addElement(new THREE.Color(1.0, 0.6, 0.0), 0.5);
 embersColorInterpolatorOperator.addElement(new THREE.Color(1.0, 0.4, 0.0), 1.0);
 
 const acceleratorOperatorGenerator = new Photons.SphereRandomGenerator(THREE.Vector3,
-                                                                      Math.PI * 2.0, 0.0, Math.PI,
-                                                                      -Math.PI / 2, 20.0, -8,
-                                                                      scale, scale, scale,
-                                                                      0.0, 0.0, 0.0);
+                                                                       Math.PI * 2.0, 0.0, Math.PI,
+                                                                       -Math.PI / 2, 20.0, -8,
+                                                                       1, 1, 1,
+                                                                       0.0, 0.0, 0.0);
 
 embersParticleSystem.addParticleStateOperator(Photons.AccelerationOperator, acceleratorOperatorGenerator);
 
