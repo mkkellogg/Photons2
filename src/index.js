@@ -25,6 +25,8 @@ import { AccelerationOperator } from './operator/AccelerationOperator.js';
 
 import { RandomGenerator } from './util/RandomGenerator.js';
 
+import { FlickerLight } from './light/FlickerLight.js';
+
 export {
     ParticleSystem,
     ParticleSystemManager,
@@ -47,5 +49,6 @@ export {
     OpacityInterpolatorOperator,
     SizeInterpolatorOperator,
     ColorInterpolatorOperator,
-    RandomGenerator
+    RandomGenerator,
+    FlickerLight
 };
