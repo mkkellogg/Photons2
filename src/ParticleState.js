@@ -105,7 +105,7 @@ export class ParticleStateArray {
         return this.particleCount;
     }
 
-    flushParticleStateToBuffers(){
+    flushParticleStateToBuffers() {
     }
 
     copyState(srcIndex, destIndex) {

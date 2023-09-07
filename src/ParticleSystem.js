@@ -194,7 +194,8 @@ export class ParticleSystem {
     }
 
     activateParticles(particleCount) {
-        const newActiveParticleCount = Utils.clamp(this.activeParticleCount + particleCount, 0, this.maximumActiveParticles);
+        const newActiveParticleCount = Utils.clamp(this.activeParticleCount + particleCount,
+                                                   0, this.maximumActiveParticles);
         for (let i = this.activeParticleCount; i < newActiveParticleCount; i++) {
             this.activateParticle(i);
         }

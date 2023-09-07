@@ -60,11 +60,11 @@ export class AnimatedSpriteRenderer extends Renderer {
             'interpolateAtlasFrames': {
                 'value': interpolateAtlasFrames
             },
-            'uvOffset': { 
+            'uvOffset': {
                 'type': 'v2',
                 'value': new THREE.Vector2()
             },
-        }
+        };
 
         customUniforms = customUniforms || {};
         Object.assign(customUniforms, baseUniforms);
@@ -140,17 +140,17 @@ export class AnimatedSpriteRenderer extends Renderer {
                 '   float atlasTileY = atlasTiles.y; \n',
                 '   int firstRowSections = int((1.0 - atlasTileX) / atlasTileWidth); \n',
                 '   int maxRowSections = int(1.0 / atlasTileWidth); \n',
-    
+
                 '   float firstRowX = atlasTileX + atlasTileWidth * float(sequenceElement); \n',
                 '   float firstRowY = 1.0 - (atlasTileY + atlasTileHeight); \n',
-    
+
                 '   int nRowSequenceElement = sequenceElement - firstRowSections; \n',
                 '   float SNOverHS = float(nRowSequenceElement) / float(maxRowSections);\n',
                 '   int nRowYTile = int(SNOverHS);\n',
                 '   int nRowXTile = int((SNOverHS - float(nRowYTile)) * float(maxRowSections));\n',
                 '   float nRowX = float(nRowXTile) * atlasTileWidth;\n',
                 '   float nRowY = 1.0 - ((float(nRowYTile) + 1.0) * (atlasTileHeight) + atlasTileY + atlasTileHeight);\n',
-    
+
                 '   float nRow = step(float(firstRowSections), float(sequenceElement)); \n',
                 '   uv.x = nRow * nRowX + (1.0 - nRow) * firstRowX; \n',
                 '   uv.y = nRow * nRowY + (1.0 - nRow) * firstRowY; \n',
@@ -163,12 +163,12 @@ export class AnimatedSpriteRenderer extends Renderer {
                 '   const vec2 up = vec2(0.0, 1.0);\n',
                 '   const vec2 left = vec2(-1.0, 0.0);\n',
                 '   const vec2 down = vec2(0.0, -1.0);\n',
-    
+
                 '   const vec2 uRight = vec2(1.0, 1.0);\n',
                 '   const vec2 uLeft = vec2(-1.0, 1.0);\n',
                 '   const vec2 dLeft = vec2(-1.0, -1.0);\n',
                 '   const vec2 dRight = vec2(1.0, -1.0);\n',
-                
+
                 '   vec4 viewPosition = viewMatrix * worldPosition;\n',
                 '   float sequenceElementF = sequenceElement.x;\n',
                 '   int sequenceNumber = int(sequenceElement.y);\n',
@@ -182,7 +182,9 @@ export class AnimatedSpriteRenderer extends Renderer {
                 '   int firstSequenceElement = int(sequenceElementF); \n',
                 '   int secondSequenceElement = clamp(firstSequenceElement + 1, sequenceStart, sequenceStart + sequenceLength - 1); \n',
                 '   getUV(firstSequenceElement, sequenceNumber, atlasTiles, uv1); \n',
-                '   if (interpolateAtlasFrames == 1 && firstSequenceElement != secondSequenceElement) getUV(secondSequenceElement, sequenceNumber, atlasTiles, uv2); \n',
+                '   if (interpolateAtlasFrames == 1 && firstSequenceElement != secondSequenceElement) { \n ',
+                '       getUV(secondSequenceElement, sequenceNumber, atlasTiles, uv2); \n',
+                '   } \n',
                 '   float atlasTileWidth = atlasTiles.z; \n',
                 '   float atlasTileHeight = atlasTiles.w; \n',
 
@@ -201,7 +203,6 @@ export class AnimatedSpriteRenderer extends Renderer {
                 '   float dLeftV = rotVecStep.y - rotVecStep.x; \n',
                 '   float uRightV = rotVecStep.z; \n',
                 '   float dRightV = rotVecStep.w - rotVecStep.z; \n',
-
 
                 '   vec2 rotVec = uLeft * uLeftV + dLeft * dLeftV + dRight * dRightV + uRight * uRightV; \n',
 

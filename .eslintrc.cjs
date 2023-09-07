@@ -23,12 +23,13 @@ module.exports = {
   },
   'rules': {
     "indent": ["error", 4],
-    "max-len": ["error", 120],
+    "max-len": ["error", 140],
     "object-curly-spacing": ["off"],
     "comma-dangle": ["off"],
     "prefer-const": ["off"],
     'require-jsdoc': ["off"],
     "padded-blocks": ["off"],
-    "indent": ["off"]
+    "indent": ["off"],
+    "arrow-parens": ["off"],
   },
 };

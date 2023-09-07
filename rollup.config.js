@@ -34,7 +34,6 @@ export default [
 
             format: 'esm',
             file: './build/photons.module.js',
-           // dir: './build/',
             inlineDynamicImports: true,
             sourcemap: true,
 

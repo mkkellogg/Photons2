@@ -69,18 +69,21 @@ export class FlickerLight {
         if (elapsedTimeSinceLastIntensityFlicker > flickerIntensityIntervalLength) {
             this.lastIntensityFlickerTime = time;
 
-            const intensityDiff = (Math.random() - 0.5) * 2.0 * perUpdateIntervalIntensityFluxRange * flickerIntensityIntervalLength;
+            const intensityDiff = (Math.random() - 0.5) * 2.0 *
+                                   perUpdateIntervalIntensityFluxRange * flickerIntensityIntervalLength;
 
             let intensityAdjuster = 1.0 + intensityDiff;
             const diff = (intensityAdjuster - this.lastIntensityAdjuster);
             intensityAdjuster = this.lastIntensityAdjuster + diff;
 
             this.lastIntensityAdjuster = this.nextIntensityAdjuster;
-            this.nextIntensityAdjuster = Utils.clamp(intensityAdjuster, intensityFactorRangeLowerBound, intensityFactorRangeUpperBound);
+            this.nextIntensityAdjuster = Utils.clamp(intensityAdjuster,
+                                                     intensityFactorRangeLowerBound, intensityFactorRangeUpperBound);
 
         } else {
             const elapsedFlickerIntensityT = elapsedTimeSinceLastIntensityFlicker / flickerIntensityIntervalLength;
-            const intensityAdjuster = (1.0 - elapsedFlickerIntensityT) * this.lastIntensityAdjuster + elapsedFlickerIntensityT * this.nextIntensityAdjuster;
+            const intensityAdjuster = (1.0 - elapsedFlickerIntensityT) * this.lastIntensityAdjuster +
+                                      elapsedFlickerIntensityT * this.nextIntensityAdjuster;
             this.light.intensity = intensityAdjuster * this.intensity;
         }
 

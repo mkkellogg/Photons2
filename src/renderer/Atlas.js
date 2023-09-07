@@ -8,7 +8,7 @@ export class TileArrayDescriptor {
         this.height = height;
     }
 
-};    
+};
 
 export class Atlas {
 

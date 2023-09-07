@@ -36,10 +36,11 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
 
     setActiveParticleCount(activeParticleCount) {
         super.setActiveParticleCount(activeParticleCount);
-        if (activeParticleCount > 0 ) 
+        if (activeParticleCount > 0) {
             this.geometry.setDrawRange(0, this.verticesPerParticles * activeParticleCount);
-        else
+        } else {
             this.geometry.setDrawRange(0, 0);
+        }
     }
 
     flushParticleStateToBuffers(index) {
@@ -51,9 +52,6 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         const offset = index * this.verticesPerParticles;
 
         for (let i = 0; i < this.verticesPerParticles; i++) {
-            //this.progressTypes.setX(offset + i, particleState.progressType);
-           // this.progressTypes.needsUpdate = true;
-
             this.lifetimes.setX(offset + i, particleState.lifetime);
             this.lifetimes.needsUpdate = true;
 
@@ -144,11 +142,7 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         super.allocate(particleCount);
 
         this.geometry = new THREE.BufferGeometry();
-        this.geometry.onUploadCallback = () => {
-            console.log("updated")
-        };
 
-        const progressTypesArray = new Float32Array(this.vertexCount);
         const lifetimesArray = new Float32Array(this.vertexCount);
         const agesArray = new Float32Array(this.vertexCount);
         const sequenceElementsArray = new Float32Array(this.vertexCount * 4);
@@ -165,10 +159,6 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         const initialColorsArray = new Float32Array(this.vertexCount * 3);
         const initialAlphasArray = new Float32Array(this.vertexCount);
         const customIndexesArray = new Float32Array(this.vertexCount);
-
-        //this.progressTypes = new THREE.BufferAttribute(progressTypesArray, 1);
-        //this.progressTypes.dynamic = true;
-        //this.geometry.setAttribute('progressType', this.progressTypes);
 
         this.lifetimes = new THREE.BufferAttribute(lifetimesArray, 1);
         this.lifetimes.dynamic = true;
