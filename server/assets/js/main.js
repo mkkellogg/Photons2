@@ -24,7 +24,7 @@ const initThreeJS = async () => {
     const renderHeight =  window.innerHeight;
 
     camera = new THREE.PerspectiveCamera(70, renderWidth / renderHeight, 0.1, 100);
-    camera.position.set(0.010393465045119121, 2.1683863686245393, 2.1185542403178967);
+    camera.position.set(0.024318913205115755, 2.263085369169634, 2.2461082450972363);
     camera.quaternion.set(-0.31211109312645235, 0.05162137245260911, 0.016986581102126804, 0.9484900397558116);
 
     scene = new THREE.Scene();

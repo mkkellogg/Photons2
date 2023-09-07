@@ -21,6 +21,8 @@ export class SphereRandomGenerator extends Generator {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.offsetZ = offsetZ;
+
+        this.tempUp = new THREE.Vector3().set(0.0, 1.0, 0.0);
     }
 
     generate(out) {
@@ -33,7 +35,7 @@ export class SphereRandomGenerator extends Generator {
                 // TODO: implement
             break;
             case BuiltinType.Vector3:
-                return generateForVector3(out);
+                return this.generateForVector3(out);
             break;
             case BuiltinType.Vector4:
                 // TODO: implement
@@ -42,7 +44,7 @@ export class SphereRandomGenerator extends Generator {
     }
 
     generateForVector3(out) {
-        const up = new THREE.Vector3().set(0.0, 1.0, 0.0);
+        this.tempUp.set(0.0, 1.0, 0.0);
         const theta = Math.random() * this.rangeTheta + this.offsetTheta;
         const phi = Math.random() * this.rangePhi + this.offsetPhi;
         const thetaX = Math.cos(theta);
@@ -51,20 +53,22 @@ export class SphereRandomGenerator extends Generator {
         const phiY = Math.sin(phi);
 
         out.set(thetaX, 0.0, -thetaY);
-        out.scale(phiX);
-        up.scale(phiY);
-        out.add(up);
+        out.multiplyScalar(phiX);
+        this.tempUp.multiplyScalar(phiY);
+        out.add(this.tempUp);
 
         out.normalize();
 
         const radius = Math.random() * this.rangeRadius + this.offsetRadius;
-        out.scale(radius);
+        out.multiplyScalar(radius);
 
         out.x *= this.scaleX;
         out.y *= this.scaleY;
         out.z *= this.scaleZ;
 
-        out.add(this.offsetX, this.offsetY, this.offsetZ);
+        out.x += this.offsetX;
+        out.y += this.offsetY;
+        out.z += this.offsetZ;
     }
 
     clone() {

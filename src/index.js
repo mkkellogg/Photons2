@@ -24,6 +24,7 @@ import { ColorInterpolatorOperator } from './operator/ColorInterpolatorOperator.
 import { AccelerationOperator } from './operator/AccelerationOperator.js';
 
 import { RandomGenerator } from './util/RandomGenerator.js';
+import { SphereRandomGenerator } from './util/SphereRandomGenerator.js';
 
 import { FlickerLight } from './light/FlickerLight.js';
 
@@ -50,5 +51,6 @@ export {
     SizeInterpolatorOperator,
     ColorInterpolatorOperator,
     RandomGenerator,
+    SphereRandomGenerator,
     FlickerLight
 };

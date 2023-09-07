@@ -45,8 +45,56 @@ export class DemoScene {
     setupParticleSystems (){
         let scale = 0.15;
         let flamePosition = new THREE.Vector3(-.3, 1.65, 1.65);
+        this.particleSystems.push(this.setupEmbers(scale, flamePosition));
         this.particleSystems.push(this.setupBaseFlame(scale, flamePosition));
         this.particleSystems.push(this.setupBrightFLame(scale, flamePosition));
+    }
+
+    setupEmbers (scale, position) {
+
+        const embersTexture = new THREE.TextureLoader().load('assets/textures/ember.png');
+        const embersAtlas = new Photons.Atlas(embersTexture);
+        embersAtlas.addTileArray(1, 0.0, 0.0, 1.0, 1.0);
+        const embersRoot = new THREE.Object3D();
+        embersRoot.position.copy(position);
+        const embersRenderer = new Photons.AnimatedSpriteRenderer(embersAtlas, true);
+
+        const embersParticleSystem = new Photons.ParticleSystem(embersRoot, embersRenderer, this.renderer);
+        embersParticleSystem.addParticleStateOperator(Photons.BaseParticleStateOperator);
+        embersParticleSystem.addParticleStateInitializer(Photons.BaseParticleStateInitializer);
+        embersParticleSystem.init(150);
+        embersRenderer.material.blending = THREE.AdditiveBlending;
+        // TODO: Remove this hack and properly implement bounds calculations
+        embersRenderer.mesh.frustumCulled = false;
+    
+        const embersEmitter = embersParticleSystem.setEmitter(Photons.ConstantParticleEmitter);
+        embersEmitter.emissionRate = 6;
+
+        embersParticleSystem.addParticleStateInitializer(Photons.LifetimeInitializer, new Photons.RandomGenerator(0, 3.0, 1.0, 0.0, 0.0, false));
+        embersParticleSystem.addParticleStateInitializer(Photons.SizeInitializer,
+                                                         new Photons.RandomGenerator(THREE.Vector2, new THREE.Vector2(0.0, 0.0),
+                                                                                    new THREE.Vector2(scale * 0.15, scale  * 0.15), 0.0, 0.0, false));
+        embersParticleSystem.addParticleStateInitializer(Photons.BoxPositionInitializer, new THREE.Vector3(0.05 * scale, 0.0, 0.05 * scale), new THREE.Vector3(-0.025 * scale, 0.0, -0.025 * scale));
+        embersParticleSystem.addParticleStateInitializer(Photons.RandomVelocityInitializer, new THREE.Vector3(0.4 * scale, 0.5 * scale, 0.4 * scale),
+                                                         new THREE.Vector3(-0.2 * scale, 0.8 * scale, -0.2 * scale), 0.6 * scale, 0.8 * scale);
+
+        const embersOpacityInterpolatorOperator = embersParticleSystem.addParticleStateOperator(Photons.OpacityInterpolatorOperator);
+        embersOpacityInterpolatorOperator.addElement(0.0, 0.0);
+        embersOpacityInterpolatorOperator.addElement(0.7, 0.25);
+        embersOpacityInterpolatorOperator.addElement(0.9, 0.75);
+        embersOpacityInterpolatorOperator.addElement(0.0, 1.0);
+
+        const embersColorInterpolatorOperator = embersParticleSystem.addParticleStateOperator(Photons.ColorInterpolatorOperator, true);
+        embersColorInterpolatorOperator.addElement(new THREE.Color(1.0, 0.7, 0.0), 0.0);
+        embersColorInterpolatorOperator.addElement(new THREE.Color(1.0, 0.6, 0.0), 0.5);
+        embersColorInterpolatorOperator.addElement(new THREE.Color(1.0, 0.4, 0.0), 1.0);
+
+        embersParticleSystem.addParticleStateOperator(Photons.AccelerationOperator, new Photons.SphereRandomGenerator(THREE.Vector3, Math.PI * 2.0, 0.0, Math.PI , -Math.PI / 2, 20.0, -8, scale, scale, scale, 0.0, 0.0, 0.0));
+    
+        embersParticleSystem.setSimulateInWorldSpace(true);
+        embersParticleSystem.start(); 
+    
+        return embersParticleSystem;
     }
     
     setupBaseFlame (scale, position) {
@@ -74,12 +122,12 @@ export class DemoScene {
         baseFlameParticleSystem.addParticleStateInitializer(Photons.RotationInitializer, new Photons.RandomGenerator(0, Math.PI / 2.0, -Math.PI / 2.0, 0.0, 0.0, false));
         baseFlameParticleSystem.addParticleStateInitializer(Photons.RotationalSpeedInitializer, new Photons.RandomGenerator(0, 1.0, -1.0, 0.0, 0.0, false));
         baseFlameParticleSystem.addParticleStateInitializer(Photons.SizeInitializer,
-                                                        new Photons.RandomGenerator(THREE.Vector2, new THREE.Vector2(0.25  * scale, 0.25 * scale),
+                                                            new Photons.RandomGenerator(THREE.Vector2, new THREE.Vector2(0.25  * scale, 0.25 * scale),
                                                                                     new THREE.Vector2(0.5 * scale, 0.5 * scale), 0.0, 0.0, false));
     
         baseFlameParticleSystem.addParticleStateInitializer(Photons.BoxPositionInitializer, new THREE.Vector3(0.05 * scale, 0.0, 0.05 * scale), new THREE.Vector3(-0.025 * scale, 0.0, -0.025 * scale));
         baseFlameParticleSystem.addParticleStateInitializer(Photons.RandomVelocityInitializer, new THREE.Vector3(0.05 * scale, 0.4 * scale, 0.05 * scale),
-                                                        new THREE.Vector3(-0.025 * scale, 0.8 * scale, -0.025 * scale),  0.35 * scale, 0.5 * scale);
+                                                            new THREE.Vector3(-0.025 * scale, 0.8 * scale, -0.025 * scale),  0.35 * scale, 0.5 * scale);
         baseFlameParticleSystem.addParticleStateInitializer(Photons.SequenceInitializer, baseFlameParticleSequences);
     
         baseFlameParticleSystem.addParticleStateOperator(Photons.SequenceOperator, baseFlameParticleSequences, 0.07, false);
@@ -172,9 +220,9 @@ export class DemoScene {
     }
     
     setupSceneComponents () {
-        const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-        this.scene.add( directionalLight );
-        directionalLight.position.set( 5, 5, 5 );
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        this.scene.add(directionalLight) ;
+        directionalLight.position.set(5, 5, 5);
     
         const modelLoader = new GLTFLoader();
         modelLoader.load("assets/models/pumpkin_graveyard/pumpkin_graveyard.gltf", (object) => {
@@ -233,7 +281,7 @@ export class DemoScene {
                 'bias': .000009,
                 'edgeRadius': 3
             };
-            this.particleSystems[0].addLight(Photons.FlickerLight, lightParent, 10, 2, new THREE.Color().setRGB( 1, .8, .4), 0, 1.0, flickerLightShadows);
+            this.particleSystems[0].addLight(Photons.FlickerLight, lightParent, 10, 2, new THREE.Color().setRGB(1, .8, .4), 0, 1.0, flickerLightShadows);
         });
     }
 }
