@@ -1,5 +1,7 @@
 # Photons 2 - JavaScript Particle System for Three.js
 
+![Demo scene](https://github.com/mkkellogg/Photons2/assets/6249005/6aa92851-d1b9-454e-bef9-da100b03807e)
+ 
 Basic particle system for the Three.js 3D graphics library implemented in JavaScript. This is a sequel/complete rewrite of Photons (https://github.com/mkkellogg/Photons), my original particle system for Three.js.
 
 **This is very much a work in progress!**
