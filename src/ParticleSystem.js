@@ -27,6 +27,7 @@ export class ParticleSystem {
         this.simulateInWorldSpace = true;
         this.emitterInitialized = false;
         this.emitter = null;
+        this.lights = [];
         this.particleStateInitializers = [];
         this.particleStateOperators = [];
         this.particleStates = null;
@@ -67,6 +68,9 @@ export class ParticleSystem {
             if (particlesToEmit > 0) this.activateParticles(particlesToEmit);
             this.advanceActiveParticles(timeDelta);
             if (this.onUpdateCallback) this.onUpdateCallback(this.activeParticleCount);
+        }
+        for (let light of this.lights) {
+            light.update(curTime, timeDelta);
         }
         this.lastUpdateTime = curTime;
     }
@@ -109,6 +113,19 @@ export class ParticleSystem {
         this.particleEmitter.maximumActiveParticles = this.maximumActiveParticles;
         this.emitterInitialized = true;
         return this.particleEmitter;
+    }
+
+    addLight(LightClass, ...args) {
+        const light = new LightClass(...args);
+        this.lights.push(light);
+        return light;
+    }
+
+    getLight(index) {
+        if (index >= this.lights.length) {
+            throw new Error('ParticleSystem::getLight() -> "index" is out of range.');
+        }
+        return this.lights[index];
     }
 
     addParticleStateInitializer(InitializerClass, ...args) {

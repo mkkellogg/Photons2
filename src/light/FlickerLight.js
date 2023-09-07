@@ -3,7 +3,7 @@ import { Utils } from '../util/Utils.js';
 
 export class FlickerLight {
 
-    constructor() {
+    constructor(parent, intensity, intensityFlux, color, distance, decay, shadows = undefined) {
         this.owner = null;
         this.light = null;
         this.lastUpdateTime = performance.now() / 1000;
@@ -11,27 +11,39 @@ export class FlickerLight {
         this.lastPositionFlickerTime = this.lastUpdateTime;
         this.lastIntensityAdjuster = 1.0;
         this.nextIntensityAdjuster = 1.0;
-        this.intensity = 1.0;
         this.lastPositionAdjuster = new THREE.Vector3();
         this.positionAdjuster = new THREE.Vector3();
+        this.intensity = 1.0;
         this.intensityFlux = 2;
+
+        this.init(parent, intensity, intensityFlux, color, distance, decay, shadows);
     }
 
-    init(parent, shadowsEnabled, shadowMapSize, constantShadowBias, angularShadowBias, intensityFlux) {
+    init(parent, intensity, intensityFlux, color, distance, decay, shadows = undefined) {
         this.owner = new THREE.Object3D();
         parent.add(this.owner);
 
-        this.light = new THREE.PointLight(0xffffff, 2, 0, 1);
-        this.light.castShadow = shadowsEnabled;
-        this.light.shadowCameraNear = 1;
-        this.light.shadowCameraFar = 1000;
-        this.light.shadowDarkness = .8;
-        this.light.mapSize = shadowMapSize;
-        this.light.shadow.bias = .000009;
-        this.light.shadow.radius = 3;
-      //  this.light.shadowBias = constantShadowBias;
-        this.owner.add(this.light);
+        color = color || new THREE.Color();
+        distance = distance || 0;
+        if (decay == null || decay == undefined) decay = 2.0;
+        const shadowsEnabled = !!shadows;
 
+        this.light = new THREE.PointLight(0xffffff, 2, 0, 1);
+        this.light.color.copy(color);
+        this.light.distance = distance;
+        this.light.decay = decay;
+        this.light.castShadow = shadowsEnabled;
+        if (shadowsEnabled) {
+            this.light.shadow.mapSize.width = shadows.mapSize || 512;
+            this.light.shadow.mapSize.height = shadows.mapSize || 512;
+            this.light.shadow.camera.near = shadows.cameraNear || 0.5;
+            this.light.shadow.camera.far = shadows.cameraFar || 500;
+            this.light.shadow.bias = shadows.bias || 0.0001;
+            this.light.shadow.radius = shadows.edgeRadius || 1;
+        }
+
+        this.owner.add(this.light);
+        this.intensity = intensity;
         this.intensityFlux = intensityFlux;
 
         return this.light;
@@ -45,9 +57,7 @@ export class FlickerLight {
         this.intensity = intensity;
     }
 
-    update() {
-
-        const time = performance.now() / 1000;
+    update(time, timeDelta) {
 
         const elapsedTimeSinceLastIntensityFlicker = time - this.lastIntensityFlickerTime;
         const flickerIntensityIntervalsPerSecond = 8.0;
