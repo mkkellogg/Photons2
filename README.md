@@ -37,6 +37,9 @@ The repository includes a demo page (`server/index.html`) which contains a demo 
 To set up a particle system:
 
 ```javascript
+import * as Photons from './lib/photons.module.js';
+import * as THREE from 'three';
+
 // Create atlas, in this case it only contains a single image
 const embersTexture = new THREE.TextureLoader().load('assets/textures/ember.png');
 const embersAtlas = new Photons.Atlas(embersTexture);
