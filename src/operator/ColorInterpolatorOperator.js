@@ -7,6 +7,10 @@ export class ColorInterpolatorOperator extends InterpolatorOperator {
         super(THREE.Color, relativeToInitialValue);
     }
 
+    addElementsFromParameters(elementParametersTValuePairs) {
+        super.addElementsFromElementClassAndParameters(THREE.Color, elementParametersTValuePairs);
+    }
+
     updateState = function() {
 
         const tempColor = new THREE.Color();

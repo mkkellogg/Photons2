@@ -14,6 +14,19 @@ export class InterpolatorOperator extends ParticleStateOperator {
             this.interpolationElements.addElement(element, tValue);
         }
 
+        addElements(elementTValuePairs) {
+            for (let pair of elementTValuePairs) {
+                this.interpolationElements.addElement(pair[0], pair[1]);
+            }   
+        }
+
+        addElementsFromElementClassAndParameters(ElementClass, elementParametersTValuePairs) {
+            for (let pair of elementParametersTValuePairs) {
+                const [...args] = pair[0];
+                this.interpolationElements.addElement(new ElementClass(...args), pair[1]);
+            }   
+        }
+
         getInterpolatedValue(state, out) {
             let t = 0;
             switch (state.progressType) {

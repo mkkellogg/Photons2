@@ -7,6 +7,10 @@ export class SizeInterpolatorOperator extends InterpolatorOperator {
         super(THREE.Vector2, relativeToInitialValue);
     }
 
+    addElementsFromParameters(elementParametersTValuePairs) {
+        super.addElementsFromElementClassAndParameters(THREE.Vector2, elementParametersTValuePairs);
+    }
+
     updateState = function() {
 
         const tempSize = new THREE.Vector2();

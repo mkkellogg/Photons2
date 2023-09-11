@@ -7,6 +7,10 @@ export class AccelerationOperator extends ParticleStateOperator {
         this.generator = generator.clone();
     }
 
+    addElementsFromParameters(elementParametersTValuePairs) {
+        super.addElementsFromElementClassAndParameters(THREE.Vector3, elementParametersTValuePairs);
+    }
+
     updateState(state) {
         this.generator.generate(state.acceleration);
         return true;
