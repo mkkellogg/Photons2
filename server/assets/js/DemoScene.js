@@ -60,8 +60,6 @@ export class DemoScene {
         const embersRenderer = new Photons.AnimatedSpriteRenderer(embersAtlas, true);
 
         const embersParticleSystem = new Photons.ParticleSystem(embersRoot, embersRenderer, this.renderer);
-        embersParticleSystem.addParticleStateOperator(Photons.BaseParticleStateOperator);
-        embersParticleSystem.addParticleStateInitializer(Photons.BaseParticleStateInitializer);
         embersParticleSystem.init(150);
         embersRenderer.material.blending = THREE.AdditiveBlending;
         // TODO: Remove this hack and properly implement bounds calculations
@@ -118,8 +116,6 @@ export class DemoScene {
         const baseFlameRenderer = new Photons.AnimatedSpriteRenderer(baseFlameAtlas, true);
 
         const baseFlameParticleSystem = new Photons.ParticleSystem(baseFlameRoot, baseFlameRenderer, this.renderer);
-        baseFlameParticleSystem.addParticleStateOperator(Photons.BaseParticleStateOperator);
-        baseFlameParticleSystem.addParticleStateInitializer(Photons.BaseParticleStateInitializer);
         baseFlameParticleSystem.init(50);
         // TODO: Remove this hack and properly implement bounds calculations
         baseFlameRenderer.mesh.frustumCulled = false;
@@ -177,8 +173,6 @@ export class DemoScene {
         const brightFlameRenderer = new Photons.AnimatedSpriteRenderer(brightFlameAtlas, true);
 
         const brightFlameParticleSystem = new Photons.ParticleSystem(brightFlameRoot, brightFlameRenderer, this.renderer);
-        brightFlameParticleSystem.addParticleStateOperator(Photons.BaseParticleStateOperator);
-        brightFlameParticleSystem.addParticleStateInitializer(Photons.BaseParticleStateInitializer);
         brightFlameParticleSystem.init(20);
         // TODO: Remove this hack and properly implement bounds calculations
         brightFlameRenderer.mesh.frustumCulled = false;

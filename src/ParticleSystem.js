@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { ParticleStateArray } from './ParticleState.js';
 import { ParticleSequenceGroup } from './ParticleSequenceGroup.js';
+import { BaseParticleStateInitializer } from './initializer/BaseParticleStateInitializer.js';
+import { BaseParticleStateOperator } from './operator/BaseParticleStateOperator.js';
 import { Utils } from './util/Utils.js';
 
 export class ParticleSystemState {
@@ -48,6 +50,8 @@ export class ParticleSystem {
                 this.particleStates = new ParticleStateArray();
                 this.particleStates.init(this.maximumActiveParticles);
             }
+            this.addParticleStateOperator(BaseParticleStateOperator);
+            this.addParticleStateInitializer(BaseParticleStateInitializer);
         } else {
             throw new Error('ParticleSystem::init() -> trying to intialize more than once.');
         }

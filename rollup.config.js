@@ -4,21 +4,13 @@ export default [
         input: './src/index.js',
         treeshake: false,
         external: p => /^three/.test( p ),
-
-        watch: {
-            include: ['./src/**/*.js', './server/**/*.*']
-        },
-
         output: {
-
             name: 'Photons',
             extend: true,
             format: 'umd',
             file: './build/photons.umd.cjs',
             sourcemap: true,
-
             globals: p => /^three/.test( p ) ? 'THREE' : null,
-
         },
 
     },
@@ -26,18 +18,12 @@ export default [
         input: './src/index.js',
         treeshake: false,
         external: p => /^three/.test( p ),
-        watch: {
-            include: ['./src/**/*.js', './server/**/*.*']
-        },
-
         output: {
-
+            name: 'Photons',
             format: 'esm',
             file: './build/photons.module.js',
-            inlineDynamicImports: true,
             sourcemap: true,
-
+            globals: p => /^three/.test( p ) ? 'THREE' : null,
         },
-
     }
 ];
