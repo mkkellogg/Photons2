@@ -55,8 +55,6 @@ const embersRenderer = new Photons.AnimatedSpriteRenderer(embersAtlas, true);
 
 // Create and initialize the particle system
 const embersParticleSystem = new Photons.ParticleSystem(embersRoot, embersRenderer, this.renderer);
-embersParticleSystem.addParticleStateOperator(Photons.BaseParticleStateOperator);
-embersParticleSystem.addParticleStateInitializer(Photons.BaseParticleStateInitializer);
 embersParticleSystem.init(150);
 
 // Modify renderer parameters (must be done after the particle system has initialized)
@@ -89,16 +87,11 @@ embersParticleSystem.addParticleStateInitializer(Photons.RandomVelocityInitializ
     0.6, 0.8);
 
 // Set up particle operators
-const embersOpacityInterpolatorOperator = embersParticleSystem.addParticleStateOperator(Photons.OpacityInterpolatorOperator);
-embersOpacityInterpolatorOperator.addElement(0.0, 0.0);
-embersOpacityInterpolatorOperator.addElement(0.7, 0.25);
-embersOpacityInterpolatorOperator.addElement(0.9, 0.75);
-embersOpacityInterpolatorOperator.addElement(0.0, 1.0);
+const embersOpacityOperator = embersParticleSystem.addParticleStateOperator(Photons.OpacityInterpolatorOperator);
+embersOpacityOperator.addElements([[0.0, 0.0], [0.7, 0.25], [0.9, 0.75], [0.0, 1.0]]);
 
-const embersColorInterpolatorOperator = embersParticleSystem.addParticleStateOperator(Photons.ColorInterpolatorOperator, true);
-embersColorInterpolatorOperator.addElement(new THREE.Color(1.0, 0.7, 0.0), 0.0);
-embersColorInterpolatorOperator.addElement(new THREE.Color(1.0, 0.6, 0.0), 0.5);
-embersColorInterpolatorOperator.addElement(new THREE.Color(1.0, 0.4, 0.0), 1.0);
+const embersColorOperator = embersParticleSystem.addParticleStateOperator(Photons.ColorInterpolatorOperator, true);
+embersColorOperator.addElementsFromParameters([[[1.0, 0.7, 0.0], 0.0], [[1.0, 0.6, 0.0], 0.5], [[1.0, 0.4, 0.0], 1.0]]);
 
 const acceleratorOperatorGenerator = new Photons.SphereRandomGenerator(THREE.Vector3,
     Math.PI * 2.0, 0.0, Math.PI,
