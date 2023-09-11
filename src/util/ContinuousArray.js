@@ -36,59 +36,38 @@ export class ContinuousArray {
         const upper4 = new THREE.Vector4();
         const upperC = new THREE.Color();
 
+        const getVectorBasedInterpolator = (upperVector) => {
+            return (tValue, elements, tValues, out) => {
+                ContinuousArray.getInterpolationValuesForTValue(tValues, tValue, iResult);
+                upperVector.copy(elements[iResult.upperIndex]).multiplyScalar(iResult.localT);
+                out.copy(elements[iResult.lowerIndex]).multiplyScalar((1.0 - iResult.localT)).add(upperVector);
+
+            };
+        };
+
         return function(typeID) {
             switch (typeID) {
                 case BuiltinType.Scalar:
-                    return (tValue) => {
-                        this.getInterpolationValuesForTValue(tValue, iResult);
-                        return (1.0 - iResult.localT) * this.elements[iResult.lowerIndex] +
-                                iResult.localT * this.elements[iResult.upperIndex];
+                    return (tValue, elements, tValues) => {
+                        ContinuousArray.getInterpolationValuesForTValue(tValues, tValue, iResult);
+                        return (1.0 - iResult.localT) * elements[iResult.lowerIndex] +
+                                iResult.localT * elements[iResult.upperIndex];
                     };
                 case BuiltinType.Vector2:
-                    return (tValue, elements, tValues, out) => {
-                        this.getInterpolationValuesForTValue(tValue, iResult);
-                        out.copy(this.elements[iResult.lowerIndex]);
-                        upper2.copy(this.elements[iResult.upperIndex]);
-                        out.set(out.x * (1.0 - iResult.localT) + iResult.localT * upper2.x,
-                                out.y * (1.0 - iResult.localT) + iResult.localT * upper2.y);
-
-                    };
+                    return getVectorBasedInterpolator(upper2);
                 case BuiltinType.Vector3:
-                    return (tValue, elements, tValues, out) => {
-                        this.getInterpolationValuesForTValue(tValue, iResult);
-                        out.copy(this.elements[iResult.lowerIndex]);
-                        upper3.copy(this.elements[iResult.upperIndex]);
-                        out.set(out.x * (1.0 - iResult.localT) + iResult.localT * upper3.x,
-                                out.y * (1.0 - iResult.localT) + iResult.localT * upper3.y,
-                                out.z * (1.0 - iResult.localT) + iResult.localT * upper3.z);
-                    };
+                    return getVectorBasedInterpolator(upper3);
                 case BuiltinType.Vector4:
-                    return (tValue, elements, tValues, out) => {
-                        this.getInterpolationValuesForTValue(tValue, iResult);
-                        out.copy(this.elements[iResult.lowerIndex]);
-                        upper4.copy(this.elements[iResult.upperIndex]);
-                        out.set(out.x * (1.0 - iResult.localT) + iResult.localT * upper4.x,
-                                out.y * (1.0 - iResult.localT) + iResult.localT * upper4.y,
-                                out.z * (1.0 - iResult.localT) + iResult.localT * upper4.z,
-                                out.w * (1.0 - iResult.localT) + iResult.localT * upper4.w);
-                    };
+                    return getVectorBasedInterpolator(upper4);
                 case BuiltinType.Color:
-                    return (tValue, elements, tValues, out) => {
-                        this.getInterpolationValuesForTValue(tValue, iResult);
-                        out.copy(this.elements[iResult.lowerIndex]);
-                        upperC.copy(this.elements[iResult.upperIndex]);
-                        out.setRGB(out.r * (1.0 - iResult.localT) + iResult.localT * upperC.r,
-                                   out.g * (1.0 - iResult.localT) + iResult.localT * upperC.g,
-                                   out.b * (1.0 - iResult.localT) + iResult.localT * upperC.b);
-                    };
-
+                    return getVectorBasedInterpolator(upperC);
             }
         };
 
     }();
 
-    getInterpolationValuesForTValue(t, iResult) {
-        let tValueCount = this.tValues.length;
+    static getInterpolationValuesForTValue(tValues, t, iResult) {
+        let tValueCount = tValues.length;
         if (tValueCount === 0) {
             iResult.lowerIndex = -1;
             iResult.upperIndex = -1;
@@ -99,15 +78,15 @@ export class ContinuousArray {
         let lowerIndex = -1;
         let upperIndex = 0;
         for (let i = 0; i < tValueCount; i++) {
-            tValue = this.tValues[i];
+            tValue = tValues[i];
             if (tValue > t) break;
             lowerIndex++;
             upperIndex++;
         }
         iResult.lowerIndex = Utils.clamp(lowerIndex, 0, tValueCount - 1);
         iResult.upperIndex = Utils.clamp(upperIndex, 0, tValueCount - 1);
-        let lowerTValue = this.tValues[lowerIndex];
-        let upperTValue = this.tValues[upperIndex];
+        let lowerTValue = tValues[lowerIndex];
+        let upperTValue = tValues[upperIndex];
         iResult.localT = (t - lowerTValue) / (upperTValue - lowerTValue);
     }
 
