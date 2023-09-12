@@ -126,8 +126,8 @@ export class ParticleSystem {
         this.emitterInitialized = true;
     }
 
-    addComponent(ComponentClass, ...args) {
-        return this.componentContainer.addComponent(ComponentClass, ...args);
+    addComponent(component) {
+        this.componentContainer.addComponent(component);
     }
 
     getComponent(index) {

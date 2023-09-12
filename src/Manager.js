@@ -37,8 +37,8 @@ export class Manager {
         this.particleSystems.push(particleSystem);
     }
 
-    addComponent(ComponentClass, ...args) {
-        return this.componentContainer.addComponent(ComponentClass, ...args);
+    addComponent(component) {
+        this.componentContainer.addComponent(component);
     }
 
     getComponent(index) {

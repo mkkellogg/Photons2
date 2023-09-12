@@ -456,7 +456,7 @@ export class DemoScene {
                 'bias': .000009,
                 'edgeRadius': 3
             };
-            this.manager.addComponent(Photons.FlickerLight, lightParent, 10, 2, new THREE.Color().setRGB(1, .8, .4), 0, 1.0, flickerLightShadows);
+            this.manager.addComponent(new Photons.FlickerLight(lightParent, 10, 2, new THREE.Color().setRGB(1, .8, .4), 0, 1.0, flickerLightShadows));
         });
     }
 }
