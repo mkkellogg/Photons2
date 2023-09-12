@@ -1,6 +1,6 @@
 
 import { ParticleSystem, ParticleSystemState } from './ParticleSystem.js';
-import { ParticleSystemManager } from './ParticleSystemManager.js';
+import { Manager } from './Manager.js';
 import { ParticleStateArray } from './ParticleState.js';
 import { Renderer } from './renderer/Renderer.js';
 import { AnimatedSpriteRenderer } from './renderer/AnimatedSpriteRenderer.js';
@@ -26,12 +26,12 @@ import { AccelerationOperator } from './operator/AccelerationOperator.js';
 import { RandomGenerator } from './util/RandomGenerator.js';
 import { SphereRandomGenerator } from './util/SphereRandomGenerator.js';
 
-import { FlickerLight } from './light/FlickerLight.js';
+import { FlickerLight } from './component/FlickerLight.js';
 
 export {
     ParticleSystem,
     ParticleSystemState,
-    ParticleSystemManager,
+    Manager,
     ParticleStateArray,
     Renderer,
     AnimatedSpriteRenderer,

@@ -10,6 +10,7 @@ export class DemoScene {
         this.camera = camera;
         this.renderer = renderer;
         this.particleSystems = [];
+        this.manager = new Photons.Manager();
     }
 
     build () {
@@ -18,15 +19,11 @@ export class DemoScene {
     }
 
     update() {
-        for (let particleSystem of this.particleSystems) {
-            particleSystem.update();
-        }
+        this.manager.update();
     }
 
     render() {
-        for (let particleSystem of this.particleSystems) {
-            particleSystem.render(this.renderer, this.camera);
-        }
+        this.manager.render(this.renderer, this.camera);
     }
 
     static traverseScene (node, onVisit, visited) {
@@ -45,9 +42,9 @@ export class DemoScene {
     setupParticleSystems (){
         let scale = 0.15;
         let flamePosition = new THREE.Vector3(-.3, 1.65, 1.65);
-        this.particleSystems.push(this.setupEmbers(scale, flamePosition));
-        this.particleSystems.push(this.setupBaseFlame(scale, flamePosition));
-        this.particleSystems.push(this.setupBrightFLame(scale, flamePosition));
+        this.manager.addParticleSystem(this.setupEmbers(scale, flamePosition));
+        this.manager.addParticleSystem(this.setupBaseFlame(scale, flamePosition));
+        this.manager.addParticleSystem(this.setupBrightFLame(scale, flamePosition));
     }
 
     setupEmbers (scale, position) {
@@ -277,7 +274,7 @@ export class DemoScene {
                 'bias': .000009,
                 'edgeRadius': 3
             };
-            this.particleSystems[2].addLight(Photons.FlickerLight, lightParent, 10, 2, new THREE.Color().setRGB(1, .8, .4), 0, 1.0, flickerLightShadows);
+            this.manager.addComponent(Photons.FlickerLight, lightParent, 10, 2, new THREE.Color().setRGB(1, .8, .4), 0, 1.0, flickerLightShadows);
         });
     }
 }

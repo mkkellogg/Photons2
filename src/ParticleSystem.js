@@ -4,6 +4,7 @@ import { ParticleSequenceGroup } from './ParticleSequenceGroup.js';
 import { BaseParticleStateInitializer } from './initializer/BaseParticleStateInitializer.js';
 import { BaseParticleStateOperator } from './operator/BaseParticleStateOperator.js';
 import { Utils } from './util/Utils.js';
+import { ComponentContainer } from './ComponentContainer.js';
 
 export class ParticleSystemState {
 
@@ -30,7 +31,7 @@ export class ParticleSystem {
         this.simulateInWorldSpace = true;
         this.emitterInitialized = false;
         this.emitter = null;
-        this.lights = [];
+        this.componentContainer = new ComponentContainer();
         this.particleStateInitializers = [];
         this.particleStateOperators = [];
         this.particleStates = null;
@@ -57,7 +58,7 @@ export class ParticleSystem {
         }
     }
 
-    getVisibile() {
+    getVisible() {
         return this.visible;
     }
 
@@ -65,33 +66,27 @@ export class ParticleSystem {
         return this.visible = visible;
     }
 
-    currentTime() {
-        return performance.now() / 1000;
-    }
-
     onUpdate(callback) {
         this.onUpdateCallback = callback;
     }
 
-    update() {
+    update(currentTime, timeDelta) {
         if (this.systemState == ParticleSystemState.Running) {
-            const curTime = this.currentTime();
-            const timeDelta = curTime - this.lastUpdateTime;
+            currentTime = (currentTime == undefined || currentTime == null) ? Utils.currentTime() : currentTime;
+            timeDelta = (timeDelta == undefined || timeDelta == null) ? currentTime - this.lastUpdateTime : timeDelta;
             if (this.emitterInitialized && this.systemState == ParticleSystemState.Running) {
                 const particlesToEmit = this.particleEmitter.update(timeDelta);
                 if (particlesToEmit > 0) this.activateParticles(particlesToEmit);
                 this.advanceActiveParticles(timeDelta);
                 if (this.onUpdateCallback) this.onUpdateCallback(this.activeParticleCount);
             }
-            for (let light of this.lights) {
-                light.update(curTime, timeDelta);
-            }
-            this.lastUpdateTime = curTime;
+            this.componentContainer.update(currentTime, timeDelta);
+            this.lastUpdateTime = currentTime;
         }
     }
 
     render(threeRenderer, camera) {
-        if (this.getVisibile()) {
+        if (this.getVisible()) {
             const saveAutoClear = threeRenderer.autoClear;
             threeRenderer.autoClear = false;
             this.owner.visible = true;
@@ -104,7 +99,7 @@ export class ParticleSystem {
     start() {
         if (this.systemState == ParticleSystemState.NotStarted || this.systemState == ParticleSystemState.Paused) {
             this.systemState = ParticleSystemState.Running;
-            this.startTime = this.currentTime();
+            this.startTime = Utils.currentTime();
             this.lastUpdateTime = this.startTime;
         } else {
             // TODO: Decide how to handle this case
@@ -132,17 +127,12 @@ export class ParticleSystem {
         return this.particleEmitter;
     }
 
-    addLight(LightClass, ...args) {
-        const light = new LightClass(...args);
-        this.lights.push(light);
-        return light;
+    addComponent(ComponentClass, ...args) {
+        return this.componentContainer.addComponent(ComponentClass, ...args);
     }
 
-    getLight(index) {
-        if (index >= this.lights.length) {
-            throw new Error('ParticleSystem::getLight() -> "index" is out of range.');
-        }
-        return this.lights[index];
+    getComponent(index) {
+        return this.componentContainer.getComponent(index);
     }
 
     addParticleStateInitializer(InitializerClass, ...args) {

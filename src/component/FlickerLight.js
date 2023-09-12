@@ -1,9 +1,11 @@
 import * as THREE from 'three';
 import { Utils } from '../util/Utils.js';
+import { Component } from './Component.js';
 
-export class FlickerLight {
+export class FlickerLight extends Component {
 
     constructor(parent, intensity, intensityFlux, color, distance, decay, shadows = undefined) {
+        super();
         this.owner = null;
         this.light = null;
         this.lastUpdateTime = performance.now() / 1000;
@@ -57,7 +59,7 @@ export class FlickerLight {
         this.intensity = intensity;
     }
 
-    update(time, timeDelta) {
+    update(time) {
 
         const elapsedTimeSinceLastIntensityFlicker = time - this.lastIntensityFlickerTime;
         const flickerIntensityIntervalsPerSecond = 8.0;
