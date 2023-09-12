@@ -2,9 +2,9 @@ import { ContinuousParticleEmitter } from './ContinuousParticleEmitter.js';
 
 export class ConstantParticleEmitter extends ContinuousParticleEmitter {
 
-    constructor() {
+    constructor(emissionRate = 0.0) {
         super();
-        this.emissionRate = 0.0;
+        this.emissionRate = emissionRate;
     }
 
     update(timeDelta) {

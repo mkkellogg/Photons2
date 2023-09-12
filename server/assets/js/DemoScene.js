@@ -62,23 +62,22 @@ export class DemoScene {
         // TODO: Remove this hack and properly implement bounds calculations
         embersRenderer.mesh.frustumCulled = false;
     
-        const embersEmitter = embersParticleSystem.setEmitter(Photons.ConstantParticleEmitter);
-        embersEmitter.emissionRate = 6;
+        const embersEmitter = embersParticleSystem.setEmitter(new Photons.ConstantParticleEmitter(6));
 
         const lifetimeInitializerGenerator = new Photons.RandomGenerator(0, 3.0, 1.0, 0.0, 0.0, false);
         const sizeInitializerGenerator = new Photons.RandomGenerator(THREE.Vector2,
                                                                      new THREE.Vector2(0.0, 0.0),
                                                                      new THREE.Vector2(scale * 0.15, scale  * 0.15),
                                                                      0.0, 0.0, false);
-        embersParticleSystem.addParticleStateInitializer(Photons.LifetimeInitializer, lifetimeInitializerGenerator);
-        embersParticleSystem.addParticleStateInitializer(Photons.SizeInitializer, sizeInitializerGenerator);
-        embersParticleSystem.addParticleStateInitializer(Photons.BoxPositionInitializer,
+        embersParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(lifetimeInitializerGenerator));
+        embersParticleSystem.addParticleStateInitializer(new Photons.SizeInitializer(sizeInitializerGenerator));
+        embersParticleSystem.addParticleStateInitializer(new Photons.BoxPositionInitializer(
                                                          new THREE.Vector3(0.05 * scale, 0.0, 0.05 * scale),
-                                                         new THREE.Vector3(-0.025 * scale, 0.0, -0.025 * scale));
-        embersParticleSystem.addParticleStateInitializer(Photons.RandomVelocityInitializer,
+                                                         new THREE.Vector3(-0.025 * scale, 0.0, -0.025 * scale)));
+        embersParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(
                                                          new THREE.Vector3(0.4 * scale, 0.5 * scale, 0.4 * scale),
                                                          new THREE.Vector3(-0.2 * scale, 0.8 * scale, -0.2 * scale),
-                                                         0.6 * scale, 0.8 * scale);
+                                                         0.6 * scale, 0.8 * scale));
 
         const embersOpacityOperator = embersParticleSystem.addParticleStateOperator(Photons.OpacityInterpolatorOperator);
         embersOpacityOperator.addElements([[0.0, 0.0], [0.7, 0.25], [0.9, 0.75], [0.0, 1.0]]);
@@ -114,27 +113,26 @@ export class DemoScene {
         // TODO: Remove this hack and properly implement bounds calculations
         baseFlameRenderer.mesh.frustumCulled = false;
 
-        const baseFlameEmitter = baseFlameParticleSystem.setEmitter(Photons.ConstantParticleEmitter);
-        baseFlameEmitter.emissionRate = 10;
+        const baseFlameEmitter = baseFlameParticleSystem.setEmitter(new Photons.ConstantParticleEmitter(10));
 
         baseFlameParticleSystem.addParticleSequence(0, 18);
         const baseFlameParticleSequences = baseFlameParticleSystem.getParticleSequences();
 
-        baseFlameParticleSystem.addParticleStateInitializer(Photons.LifetimeInitializer, new Photons.RandomGenerator(0, 0.0, 0.0, 0.0, 0.0, false));
-        baseFlameParticleSystem.addParticleStateInitializer(Photons.RotationInitializer, new Photons.RandomGenerator(0, Math.PI / 2.0, -Math.PI / 2.0, 0.0, 0.0, false));
-        baseFlameParticleSystem.addParticleStateInitializer(Photons.RotationalSpeedInitializer, new Photons.RandomGenerator(0, 1.0, -1.0, 0.0, 0.0, false));
-        baseFlameParticleSystem.addParticleStateInitializer(Photons.SizeInitializer,
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(new Photons.RandomGenerator(0, 0.0, 0.0, 0.0, 0.0, false)));
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.RotationInitializer(new Photons.RandomGenerator(0, Math.PI / 2.0, -Math.PI / 2.0, 0.0, 0.0, false)));
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.RotationalSpeedInitializer(new Photons.RandomGenerator(0, 1.0, -1.0, 0.0, 0.0, false)));
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.SizeInitializer(
                                                             new Photons.RandomGenerator(THREE.Vector2,
                                                                                         new THREE.Vector2(0.25  * scale, 0.25 * scale),
                                                                                         new THREE.Vector2(0.5 * scale, 0.5 * scale),
-                                                                                        0.0, 0.0, false));
+                                                                                        0.0, 0.0, false)));
 
-        baseFlameParticleSystem.addParticleStateInitializer(Photons.BoxPositionInitializer,
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.BoxPositionInitializer(
                                                             new THREE.Vector3(0.05 * scale, 0.0, 0.05 * scale),
-                                                            new THREE.Vector3(-0.025 * scale, 0.0, -0.025 * scale));
-        baseFlameParticleSystem.addParticleStateInitializer(Photons.RandomVelocityInitializer, new THREE.Vector3(0.05 * scale, 0.4 * scale, 0.05 * scale),
-                                                            new THREE.Vector3(-0.025 * scale, 0.8 * scale, -0.025 * scale),  0.35 * scale, 0.5 * scale);
-        baseFlameParticleSystem.addParticleStateInitializer(Photons.SequenceInitializer, baseFlameParticleSequences);
+                                                            new THREE.Vector3(-0.025 * scale, 0.0, -0.025 * scale)));
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(new THREE.Vector3(0.05 * scale, 0.4 * scale, 0.05 * scale),
+                                                            new THREE.Vector3(-0.025 * scale, 0.8 * scale, -0.025 * scale),  0.35 * scale, 0.5 * scale));
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.SequenceInitializer(baseFlameParticleSequences));
 
         baseFlameParticleSystem.addParticleStateOperator(Photons.SequenceOperator, baseFlameParticleSequences, 0.07, false);
 
@@ -172,24 +170,23 @@ export class DemoScene {
         // TODO: Remove this hack and properly implement bounds calculations
         brightFlameRenderer.mesh.frustumCulled = false;
 
-        const brightFlameEmitter = brightFlameParticleSystem.setEmitter(Photons.ConstantParticleEmitter);
-        brightFlameEmitter.emissionRate = 5;
+        const brightFlameEmitter = brightFlameParticleSystem.setEmitter(new Photons.ConstantParticleEmitter(5));
 
         brightFlameParticleSystem.addParticleSequence(0, 16);
         const brightFlameParticleSequences = brightFlameParticleSystem.getParticleSequences();
 
-        brightFlameParticleSystem.addParticleStateInitializer(Photons.LifetimeInitializer, new Photons.RandomGenerator(0, 0.0, 0.0, 0.0, 0.0, false));
-        brightFlameParticleSystem.addParticleStateInitializer(Photons.RotationInitializer, new Photons.RandomGenerator(0, Math.PI, -Math.PI / 2.0, 0.0, 0.0, false));
-        brightFlameParticleSystem.addParticleStateInitializer(Photons.RotationalSpeedInitializer, new Photons.RandomGenerator(0, Math.PI / 2.0, -Math.PI / 4.0, 0.0, 0.0, false));
-        brightFlameParticleSystem.addParticleStateInitializer(Photons.SizeInitializer,
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(new Photons.RandomGenerator(0, 0.0, 0.0, 0.0, 0.0, false)));
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.RotationInitializer(new Photons.RandomGenerator(0, Math.PI, -Math.PI / 2.0, 0.0, 0.0, false)));
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.RotationalSpeedInitializer(new Photons.RandomGenerator(0, Math.PI / 2.0, -Math.PI / 4.0, 0.0, 0.0, false)));
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.SizeInitializer(
                                                               new Photons.RandomGenerator(THREE.Vector2, new THREE.Vector2(0.0, 0.0),
-                                                              new THREE.Vector2(0.0, 0.0), 0.2 * scale, 0.65 * scale, false));
-        brightFlameParticleSystem.addParticleStateInitializer(Photons.BoxPositionInitializer,
+                                                              new THREE.Vector2(0.0, 0.0), 0.2 * scale, 0.65 * scale, false)));
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.BoxPositionInitializer(
                                                               new THREE.Vector3(0.1 * scale, 0.0, 0.1 * scale),
-                                                              new THREE.Vector3(-0.05 * scale, 0.0, -0.05 * scale));
-        brightFlameParticleSystem.addParticleStateInitializer(Photons.RandomVelocityInitializer, new THREE.Vector3(0.02 * scale, 0.4 * scale, 0.02 * scale),
-                                                              new THREE.Vector3(-0.01 * scale, 0.4 * scale, -0.01 * scale),  0.1 * scale, .2 * scale);
-        brightFlameParticleSystem.addParticleStateInitializer(Photons.SequenceInitializer, brightFlameParticleSequences);
+                                                              new THREE.Vector3(-0.05 * scale, 0.0, -0.05 * scale)));
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(new THREE.Vector3(0.02 * scale, 0.4 * scale, 0.02 * scale),
+                                                              new THREE.Vector3(-0.01 * scale, 0.4 * scale, -0.01 * scale),  0.1 * scale, .2 * scale));
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.SequenceInitializer(brightFlameParticleSequences));
 
         brightFlameParticleSystem.addParticleStateOperator(Photons.SequenceOperator, brightFlameParticleSequences, 0.1, false);
 
