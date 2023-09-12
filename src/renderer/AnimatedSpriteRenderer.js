@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Renderer } from './Renderer.js';
 import { ParticleStateAttributeArray } from './ParticleStateAttributeArray.js';
+import { Atlas } from './Atlas.js';
 
 export class AnimatedSpriteRenderer extends Renderer {
 
@@ -254,5 +255,15 @@ export class AnimatedSpriteRenderer extends Renderer {
             return shader;
         }
     };
+
+    static loadFromJSON(params) {
+        const atlasJSON = params.atlas;
+        const atlasTexture = new THREE.TextureLoader().load(atlasJSON.texture);
+        const atlas = new Atlas(atlasTexture);
+        const frames = atlasJSON.frames;
+        atlas.addTileArray(frames.count, frames.x, frames.y, frames.width, frames.height);
+        const renderer = new AnimatedSpriteRenderer(atlas, atlasJSON.interpolateFrames);
+        return renderer;
+    }
 
 }

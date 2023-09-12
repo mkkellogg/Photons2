@@ -211,6 +211,189 @@ export class DemoScene {
                                                                                        0.0, 0.0, false));
 
         brightFlameParticleSystem.setSimulateInWorldSpace(true);
+
+
+        const brightFlameJSON = {
+            'maxParticleCount': 20,
+            'simulateInWorldSpace': true,
+            'renderer': {
+                'type': 'Photons.AnimatedSpriteRenderer',
+                'params': {
+                    'atlas': {
+                        'interpolateFrames': true,
+                        'texture': 'assets/textures/bright_flame.png',
+                        'frames': {
+                            'count': 16,
+                            'x': 0.0,
+                            'y': 0.0,
+                            'width': 212.0 / 1024.0,
+                            'height': 256.0 / 1024.0
+                        }
+                    }
+                }
+            },
+            'emitter': {
+                'type': 'Photons.ConstantParticleEmitter',
+                'params': {
+                    'emissionRate': 5,
+                }
+            },
+            'sequences': [
+                {
+                    'start': 0,
+                    'length': 16
+                }
+            ],
+            'initializers': [
+                {
+                    'type': 'Photons.LifetimeInitializer',
+                    'params': {
+                        'generator': {
+                            'type': 'Photons.RandomGenerator',
+                            'params': {
+                                'type': 'Scalar',
+                                'range': 0.0,
+                                'offset': 0.0,
+                                'uniformOffset': 0.0,
+                                'normalize': 0.0,
+                                'normalize': false
+                            }
+                        }
+                    }
+                },
+                {
+                    'type': 'Photons.RotationInitializer',
+                    'params': {
+                        'generator': {
+                            'type': 'Photons.RandomGenerator',
+                            'params': {
+                                'type': 'Scalar',
+                                'range': Math.PI,
+                                'offset': -Math.PI / 2.0,
+                                'uniformOffset': 0.0,
+                                'uniformRange': 0.0,
+                                'normalize': false
+                            }
+                        }
+                    }
+                },
+                {
+                    'type': 'Photons.RotationalSpeedInitializer',
+                    'params': {
+                        'generator': {
+                            'type': 'Photons.RandomGenerator',
+                            'params': {
+                                'type': 'Scalar',
+                                'range': Math.PI / 2.0,
+                                'offset': -Math.PI / 4.0,
+                                'uniformOffset': 0.0,
+                                'uniformRange': 0.0,
+                                'normalize': false
+                            }
+                        }
+                    }
+                },
+                {
+                    'type': 'Photons.SizeInitializer',
+                    'params': {
+                        'generator': {
+                            'type': 'Photons.RandomGenerator',
+                            'params': {
+                                'type': 'THREE.Vector2',
+                                'range': [0.0, 0.0],
+                                'offset': [0.0, 0.0],
+                                'uniformOffset': 0.03,
+                                'uniformRange': 0.0975,
+                                'normalize': false
+                            }
+                        }
+                    }
+                },
+                {
+                    'type': 'Photons.BoxPositionInitializer',
+                    'params': {
+                        'range': [0.015, 0.0, 0.015],
+                        'offset': [-0.0075, 0.0, -0.0075]
+                    }
+                },
+                {
+                    'type': 'Photons.RandomVelocityInitializer',
+                    'params': {
+                        'range': [0.003, 0.06, 0.003],
+                        'offset': [-0.0015, 0.06, -0.0015],
+                        'uniformRange': 0.015,
+                        'uniformOffset': 0.03
+                    }
+                },
+                {
+                    'type': 'Photons.SequenceInitializer',
+                    'params': {}
+                },
+                {
+                    'type': 'Photons.SequenceOperator',
+                    'params': {}
+                }
+            ],
+            'operators': [
+                {
+                    'type': 'Photons.OpacityInterpolatorOperator',
+                    'params': {},
+                    'elements': [
+                        [0.0, 0.0],
+                        [0.6, 0.2],
+                        [0.5, 0.75],
+                        [0.0, 1.0]
+                    ]
+                },
+                {
+                    'type': 'Photons.SizeInterpolatorOperator',
+                    'params': {
+                        'relativeToInitialValue': true
+                    },
+                    'elements': [
+                        [[0.3, 0.3], 0.0],
+                        [[1.0, 1.0], 0.4],
+                        [[1.0, 1.0], 0.55],
+                        [[0.65, 0.65], 0.75],
+                        [[0.1, 0.1], 1.0]
+                    ]
+                },
+                {
+                    'type': 'Photons.ColorInterpolatorOperator',
+                    'params': {
+                        'relativeToInitialValue': true
+                    },
+                    'elements': [
+                        [[[1.0, 1.0, 1.0], 0.0],
+                         [[2.0, 2.0, 2.0], 0.3],
+                         [[2.0, 2.0, 2.0], 0.4],
+                         [[0.9, 0.6, 0.3], 0.65],
+                         [[0.75, 0.0, 0.0], 1.0]]
+                    ]
+                },
+                {
+                    'type': 'Photons.AccelerationOperator',
+                    'params': {
+                        'generator': {
+                            'type': 'Photons.RandomGenerator',
+                            'params': {
+                                'type': 'THREE.Vector3',
+                                'range': [0.0, 0.0, 0.0],
+                                'offset': [0.0, 0.225, 0.0],
+                                'uniformOffset': 0.0,
+                                'uniformRange': 0.0,
+                                'normalize': false
+                            }
+                        }
+                    }
+                }
+            ]
+        };
+        this.manager.addJSONNamespace('THREE', THREE);
+        this.manager.addJSONNamespace('Photons', Photons);
+        const [testParticleSystemFromJSON, ownerObject] = this.manager.loadParticleSystemFromJSON(brightFlameJSON);
+
+
         brightFlameParticleSystem.start();
 
         return brightFlameParticleSystem;

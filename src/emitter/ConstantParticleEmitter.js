@@ -19,4 +19,9 @@ export class ConstantParticleEmitter extends ContinuousParticleEmitter {
         return 0;
     }
 
+    static loadFromJSON(params) {
+        const emitter = new ConstantParticleEmitter();
+        emitter.emissionRate = params.emissionRate || 0.0;
+        return emitter;
+    }
 }
