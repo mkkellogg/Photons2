@@ -52,7 +52,7 @@ export class ParticleSystem {
                 this.particleStates.init(this.maximumActiveParticles);
             }
             this.addParticleStateInitializer(new BaseParticleStateInitializer());
-            this.addParticleStateOperator(BaseParticleStateOperator);
+            this.addParticleStateOperator(new BaseParticleStateOperator());
         } else {
             throw new Error('ParticleSystem::init() -> trying to intialize more than once.');
         }
@@ -124,6 +124,7 @@ export class ParticleSystem {
         this.particleEmitter = emitter;
         this.particleEmitter.maximumActiveParticles = this.maximumActiveParticles;
         this.emitterInitialized = true;
+        return emitter;
     }
 
     addComponent(component) {
@@ -136,6 +137,7 @@ export class ParticleSystem {
 
     addParticleStateInitializer(initializer) {
         this.particleStateInitializers.push(initializer);
+        return initializer;
     }
 
     getParticleStateInitializer(index) {
@@ -145,8 +147,7 @@ export class ParticleSystem {
         return this.particleStateInitializers[index];
     }
 
-    addParticleStateOperator(OperatorClass, ...args) {
-        const operator = new OperatorClass(...args);
+    addParticleStateOperator(operator) {
         this.particleStateOperators.push(operator);
         return operator;
     }
