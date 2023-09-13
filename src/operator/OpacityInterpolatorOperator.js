@@ -2,8 +2,12 @@ import { InterpolatorOperator } from './InterpolatorOperator.js';
 
 export class OpacityInterpolatorOperator extends InterpolatorOperator {
 
-    constructor(relativeToInitialValue) {
+    constructor(relativeToInitialValue = false) {
         super(0, relativeToInitialValue);
+    }
+
+    addElementsFromParameters(elementParametersTValuePairs) {
+        super.addElements(elementParametersTValuePairs);
     }
 
     updateState(state) {
@@ -15,4 +19,8 @@ export class OpacityInterpolatorOperator extends InterpolatorOperator {
         return true;
     }
 
+
+    static loadFromJSON(particleSystem, params) {
+        return new OpacityInterpolatorOperator(params.relativeToInitialValue);
+    }
 }

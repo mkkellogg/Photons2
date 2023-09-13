@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { Generator } from './Generator.js';
 import { BuiltinType } from './BuiltIn.js';
 
@@ -50,8 +51,25 @@ export class RandomGenerator extends Generator {
         return clone;
     }
 
+    static loadJSONParameter(param, type) {
+        switch (type) {
+            case THREE.Vector2:
+                return new THREE.Vector2().fromArray(param);
+            case THREE.Vector3:
+                return new THREE.Vector3().fromArray(param);
+            case THREE.Vector4:
+                return new THREE.Vector4().fromArray(param);
+            case THREE.Color:
+                return new THREE.Color().fromArray(param);
+        }
+
+        return param;
+    }
+
     static loadFromJSON(params) {
-        return new RandomGenerator(params.type, params.range, params.offset,
-                                   params.uniformRange || 0.0, params.offsetRange || 0.0, params.normalize);
+        return new RandomGenerator(params.type,
+                                   RandomGenerator.loadJSONParameter(params.range, params.type),
+                                   RandomGenerator.loadJSONParameter(params.offset, params.type),
+                                   params.uniformRange || 0.0, params.uniformOffset || 0.0, params.normalize);
     }
 }

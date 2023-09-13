@@ -2,7 +2,7 @@ import { ParticleStateOperator } from './ParticleStateOperator.js';
 
 export class SequenceOperator extends ParticleStateOperator {
 
-    constructor(particleSequences, speed, loop, reverse) {
+    constructor(particleSequences, speed, loop = false, reverse = false) {
         super();
         this.particleSequences = particleSequences;
         this.speed = speed;
@@ -28,6 +28,10 @@ export class SequenceOperator extends ParticleStateOperator {
             }
         }
         return true;
+    }
+
+    static loadFromJSON(particleSystem, params) {
+        return new SequenceOperator(particleSystem.getParticleSequences(), params.speed, params.loop, params.reverse);
     }
 
 }

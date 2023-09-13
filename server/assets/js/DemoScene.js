@@ -11,6 +11,8 @@ export class DemoScene {
         this.renderer = renderer;
         this.particleSystems = [];
         this.manager = new Photons.Manager();
+        this.manager.addJSONNamespace('THREE', THREE);
+        this.manager.addJSONNamespace('Photons', Photons);
     }
 
     build () {
@@ -42,8 +44,8 @@ export class DemoScene {
     setupParticleSystems (){
         let scale = 0.15;
         let flamePosition = new THREE.Vector3(-.3, 1.65, 1.65);
-        this.manager.addParticleSystem(this.setupEmbers(scale, flamePosition));
-        this.manager.addParticleSystem(this.setupBaseFlame(scale, flamePosition));
+        //this.manager.addParticleSystem(this.setupEmbers(scale, flamePosition));
+       // this.manager.addParticleSystem(this.setupBaseFlame(scale, flamePosition));
         this.manager.addParticleSystem(this.setupBrightFLame(scale, flamePosition));
     }
 
@@ -237,8 +239,9 @@ export class DemoScene {
             },
             'sequences': [
                 {
+                    'id': 0,
                     'start': 0,
-                    'length': 16
+                    'length': 16,
                 }
             ],
             'initializers': [
@@ -251,8 +254,8 @@ export class DemoScene {
                                 'type': 'Scalar',
                                 'range': 0.0,
                                 'offset': 0.0,
-                                'uniformOffset': 0.0,
                                 'uniformRange': 0.0,
+                                'uniformOffset': 0.0,
                                 'normalize': false
                             }
                         }
@@ -267,8 +270,8 @@ export class DemoScene {
                                 'type': 'Scalar',
                                 'range': Math.PI,
                                 'offset': -Math.PI / 2.0,
-                                'uniformOffset': 0.0,
                                 'uniformRange': 0.0,
+                                'uniformOffset': 0.0,
                                 'normalize': false
                             }
                         }
@@ -283,8 +286,8 @@ export class DemoScene {
                                 'type': 'Scalar',
                                 'range': Math.PI / 2.0,
                                 'offset': -Math.PI / 4.0,
-                                'uniformOffset': 0.0,
                                 'uniformRange': 0.0,
+                                'uniformOffset': 0.0,
                                 'normalize': false
                             }
                         }
@@ -299,8 +302,8 @@ export class DemoScene {
                                 'type': 'THREE.Vector2',
                                 'range': [0.0, 0.0],
                                 'offset': [0.0, 0.0],
-                                'uniformOffset': 0.03,
-                                'uniformRange': 0.0975,
+                                'uniformRange': 0.03,
+                                'uniformOffset': 0.0975,
                                 'normalize': false
                             }
                         }
@@ -332,11 +335,17 @@ export class DemoScene {
             'operators': [
                 {
                     'type': 'Photons.SequenceOperator',
-                    'params': {}
+                    'params': {
+                        'speed': 0.1,
+                        'loop': false,
+                        'reverse': false
+                    }
                 },
                 {
                     'type': 'Photons.OpacityInterpolatorOperator',
-                    'params': {},
+                    'params': {
+                        'relativeToInitialValue': false
+                    },
                     'elements': [
                         [0.0, 0.0],
                         [0.6, 0.2],
@@ -363,11 +372,11 @@ export class DemoScene {
                         'relativeToInitialValue': true
                     },
                     'elements': [
-                        [[[1.0, 1.0, 1.0], 0.0],
+                         [[1.0, 1.0, 1.0], 0.0],
                          [[2.0, 2.0, 2.0], 0.3],
                          [[2.0, 2.0, 2.0], 0.4],
                          [[0.9, 0.6, 0.3], 0.65],
-                         [[0.75, 0.0, 0.0], 1.0]]
+                         [[0.75, 0.0, 0.0], 1.0]
                     ]
                 },
                 {
@@ -388,12 +397,14 @@ export class DemoScene {
                 }
             ]
         };
-        this.manager.addJSONNamespace('THREE', THREE);
-        this.manager.addJSONNamespace('Photons', Photons);
-        const [testParticleSystemFromJSON, ownerObject] = this.manager.loadParticleSystemFromJSON(brightFlameJSON);
+        const [testParticleSystemFromJSON, rootObject] = this.manager.loadParticleSystemFromJSON(brightFlameJSON);
+        rootObject.position.copy(position);
+        //testParticleSystemFromJSON.start();
+        //testParticleSystemFromJSON.particleSystemRenderer.mesh.frustumCulled = false;
+       // return testParticleSystemFromJSON;
 
 
-        brightFlameParticleSystem.start();
+       brightFlameParticleSystem.start();
 
         return brightFlameParticleSystem;
     }

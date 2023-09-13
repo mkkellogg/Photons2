@@ -129,11 +129,12 @@ export class Manager {
         particleSystem.setSimulateInWorldSpace(simulateInWorldSpace);
 
         const emitterJSON = json.emitter;
-        emitterJSON.type.loadFromJSON(emitterJSON.params);
+        const emitter = emitterJSON.type.loadFromJSON(emitterJSON.params);
+        particleSystem.setEmitter(emitter);
 
         if (json.sequences) {
             for(const sequenceJSON of json.sequences) {
-                particleSystem.addParticleSequence(sequenceJSON.start, sequenceJSON.length);
+                particleSystem.addParticleSequence(sequenceJSON.start, sequenceJSON.length, sequenceJSON.id);
             }
         }
 
@@ -143,7 +144,16 @@ export class Manager {
             }
         }
 
-        return [undefined, undefined];
+        if (json.operators) {
+            for(const operatorJSON of json.operators) {
+                const operator = particleSystem.addParticleStateOperator(operatorJSON.type.loadFromJSON(particleSystem, operatorJSON.params));
+                if (operatorJSON.elements) {
+                    operator.addElementsFromParameters(operatorJSON.elements);
+                }
+            }
+        }
+    
+        return [particleSystem, rootObject];
     }
 
     convertParticleSystemToJSON() {

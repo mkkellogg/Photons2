@@ -3,7 +3,7 @@ import { InterpolatorOperator } from './InterpolatorOperator.js';
 
 export class ColorInterpolatorOperator extends InterpolatorOperator {
 
-    constructor(relativeToInitialValue) {
+    constructor(relativeToInitialValue = false) {
         super(THREE.Color, relativeToInitialValue);
     }
 
@@ -29,4 +29,7 @@ export class ColorInterpolatorOperator extends InterpolatorOperator {
 
     }();
 
+    static loadFromJSON(particleSystem, params) {
+        return new ColorInterpolatorOperator(params.relativeToInitialValue);
+    }
 }

@@ -3,7 +3,7 @@ import { InterpolatorOperator } from './InterpolatorOperator.js';
 
 export class SizeInterpolatorOperator extends InterpolatorOperator {
 
-    constructor(relativeToInitialValue) {
+    constructor(relativeToInitialValue = false) {
         super(THREE.Vector2, relativeToInitialValue);
     }
 
@@ -28,4 +28,7 @@ export class SizeInterpolatorOperator extends InterpolatorOperator {
 
     }();
 
+    static loadFromJSON(particleSystem, params) {
+        return new SizeInterpolatorOperator(params.relativeToInitialValue);
+    }
 }

@@ -31,4 +31,5 @@ export class SequenceInitializer extends ParticleStateInitializer {
     static loadFromJSON(particleSystem, params) {
         return new SequenceInitializer(particleSystem.getParticleSequences(), params.reverse);
     }
+
 }
