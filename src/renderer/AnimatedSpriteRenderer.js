@@ -28,6 +28,8 @@ export class AnimatedSpriteRenderer extends Renderer {
             this.particleStateArray.init(particleCount);
             this.material = this.createMaterial(null, null, null, true, false);
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
+            // TODO: At some point remove this and perform proper bounds calculations
+            this.mesh.frustumCulled = false;
             this.owner.add(this.mesh);
         }
     }
@@ -258,40 +260,53 @@ export class AnimatedSpriteRenderer extends Renderer {
 
     static loadFromJSON(params) {
         const atlasJSON = params.atlas;
-        const atlasTexture = new THREE.TextureLoader().load(atlasJSON.texture);
-        const atlas = new Atlas(atlasTexture);
+        const atlasTexture = new THREE.TextureLoader().load(atlasJSON.texturePath);
+        const atlas = new Atlas(atlasTexture, atlasJSON.texturePath);
         const framesets = atlasJSON.framesets;
         for (let frameset of framesets) {
-            atlas.addFrameSet(frameset.count, frameset.x, frameset.y, frameset.width, frameset.height);
+            atlas.addFrameSet(frameset.length, frameset.x, frameset.y, frameset.width, frameset.height);
         }
         const renderer = new AnimatedSpriteRenderer(atlas, atlasJSON.interpolateFrames);
         return renderer;
     }
 
-    /* toJSON() {
+    toJSON(texturePathGenerator) {
 
-        const json = {
-            'atlas': {
-                'interpolateFrames': this.interpolateAtlasFrames,
-                'texture': this.atlas.getTexture(),
-                'frames': {
-                    'count':
+        const defaultTexturePathGenerator = (atlas) => {
+            if (atlas.texturePath) return atlas.texturePath;
+            const texture = atlas.getTexture();
+            const textureSource = texture.source;
+            if (textureSource) {
+                const textureData = textureSource.data;
+                if (textureData) {
+                    const baseURI = textureData.baseURI;
+                    const currentSrc = textureData.currentSrc;
+                    const baseURISubStrLoc = currentSrc.indexOf(baseURI);
+                    if (baseURISubStrLoc >= 0) {
+                        return currentSrc.substr(baseURI.length, currentSrc.length - baseURI.length);
+                    } else {
+                        return currentSrc;
+                    }
                 }
             }
         };
 
-        'params': {
-            'atlas': {
-                'interpolateFrames': true,
-                'texture': 'assets/textures/bright_flame.png',
-                'frames': {
-                    'count': 16,
-                    'x': 0.0,
-                    'y': 0.0,
-                    'width': 212.0 / 1024.0,
-                    'height': 256.0 / 1024.0
-                }
-            }
+        texturePathGenerator = texturePathGenerator || defaultTexturePathGenerator;
+
+        const frameSets = [];
+        for (let i = 0; i < this.atlas.getFrameSetCount(); i++) {
+            const frameSet = this.atlas.getFrameSet(i);
+            frameSets.push(frameSet);
         }
-    }*/
+
+        const json = {
+            'atlas': {
+                'interpolateFrames': this.interpolateAtlasFrames,
+                'texturePath': texturePathGenerator(this.atlas),
+                'framesets': frameSets
+            }
+        };
+
+        return json;
+    }
 }

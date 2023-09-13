@@ -15,6 +15,8 @@ export class Manager {
             'default': {}
         };
 
+        this.jsonTypeNames = {};
+        this.typeIDGen = 0;
     }
 
     update() {
@@ -45,61 +47,85 @@ export class Manager {
         return this.componentContainer.getComponent(index);
     }
 
-    getTypeName(type) {
-        return this.jsonTypeNames[type];
+    addJSONType(typeName, type) {
+        this.addJSONTypeToNamespace('default', typeName, type);
     }
 
-    addJSONType(typename, type) {
-        this.addJSONTypeToNamespace('default', typename, type);
-    }
-
-    addJSONTypeToNamespace(namespace, typename, type) {
+    addJSONTypeToNamespace(namespace, typeName, type) {
         if (!this.jsonTypes[namespace]) {
             throw new Error('Mnager::addJSONTypeToNamespace -> namespace does not exist');
         }
-        if (this.jsonTypes[namespace][typename]) {
-            throw new Error('Mnager::addJSONTypeToNamespace -> typename already exists');
+        if (this.jsonTypes[namespace][typeName]) {
+            throw new Error('Mnager::addJSONTypeToNamespace -> typeName already exists');
         }
 
-        this.jsonTypes[namespace][typename] = type;
-        this.jsonTypeNames[type] = {
-            'namespace': namespace,
-            'typename': typename
-        };
+        if (this.checkAndAddTypeName(type, typeName, namespace)) {
+            this.jsonTypes[namespace][typeName] = type;
+        }
     }
 
-    addJSONNamespace(name, namespace) {
-        if (this.jsonTypes[name]) {
+    addJSONNamespace(namespace, namespaceObject) {
+        if (this.jsonTypes[namespace]) {
             throw new Error('Mnager::addJSONNamespace -> namespace already exists');
         }
-        this.jsonTypes[name] = namespace;
+        this.jsonTypes[namespace] = namespaceObject;
+        for (const typeName in namespaceObject) {
+            if (!namespaceObject.hasOwnProperty || namespaceObject.hasOwnProperty(typeName)) {
+                const type = namespaceObject[typeName];
+                this.checkAndAddTypeName(type, typeName, namespace);
+            }
+        }
     }
 
-    getJSONType(namespace, typename) {
+    checkAndAddTypeName(type, typeName, namespace) {
+        if (typeof type === "function") {
+            const typeID = this.typeIDGen++;
+            type.___photonsTypeID = typeID;
+            this.jsonTypeNames[typeID] = {
+                'namespace': namespace,
+                'typeName': typeName
+            };
+        }
+    }
+
+    getJSONType(namespace, typeName) {
         if (!this.jsonTypes[namespace]) {
             throw new Error('Mnager::getJSONType -> namespace does not exist');
         }
-        if (!this.jsonTypes[namespace][typename]) {
-            throw new Error('Mnager::getJSONType -> typename does not exist');
+        if (!this.jsonTypes[namespace][typeName]) {
+            throw new Error('Mnager::getJSONType -> typeName does not exist');
         }
 
-        return this.jsonTypes[namespace][typename];
+        return this.jsonTypes[namespace][typeName];
+    }
+
+    getJSONTypeNames(type) {
+        return this.jsonTypeNames[type.___photonsTypeID];
+    }
+
+    getJSONTypePath(type) {
+        const typeNames = this.jsonTypeNames[type.___photonsTypeID];
+        if (typeNames) {
+            return `${typeNames.namespace}.${typeNames.typeName}`;
+        } else {
+            return undefined;
+        }
     }
 
     parseNamespaceAndTypename(typeStr) {
         const components = typeStr.split('.');
         const namespace = components[0];
         components.splice(0, 1);
-        const typename = components.join('.');
+        const typeName = components.join('.');
         return {
             'namespace': namespace,
-            'typename': typename
+            'typeName': typeName
         };
     }
 
     parseType(typeStr) {
-        const {namespace, typename} = this.parseNamespaceAndTypename(typeStr);
-        return this.getJSONType(namespace, typename);
+        const {namespace, typeName} = this.parseNamespaceAndTypename(typeStr);
+        return this.getJSONType(namespace, typeName);
     }
 
     loadParticleSystemFromJSON(json, threeRenderer) {
@@ -165,9 +191,15 @@ export class Manager {
     }
 
     convertParticleSystemToJSON(particleSystem) {
+        const scope = this;
+        const particleSystemRenderer = particleSystem.getParticleSystemRenderer();
         const json = {
             'maxParticleCount': particleSystem.getMaximumActiveParticles(),
-            'simulateInWorldSpace': particleSystem.getSimulateInWorldSpace()
+            'simulateInWorldSpace': particleSystem.getSimulateInWorldSpace(),
+            'renderer': {
+                'type': scope.getJSONTypePath(particleSystemRenderer.constructor),
+                'params': particleSystemRenderer.toJSON()
+            }
         };
 
         return json;

@@ -179,6 +179,10 @@ export class ParticleSystem {
         return this.particleStates;
     }
 
+    getParticleSystemRenderer() {
+        return this.particleSystemRenderer;
+    }
+
     getSimulateInWorldSpace() {
         return this.simulateInWorldSpace;
     }

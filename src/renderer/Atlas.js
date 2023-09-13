@@ -12,13 +12,18 @@ export class FrameSetDescriptor {
 
 export class Atlas {
 
-    constructor(texture) {
+    constructor(texture, texturePath) {
         this.texture = texture;
+        this.texturePath = texturePath;
         this.frameSets = [];
     }
 
     getTexture() {
         return this.texture;
+    }
+
+    getTexturePath() {
+        return this.texturePath;
     }
 
     getFrameSetCount() {

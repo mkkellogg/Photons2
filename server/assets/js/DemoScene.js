@@ -53,8 +53,9 @@ export class DemoScene {
         const embersRoot = new THREE.Object3D();
         embersRoot.position.copy(position);
 
-        const embersTexture = new THREE.TextureLoader().load('assets/textures/ember.png');
-        const embersAtlas = new Photons.Atlas(embersTexture);
+        const texturePath = 'assets/textures/ember.png';
+        const embersTexture = new THREE.TextureLoader().load(texturePath);
+        const embersAtlas = new Photons.Atlas(embersTexture, texturePath);
         embersAtlas.addFrameSet(1, 0.0, 0.0, 1.0, 1.0);
         const embersRenderer = new Photons.AnimatedSpriteRenderer(embersAtlas, true);
 
@@ -105,8 +106,9 @@ export class DemoScene {
         const baseFlameRoot = new THREE.Object3D();
         baseFlameRoot.position.copy(position);
 
-        const baseFlameTexture = new THREE.TextureLoader().load('assets/textures/base_flame.png');
-        const baseFlameAtlas = new Photons.Atlas(baseFlameTexture);
+        const texturePath = 'assets/textures/base_flame.png';
+        const baseFlameTexture = new THREE.TextureLoader().load(texturePath);
+        const baseFlameAtlas = new Photons.Atlas(baseFlameTexture, texturePath);
         baseFlameAtlas.addFrameSet(18, 0.0, 0.0, 128.0 / 1024.0, 128.0 / 512.0);
         const baseFlameRenderer = new Photons.AnimatedSpriteRenderer(baseFlameAtlas, true);
 
@@ -162,8 +164,9 @@ export class DemoScene {
         /*const brightFlameRoot = new THREE.Object3D();
         brightFlameRoot.position.copy(position);
 
-        const brightFlameTexture = new THREE.TextureLoader().load('assets/textures/bright_flame.png');
-        const brightFlameAtlas = new Photons.Atlas(brightFlameTexture);
+        const texturePath = 'assets/textures/bright_flame.png';
+        const brightFlameTexture = new THREE.TextureLoader().load(texturePath);
+        const brightFlameAtlas = new Photons.Atlas(brightFlameTexture, texturePath);
         brightFlameAtlas.addFrameSet(16, 0.0, 0.0, 212.0 / 1024.0, 256.0 / 1024.0);
         const brightFlameRenderer = new Photons.AnimatedSpriteRenderer(brightFlameAtlas, true);
 
@@ -224,9 +227,9 @@ export class DemoScene {
                 'params': {
                     'atlas': {
                         'interpolateFrames': true,
-                        'texture': 'assets/textures/bright_flame.png',
+                        'texturePath': 'assets/textures/bright_flame.png',
                         'framesets': [{
-                            'count': 16,
+                            'length': 16,
                             'x': 0.0,
                             'y': 0.0,
                             'width': 212.0 / 1024.0,
@@ -404,7 +407,6 @@ export class DemoScene {
         const [brightFlameParticleSystem, brightFlameRoot] = this.manager.loadParticleSystemFromJSON(brightFlameJSON);
         brightFlameRoot.position.copy(position);
         brightFlameParticleSystem.start();
-        brightFlameParticleSystem.particleSystemRenderer.mesh.frustumCulled = false;
 
         console.log(this.manager.convertParticleSystemToJSON(brightFlameParticleSystem));
 
