@@ -10,5 +10,4 @@ export class BaseParticleStateInitializer extends ParticleStateInitializer {
         super.initializeState(state);
     }
 
-    
 }

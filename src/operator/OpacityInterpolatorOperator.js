@@ -23,4 +23,18 @@ export class OpacityInterpolatorOperator extends InterpolatorOperator {
     static loadFromJSON(particleSystem, params) {
         return new OpacityInterpolatorOperator(params.relativeToInitialValue);
     }
+
+    toJSON() {
+        const params = {
+            'relativeToInitialValue': this.relativeToInitialValue
+        };
+        const elements = [...this.interpolationElements].map((element) => {
+            return [element.element, element.tValue];
+        });
+        return {
+            'params': params,
+            'elements': elements
+        };
+    }
+
 }

@@ -157,8 +157,12 @@ export class ParticleSystem {
         return operator;
     }
 
+    getParticleStateOperatorCount() {
+        return this.particleStateOperators.length;
+    }
+
     getParticleStateOperator(index) {
-        if (index >= this.articleStateOperators.length) {
+        if (index >= this.particleStateOperators.length) {
             throw new Error('ParticleSystem::getParticleStateOperator() -> "index" is out of range.');
         }
         return this.particleStateOperators[index];

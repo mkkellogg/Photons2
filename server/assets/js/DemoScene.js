@@ -44,8 +44,8 @@ export class DemoScene {
     setupParticleSystems (){
         let scale = 0.15;
         let flamePosition = new THREE.Vector3(-.3, 1.65, 1.65);
-        //this.manager.addParticleSystem(this.setupEmbers(scale, flamePosition));
-       // this.manager.addParticleSystem(this.setupBaseFlame(scale, flamePosition));
+        this.manager.addParticleSystem(this.setupEmbers(scale, flamePosition));
+        this.manager.addParticleSystem(this.setupBaseFlame(scale, flamePosition));
         this.manager.addParticleSystem(this.setupBrightFLame(scale, flamePosition));
     }
 
@@ -57,22 +57,18 @@ export class DemoScene {
         const embersTexture = new THREE.TextureLoader().load(texturePath);
         const embersAtlas = new Photons.Atlas(embersTexture, texturePath);
         embersAtlas.addFrameSet(1, 0.0, 0.0, 1.0, 1.0);
-        const embersRenderer = new Photons.AnimatedSpriteRenderer(embersAtlas, true);
+        const embersRenderer = new Photons.AnimatedSpriteRenderer(embersAtlas, true, THREE.AdditiveBlending);
 
         const embersParticleSystem = new Photons.ParticleSystem(embersRoot, embersRenderer, this.renderer);
         embersParticleSystem.init(150);
-        embersRenderer.material.blending = THREE.AdditiveBlending;
-        // TODO: Remove this hack and properly implement bounds calculations
-        embersRenderer.mesh.frustumCulled = false;
-    
+
         embersParticleSystem.setEmitter(new Photons.ConstantParticleEmitter(6));
 
-        const lifetimeInitializerGenerator = new Photons.RandomGenerator(0, 3.0, 1.0, 0.0, 0.0, false);
         const sizeInitializerGenerator = new Photons.RandomGenerator(THREE.Vector2,
                                                                      new THREE.Vector2(0.0, 0.0),
                                                                      new THREE.Vector2(scale * 0.15, scale  * 0.15),
                                                                      0.0, 0.0, false);
-        embersParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(lifetimeInitializerGenerator));
+        embersParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(3.0, 1.0, 0.0, 0.0, false));
         embersParticleSystem.addParticleStateInitializer(new Photons.SizeInitializer(sizeInitializerGenerator));
         embersParticleSystem.addParticleStateInitializer(new Photons.BoxPositionInitializer(
                                                          new THREE.Vector3(0.05 * scale, 0.0, 0.05 * scale),
@@ -88,8 +84,7 @@ export class DemoScene {
         const embersColorOperator = embersParticleSystem.addParticleStateOperator(new Photons.ColorInterpolatorOperator(true));
         embersColorOperator.addElementsFromParameters([[[1.0, 0.7, 0.0], 0.0], [[1.0, 0.6, 0.0], 0.5], [[1.0, 0.4, 0.0], 1.0]]);
 
-        const acceleratorOperatorGenerator = new Photons.SphereRandomGenerator(THREE.Vector3,
-                                                                              Math.PI * 2.0, 0.0, Math.PI,
+        const acceleratorOperatorGenerator = new Photons.SphereRandomGenerator(Math.PI * 2.0, 0.0, Math.PI,
                                                                               -Math.PI / 2, 20.0, -8,
                                                                               scale, scale, scale,
                                                                               0.0, 0.0, 0.0);
@@ -98,7 +93,7 @@ export class DemoScene {
     
         embersParticleSystem.setSimulateInWorldSpace(true);
         embersParticleSystem.start(); 
-    
+
         return embersParticleSystem;
     }
     
@@ -114,17 +109,15 @@ export class DemoScene {
 
         const baseFlameParticleSystem = new Photons.ParticleSystem(baseFlameRoot, baseFlameRenderer, this.renderer);
         baseFlameParticleSystem.init(50);
-        // TODO: Remove this hack and properly implement bounds calculations
-        baseFlameRenderer.mesh.frustumCulled = false;
 
         baseFlameParticleSystem.setEmitter(new Photons.ConstantParticleEmitter(10));
 
         baseFlameParticleSystem.addParticleSequence(0, 18);
         const baseFlameParticleSequences = baseFlameParticleSystem.getParticleSequences();
 
-        baseFlameParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(new Photons.RandomGenerator(0, 0.0, 0.0, 0.0, 0.0, false)));
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(0.0, 0.0, 0.0, 0.0, false));
         baseFlameParticleSystem.addParticleStateInitializer(new Photons.RotationInitializer(new Photons.RandomGenerator(0, Math.PI / 2.0, -Math.PI / 2.0, 0.0, 0.0, false)));
-        baseFlameParticleSystem.addParticleStateInitializer(new Photons.RotationalSpeedInitializer(new Photons.RandomGenerator(0, 1.0, -1.0, 0.0, 0.0, false)));
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.RotationalSpeedInitializer(1.0, -1.0, 0.0, 0.0, false));
         baseFlameParticleSystem.addParticleStateInitializer(new Photons.SizeInitializer(
                                                             new Photons.RandomGenerator(THREE.Vector2,
                                                                                         new THREE.Vector2(0.25  * scale, 0.25 * scale),
@@ -161,7 +154,7 @@ export class DemoScene {
     }
     
     setupBrightFLame (scale, position) {
-        /*const brightFlameRoot = new THREE.Object3D();
+        const brightFlameRoot = new THREE.Object3D();
         brightFlameRoot.position.copy(position);
 
         const texturePath = 'assets/textures/bright_flame.png';
@@ -172,17 +165,15 @@ export class DemoScene {
 
         const brightFlameParticleSystem = new Photons.ParticleSystem(brightFlameRoot, brightFlameRenderer, this.renderer);
         brightFlameParticleSystem.init(20);
-        // TODO: Remove this hack and properly implement bounds calculations
-        brightFlameRenderer.mesh.frustumCulled = false;
 
         brightFlameParticleSystem.setEmitter(new Photons.ConstantParticleEmitter(5));
 
         brightFlameParticleSystem.addParticleSequence(0, 16);
         const brightFlameParticleSequences = brightFlameParticleSystem.getParticleSequences();
 
-        brightFlameParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(new Photons.RandomGenerator(0, 0.0, 0.0, 0.0, 0.0, false)));
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(0.0, 0.0, 0.0, 0.0, false));
         brightFlameParticleSystem.addParticleStateInitializer(new Photons.RotationInitializer(new Photons.RandomGenerator(0, Math.PI, -Math.PI / 2.0, 0.0, 0.0, false)));
-        brightFlameParticleSystem.addParticleStateInitializer(new Photons.RotationalSpeedInitializer(new Photons.RandomGenerator(0, Math.PI / 2.0, -Math.PI / 4.0, 0.0, 0.0, false)));
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.RotationalSpeedInitializer(Math.PI / 2.0, -Math.PI / 4.0, 0.0, 0.0, false));
         brightFlameParticleSystem.addParticleStateInitializer(new Photons.SizeInitializer(
                                                               new Photons.RandomGenerator(THREE.Vector2, new THREE.Vector2(0.0, 0.0),
                                                               new THREE.Vector2(0.0, 0.0), 0.2 * scale, 0.65 * scale, false)));
@@ -217,189 +208,6 @@ export class DemoScene {
         brightFlameParticleSystem.start();
 
         return brightFlameParticleSystem;
-        */
-
-        const brightFlameJSON = {
-            'maxParticleCount': 20,
-            'simulateInWorldSpace': true,
-            'renderer': {
-                'type': 'Photons.AnimatedSpriteRenderer',
-                'params': {
-                    'atlas': {
-                        'interpolateFrames': true,
-                        'texturePath': 'assets/textures/bright_flame.png',
-                        'framesets': [{
-                            'length': 16,
-                            'x': 0.0,
-                            'y': 0.0,
-                            'width': 212.0 / 1024.0,
-                            'height': 256.0 / 1024.0
-                        }]
-                    }
-                }
-            },
-            'emitter': {
-                'type': 'Photons.ConstantParticleEmitter',
-                'params': {
-                    'emissionRate': 5,
-                }
-            },
-            'sequences': [
-                {
-                    'id': 0,
-                    'start': 0,
-                    'length': 16,
-                }
-            ],
-            'initializers': [
-                {
-                    'type': 'Photons.LifetimeInitializer',
-                    'params': {
-                        'range': 0.0,
-                        'offset': 0.0,
-                        'uniformRange': 0.0,
-                        'uniformOffset': 0.0,
-                        'normalize': false
-                    }
-                },
-                {
-                    'type': 'Photons.RotationInitializer',
-                    'params': {
-                        'generator': {
-                            'type': 'Photons.RandomGenerator',
-                            'params': {
-                                'type': 'Scalar',
-                                'range': Math.PI,
-                                'offset': -Math.PI / 2.0,
-                                'uniformRange': 0.0,
-                                'uniformOffset': 0.0,
-                                'normalize': false
-                            }
-                        }
-                    }
-                },
-                {
-                    'type': 'Photons.RotationalSpeedInitializer',
-                    'params': {
-                        'range': Math.PI / 2.0,
-                        'offset': -Math.PI / 4.0,
-                        'uniformRange': 0.0,
-                        'uniformOffset': 0.0,
-                        'normalize': false
-                    }
-                },
-                {
-                    'type': 'Photons.SizeInitializer',
-                    'params': {
-                        'generator': {
-                            'type': 'Photons.RandomGenerator',
-                            'params': {
-                                'type': 'THREE.Vector2',
-                                'range': [0.0, 0.0],
-                                'offset': [0.0, 0.0],
-                                'uniformRange': 0.03,
-                                'uniformOffset': 0.0975,
-                                'normalize': false
-                            }
-                        }
-                    }
-                },
-                {
-                    'type': 'Photons.BoxPositionInitializer',
-                    'params': {
-                        'range': [0.015, 0.0, 0.015],
-                        'offset': [-0.0075, 0.0, -0.0075]
-                    }
-                },
-                {
-                    'type': 'Photons.RandomVelocityInitializer',
-                    'params': {
-                        'range': [0.003, 0.06, 0.003],
-                        'offset': [-0.0015, 0.06, -0.0015],
-                        'speedRange': 0.015,
-                        'speedOffset': 0.03
-                    }
-                },
-                {
-                    'type': 'Photons.SequenceInitializer',
-                    'params': {
-                        'reverse': false
-                    }
-                }
-            ],
-            'operators': [
-                {
-                    'type': 'Photons.SequenceOperator',
-                    'params': {
-                        'speed': 0.1,
-                        'loop': false,
-                        'reverse': false
-                    }
-                },
-                {
-                    'type': 'Photons.OpacityInterpolatorOperator',
-                    'params': {
-                        'relativeToInitialValue': false
-                    },
-                    'elements': [
-                        [0.0, 0.0],
-                        [0.6, 0.2],
-                        [0.5, 0.75],
-                        [0.0, 1.0]
-                    ]
-                },
-                {
-                    'type': 'Photons.SizeInterpolatorOperator',
-                    'params': {
-                        'relativeToInitialValue': true
-                    },
-                    'elements': [
-                        [[0.3, 0.3], 0.0],
-                        [[1.0, 1.0], 0.4],
-                        [[1.0, 1.0], 0.55],
-                        [[0.65, 0.65], 0.75],
-                        [[0.1, 0.1], 1.0]
-                    ]
-                },
-                {
-                    'type': 'Photons.ColorInterpolatorOperator',
-                    'params': {
-                        'relativeToInitialValue': true
-                    },
-                    'elements': [
-                         [[1.0, 1.0, 1.0], 0.0],
-                         [[2.0, 2.0, 2.0], 0.3],
-                         [[2.0, 2.0, 2.0], 0.4],
-                         [[0.9, 0.6, 0.3], 0.65],
-                         [[0.75, 0.0, 0.0], 1.0]
-                    ]
-                },
-                {
-                    'type': 'Photons.AccelerationOperator',
-                    'params': {
-                        'generator': {
-                            'type': 'Photons.RandomGenerator',
-                            'params': {
-                                'type': 'THREE.Vector3',
-                                'range': [0.0, 0.0, 0.0],
-                                'offset': [0.0, 0.225, 0.0],
-                                'uniformRange': 0.0,
-                                'uniformOffset': 0.0,
-                                'normalize': false
-                            }
-                        }
-                    }
-                }
-            ]
-        };
-        const [brightFlameParticleSystem, brightFlameRoot] = this.manager.loadParticleSystemFromJSON(brightFlameJSON);
-        brightFlameRoot.position.copy(position);
-        brightFlameParticleSystem.start();
-
-        console.log(this.manager.convertParticleSystemToJSON(brightFlameParticleSystem));
-
-        return brightFlameParticleSystem;
-
     }
     
     setupSceneComponents () {

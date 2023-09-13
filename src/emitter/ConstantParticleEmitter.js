@@ -28,6 +28,6 @@ export class ConstantParticleEmitter extends ContinuousParticleEmitter {
     toJSON() {
         return {
             'emissionRate': this.emissionRate
-        }
+        };
     }
 }

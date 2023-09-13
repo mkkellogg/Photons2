@@ -34,4 +34,12 @@ export class SequenceOperator extends ParticleStateOperator {
         return new SequenceOperator(particleSystem.getParticleSequences(), params.speed, params.loop, params.reverse);
     }
 
+    toJSON() {
+        return {
+            'speed': this.speed,
+            'loop': this.loop,
+            'reverse': this.reverse
+        };
+    }
+
 }

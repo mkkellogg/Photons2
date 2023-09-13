@@ -31,4 +31,18 @@ export class SizeInterpolatorOperator extends InterpolatorOperator {
     static loadFromJSON(particleSystem, params) {
         return new SizeInterpolatorOperator(params.relativeToInitialValue);
     }
+
+    toJSON() {
+        const params = {
+            'relativeToInitialValue': this.relativeToInitialValue
+        };
+        const elements = [...this.interpolationElements].map((element) => {
+            return [element.element.toArray(), element.tValue];
+        });
+        return {
+            'params': params,
+            'elements': elements
+        };
+    }
+
 }

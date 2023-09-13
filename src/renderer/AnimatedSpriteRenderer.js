@@ -5,13 +5,14 @@ import { Atlas } from './Atlas.js';
 
 export class AnimatedSpriteRenderer extends Renderer {
 
-    constructor(atlas, interpolateAtlasFrames) {
+    constructor(atlas, interpolateAtlasFrames = false, blending = THREE.NormalBlending) {
         super();
         this.particleStateArray = null;
         this.material = null;
         this.mesh = null;
         this.atlas = atlas;
         this.interpolateAtlasFrames = !!interpolateAtlasFrames;
+        this.blending = blending;
     }
 
     setOwner(owner) {
@@ -27,6 +28,7 @@ export class AnimatedSpriteRenderer extends Renderer {
             this.particleStateArray = new ParticleStateAttributeArray();
             this.particleStateArray.init(particleCount);
             this.material = this.createMaterial(null, null, null, true, false);
+            this.material.blending = this.blending;
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
             // TODO: At some point remove this and perform proper bounds calculations
             this.mesh.frustumCulled = false;
@@ -267,6 +269,11 @@ export class AnimatedSpriteRenderer extends Renderer {
             atlas.addFrameSet(frameset.length, frameset.x, frameset.y, frameset.width, frameset.height);
         }
         const renderer = new AnimatedSpriteRenderer(atlas, atlasJSON.interpolateFrames);
+        if (params.blending == 'Additive') {
+            renderer.blending = THREE.AdditiveBlending;
+        } else {
+            renderer.blending = THREE.NormalBlending;
+        }
         return renderer;
     }
 
@@ -299,7 +306,13 @@ export class AnimatedSpriteRenderer extends Renderer {
             frameSets.push(frameSet);
         }
 
+        let blending = 'Normal';
+        if (this.material.blending === THREE.AdditiveBlending) {
+            blending = 'Additive';
+        }
+
         const json = {
+            'blending': blending,
             'atlas': {
                 'interpolateFrames': this.interpolateAtlasFrames,
                 'texturePath': texturePathGenerator(this.atlas),

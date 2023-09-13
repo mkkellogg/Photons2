@@ -20,4 +20,10 @@ export class AccelerationOperator extends ParticleStateOperator {
         const generator = params.generator.type.loadFromJSON(params.generator.params);
         return new AccelerationOperator(generator);
     }
+
+    toJSON(typeStore) {
+        return {
+            'generator': this.generator.toJSON(typeStore)
+        };
+    }
 }

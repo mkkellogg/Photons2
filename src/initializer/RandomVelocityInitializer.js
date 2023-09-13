@@ -27,6 +27,6 @@ export class RandomVelocityInitializer extends ParticleStateInitializer {
             'offset': this.directionGenerator.offset.toArray(),
             'speedRange': this.speedGenerator.range,
             'speedOffset': this.speedGenerator.offset
-        }
+        };
     }
 }

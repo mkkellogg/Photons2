@@ -3,6 +3,7 @@ import { Utils } from './util/Utils.js';
 import { ComponentContainer } from './ComponentContainer.js';
 import { ParticleSystem } from './ParticleSystem.js';
 import { BaseParticleStateInitializer } from './initializer/BaseParticleStateInitializer.js';
+import { BaseParticleStateOperator } from './operator/BaseParticleStateOperator.js';
 
 export class Manager {
 
@@ -54,10 +55,10 @@ export class Manager {
 
     addJSONTypeToNamespace(namespace, typeName, type) {
         if (!this.jsonTypes[namespace]) {
-            throw new Error('Mnager::addJSONTypeToNamespace -> namespace does not exist');
+            throw new Error('Manager::addJSONTypeToNamespace() -> namespace does not exist');
         }
         if (this.jsonTypes[namespace][typeName]) {
-            throw new Error('Mnager::addJSONTypeToNamespace -> typeName already exists');
+            throw new Error('Manager::addJSONTypeToNamespace() -> typeName already exists');
         }
 
         if (this.checkAndAddJSONTypeName(type, typeName, namespace)) {
@@ -67,7 +68,7 @@ export class Manager {
 
     addJSONNamespace(namespace, namespaceObject) {
         if (this.jsonTypes[namespace]) {
-            throw new Error('Mnager::addJSONNamespace -> namespace already exists');
+            throw new Error('Manager::addJSONNamespace() -> namespace already exists');
         }
         this.jsonTypes[namespace] = namespaceObject;
         for (const typeName in namespaceObject) {
@@ -79,7 +80,7 @@ export class Manager {
     }
 
     checkAndAddJSONTypeName(type, typeName, namespace) {
-        if (typeof type === "function") {
+        if (typeof type === 'function') {
             const typeID = this.typeIDGen++;
             type.___photonsTypeID = typeID;
             this.jsonTypeNames[typeID] = {
@@ -91,10 +92,10 @@ export class Manager {
 
     getJSONType(namespace, typeName) {
         if (!this.jsonTypes[namespace]) {
-            throw new Error('Mnager::getJSONType -> namespace does not exist');
+            throw new Error('Manager::getJSONType() -> namespace does not exist');
         }
         if (!this.jsonTypes[namespace][typeName]) {
-            throw new Error('Mnager::getJSONType -> typeName does not exist');
+            throw new Error('Mnaager::getJSONType() -> typeName does not exist');
         }
 
         return this.jsonTypes[namespace][typeName];
@@ -146,8 +147,7 @@ export class Manager {
 
         traverseJSON(json, (node) => {
             if (node.type) {
-                if (node.type == 'Scalar') node.type = 0;
-                else node.type = this.parseJSONTypeString(node.type);
+                node.type = this.parseJSONTypeString(node.type);
             }
         });
 
@@ -203,7 +203,7 @@ export class Manager {
                 'id': sequenceID,
                 'start': sequence.start,
                 'length': sequence.length
-            }
+            };
         });
 
         const initializers = [];
@@ -215,6 +215,25 @@ export class Manager {
                     'type': scope.getJSONTypePath(initializer.constructor),
                     'params': initializer.toJSON(this)
                 });
+            }
+        }
+
+        const operators = [];
+        const operatorCount = particleSystem.getParticleStateOperatorCount();
+        for (let i = 0; i < operatorCount; i++) {
+            const operator = particleSystem.getParticleStateOperator(i);
+            if (operator.constructor !== BaseParticleStateOperator) {
+                const json = operator.toJSON(this);
+                const params = json.params || json;
+                const elements = json.params ? json.elements : null;
+                const operatorJSON = {
+                    'type': scope.getJSONTypePath(operator.constructor),
+                    'params': params
+                };
+                if (elements) {
+                    operatorJSON['elements'] = elements;
+                }
+                operators.push(operatorJSON);
             }
         }
 
@@ -230,7 +249,8 @@ export class Manager {
                 'params': particleSystemEmitter.toJSON()
             },
             'sequences': sequences,
-            'initializers': initializers
+            'initializers': initializers,
+            'operators': operators
         };
 
         return json;

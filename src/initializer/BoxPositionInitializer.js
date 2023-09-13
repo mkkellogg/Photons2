@@ -22,6 +22,6 @@ export class BoxPositionInitializer extends ParticleStateInitializer {
         return {
             'range': this.randomGenerator.range.toArray(),
             'offset': this.randomGenerator.offset.toArray()
-        }
+        };
     }
 }
