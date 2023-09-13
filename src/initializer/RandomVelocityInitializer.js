@@ -15,4 +15,10 @@ export class RandomVelocityInitializer extends ParticleStateInitializer {
         state.velocity.multiplyScalar(this.speedGenerator.generate());
     }
 
+    static loadFromJSON(particleSystem, params) {
+        return new RandomVelocityInitializer(new THREE.Vector3().fromArray(params.range),
+                                             new THREE.Vector3().fromArray(params.offset),
+                                             params.speedRange, params.speedOffset);
+    }
+
 }

@@ -11,4 +11,9 @@ export class LifetimeInitializer extends ParticleStateInitializer {
         state.lifetime = this.generator.generate();
     }
 
+    static loadFromJSON(particleSystem, params) {
+        const generator = params.generator.type.loadFromJSON(params.generator.params);
+        return new LifetimeInitializer(generator);
+    }
+
 }

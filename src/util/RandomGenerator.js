@@ -50,4 +50,8 @@ export class RandomGenerator extends Generator {
         return clone;
     }
 
+    static loadFromJSON(params) {
+        return new RandomGenerator(params.type, params.range, params.offset,
+                                   params.uniformRange || 0.0, params.offsetRange || 0.0, params.normalize);
+    }
 }

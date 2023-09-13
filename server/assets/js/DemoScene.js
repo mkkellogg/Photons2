@@ -252,7 +252,7 @@ export class DemoScene {
                                 'range': 0.0,
                                 'offset': 0.0,
                                 'uniformOffset': 0.0,
-                                'normalize': 0.0,
+                                'uniformRange': 0.0,
                                 'normalize': false
                             }
                         }
@@ -318,20 +318,22 @@ export class DemoScene {
                     'params': {
                         'range': [0.003, 0.06, 0.003],
                         'offset': [-0.0015, 0.06, -0.0015],
-                        'uniformRange': 0.015,
-                        'uniformOffset': 0.03
+                        'speedRange': 0.015,
+                        'speedOffset': 0.03
                     }
                 },
                 {
                     'type': 'Photons.SequenceInitializer',
-                    'params': {}
-                },
-                {
-                    'type': 'Photons.SequenceOperator',
-                    'params': {}
+                    'params': {
+                        'reverse': false
+                    }
                 }
             ],
             'operators': [
+                {
+                    'type': 'Photons.SequenceOperator',
+                    'params': {}
+                },
                 {
                     'type': 'Photons.OpacityInterpolatorOperator',
                     'params': {},

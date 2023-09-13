@@ -3,7 +3,7 @@ import { ParticleStateInitializer } from './ParticleStateInitializer.js';
 
 export class SequenceInitializer extends ParticleStateInitializer {
 
-    constructor(particleSequences, reverse) {
+    constructor(particleSequences, reverse = false) {
         super();
         this.setParticleSequences(particleSequences);
         this.reverse = reverse;
@@ -28,4 +28,7 @@ export class SequenceInitializer extends ParticleStateInitializer {
         state.progressType = ParticleStateProgressType.Sequence;
     }
 
+    static loadFromJSON(particleSystem, params) {
+        return new SequenceInitializer(particleSystem.getParticleSequences(), params.reverse);
+    }
 }

@@ -11,4 +11,8 @@ export class RotationInitializer extends ParticleStateInitializer {
         state.rotation = this.generator.generate(state.rotation);
     }
 
+    static loadFromJSON(particleSystem, params) {
+        const generator = params.generator.type.loadFromJSON(params.generator.params);
+        return new RotationInitializer(generator);
+    }
 }

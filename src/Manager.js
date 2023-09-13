@@ -98,12 +98,30 @@ export class Manager {
     }
 
     loadParticleSystemFromJSON(json, threeRenderer) {
+
+        const traverseJSON = (node, onVisit, visited) => {
+            visited = visited || {};
+            onVisit(node);
+            for (const key in node) {
+                const val = node[key];
+                if (typeof val == 'object') {
+                    traverseJSON(val, onVisit, visited);
+                }
+            }
+        };
+
+        traverseJSON(json, (node) => {
+            if (node.type) {
+                if (node.type == "Scalar") node.type = 0;
+                else node.type = this.parseType(node.type);
+            }
+        });
+
         const maxParticleCount = json.maxParticleCount;
         const simulateInWorldSpace = json.simulateInWorldSpace;
 
         const rendererJSON = json.renderer;
-        const rendererType = this.parseType(rendererJSON.type);
-        const renderer = rendererType.loadFromJSON(rendererJSON.params);
+        const renderer = rendererJSON.type.loadFromJSON(rendererJSON.params);
 
         const rootObject = new THREE.Object3D();
         const particleSystem = new ParticleSystem(rootObject, renderer, threeRenderer);
@@ -111,8 +129,7 @@ export class Manager {
         particleSystem.setSimulateInWorldSpace(simulateInWorldSpace);
 
         const emitterJSON = json.emitter;
-        const emitterType = this.parseType(emitterJSON.type);
-        emitterType.loadFromJSON(emitterJSON.params);
+        emitterJSON.type.loadFromJSON(emitterJSON.params);
 
         if (json.sequences) {
             for(const sequenceJSON of json.sequences) {
@@ -122,8 +139,7 @@ export class Manager {
 
         if (json.initializers) {
             for(const initializerJSON of json.initializers) {
-                const initializerType = this.parseType(initializerJSON.type);
-               // particleSystem.addParticleStateInitializer(initializerType, sequence.length);
+                particleSystem.addParticleStateInitializer(initializerJSON.type.loadFromJSON(particleSystem, initializerJSON.params));
             }
         }
 
@@ -133,4 +149,5 @@ export class Manager {
     convertParticleSystemToJSON() {
 
     }
+
 }
