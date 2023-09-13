@@ -45,37 +45,42 @@ export class Manager {
         return this.componentContainer.getComponent(index);
     }
 
+    getTypeName(type) {
+        return this.jsonTypeNames[type];
+    }
+
     addJSONType(typename, type) {
-        if (this.jsonTypes['default'][typename]) {
-            throw new Error("Mnager::addJSONType -> typename already exists");
-        }
-        this.jsonTypes['default'][typename] = type;
+        this.addJSONTypeToNamespace('default', typename, type);
     }
 
     addJSONTypeToNamespace(namespace, typename, type) {
         if (!this.jsonTypes[namespace]) {
-            throw new Error("Mnager::addJSONTypeToNamespace -> namespace does not exist");
+            throw new Error('Mnager::addJSONTypeToNamespace -> namespace does not exist');
         }
         if (this.jsonTypes[namespace][typename]) {
-            throw new Error("Mnager::addJSONTypeToNamespace -> typename already exists");
+            throw new Error('Mnager::addJSONTypeToNamespace -> typename already exists');
         }
 
         this.jsonTypes[namespace][typename] = type;
+        this.jsonTypeNames[type] = {
+            'namespace': namespace,
+            'typename': typename
+        };
     }
 
     addJSONNamespace(name, namespace) {
         if (this.jsonTypes[name]) {
-            throw new Error("Mnager::addJSONNamespace -> namespace already exists");
+            throw new Error('Mnager::addJSONNamespace -> namespace already exists');
         }
         this.jsonTypes[name] = namespace;
     }
 
     getJSONType(namespace, typename) {
         if (!this.jsonTypes[namespace]) {
-            throw new Error("Mnager::getJSONType -> namespace does not exist");
+            throw new Error('Mnager::getJSONType -> namespace does not exist');
         }
         if (!this.jsonTypes[namespace][typename]) {
-            throw new Error("Mnager::getJSONType -> typename does not exist");
+            throw new Error('Mnager::getJSONType -> typename does not exist');
         }
 
         return this.jsonTypes[namespace][typename];
@@ -89,7 +94,7 @@ export class Manager {
         return {
             'namespace': namespace,
             'typename': typename
-        }
+        };
     }
 
     parseType(typeStr) {
@@ -103,16 +108,18 @@ export class Manager {
             visited = visited || {};
             onVisit(node);
             for (const key in node) {
-                const val = node[key];
-                if (typeof val == 'object') {
-                    traverseJSON(val, onVisit, visited);
+                if (node.hasOwnProperty(key)) {
+                    const val = node[key];
+                    if (typeof val == 'object') {
+                        traverseJSON(val, onVisit, visited);
+                    }
                 }
             }
         };
 
         traverseJSON(json, (node) => {
             if (node.type) {
-                if (node.type == "Scalar") node.type = 0;
+                if (node.type == 'Scalar') node.type = 0;
                 else node.type = this.parseType(node.type);
             }
         });
@@ -133,31 +140,37 @@ export class Manager {
         particleSystem.setEmitter(emitter);
 
         if (json.sequences) {
-            for(const sequenceJSON of json.sequences) {
+            for (const sequenceJSON of json.sequences) {
                 particleSystem.addParticleSequence(sequenceJSON.start, sequenceJSON.length, sequenceJSON.id);
             }
         }
 
         if (json.initializers) {
-            for(const initializerJSON of json.initializers) {
+            for (const initializerJSON of json.initializers) {
                 particleSystem.addParticleStateInitializer(initializerJSON.type.loadFromJSON(particleSystem, initializerJSON.params));
             }
         }
 
         if (json.operators) {
-            for(const operatorJSON of json.operators) {
-                const operator = particleSystem.addParticleStateOperator(operatorJSON.type.loadFromJSON(particleSystem, operatorJSON.params));
+            for (const operatorJSON of json.operators) {
+                const operator =
+                    particleSystem.addParticleStateOperator(operatorJSON.type.loadFromJSON(particleSystem, operatorJSON.params));
                 if (operatorJSON.elements) {
                     operator.addElementsFromParameters(operatorJSON.elements);
                 }
             }
         }
-    
+
         return [particleSystem, rootObject];
     }
 
-    convertParticleSystemToJSON() {
+    convertParticleSystemToJSON(particleSystem) {
+        const json = {
+            'maxParticleCount': particleSystem.getMaximumActiveParticles(),
+            'simulateInWorldSpace': particleSystem.getSimulateInWorldSpace()
+        };
 
+        return json;
     }
 
 }

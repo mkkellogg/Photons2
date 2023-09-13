@@ -159,7 +159,7 @@ export class DemoScene {
     }
     
     setupBrightFLame (scale, position) {
-        const brightFlameRoot = new THREE.Object3D();
+        /*const brightFlameRoot = new THREE.Object3D();
         brightFlameRoot.position.copy(position);
 
         const brightFlameTexture = new THREE.TextureLoader().load('assets/textures/bright_flame.png');
@@ -211,6 +211,10 @@ export class DemoScene {
 
         brightFlameParticleSystem.setSimulateInWorldSpace(true);
 
+        brightFlameParticleSystem.start();
+
+        return brightFlameParticleSystem;
+        */
 
         const brightFlameJSON = {
             'maxParticleCount': 20,
@@ -221,13 +225,13 @@ export class DemoScene {
                     'atlas': {
                         'interpolateFrames': true,
                         'texture': 'assets/textures/bright_flame.png',
-                        'frames': {
+                        'framesets': [{
                             'count': 16,
                             'x': 0.0,
                             'y': 0.0,
                             'width': 212.0 / 1024.0,
                             'height': 256.0 / 1024.0
-                        }
+                        }]
                     }
                 }
             },
@@ -388,8 +392,8 @@ export class DemoScene {
                                 'type': 'THREE.Vector3',
                                 'range': [0.0, 0.0, 0.0],
                                 'offset': [0.0, 0.225, 0.0],
-                                'uniformOffset': 0.0,
                                 'uniformRange': 0.0,
+                                'uniformOffset': 0.0,
                                 'normalize': false
                             }
                         }
@@ -397,16 +401,15 @@ export class DemoScene {
                 }
             ]
         };
-        const [testParticleSystemFromJSON, rootObject] = this.manager.loadParticleSystemFromJSON(brightFlameJSON);
-        rootObject.position.copy(position);
-        //testParticleSystemFromJSON.start();
-        //testParticleSystemFromJSON.particleSystemRenderer.mesh.frustumCulled = false;
-       // return testParticleSystemFromJSON;
+        const [brightFlameParticleSystem, brightFlameRoot] = this.manager.loadParticleSystemFromJSON(brightFlameJSON);
+        brightFlameRoot.position.copy(position);
+        brightFlameParticleSystem.start();
+        brightFlameParticleSystem.particleSystemRenderer.mesh.frustumCulled = false;
 
-
-       brightFlameParticleSystem.start();
+        console.log(this.manager.convertParticleSystemToJSON(brightFlameParticleSystem));
 
         return brightFlameParticleSystem;
+
     }
     
     setupSceneComponents () {

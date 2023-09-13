@@ -260,10 +260,38 @@ export class AnimatedSpriteRenderer extends Renderer {
         const atlasJSON = params.atlas;
         const atlasTexture = new THREE.TextureLoader().load(atlasJSON.texture);
         const atlas = new Atlas(atlasTexture);
-        const frames = atlasJSON.frames;
-        atlas.addTileArray(frames.count, frames.x, frames.y, frames.width, frames.height);
+        const framesets = atlasJSON.framesets;
+        for (let frameset of framesets) {
+            atlas.addTileArray(frameset.count, frameset.x, frameset.y, frameset.width, frameset.height);
+        }
         const renderer = new AnimatedSpriteRenderer(atlas, atlasJSON.interpolateFrames);
         return renderer;
     }
 
+    /* toJSON() {
+
+        const json = {
+            'atlas': {
+                'interpolateFrames': this.interpolateAtlasFrames,
+                'texture': this.atlas.getTexture(),
+                'frames': {
+                    'count':
+                }
+            }
+        };
+
+        'params': {
+            'atlas': {
+                'interpolateFrames': true,
+                'texture': 'assets/textures/bright_flame.png',
+                'frames': {
+                    'count': 16,
+                    'x': 0.0,
+                    'y': 0.0,
+                    'width': 212.0 / 1024.0,
+                    'height': 256.0 / 1024.0
+                }
+            }
+        }
+    }*/
 }
