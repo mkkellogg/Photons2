@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Utils } from './util/Utils.js';
 import { ComponentContainer } from './ComponentContainer.js';
 import { ParticleSystem } from './ParticleSystem.js';
+import { BaseParticleStateInitializer } from './initializer/BaseParticleStateInitializer.js';
 
 export class Manager {
 
@@ -59,7 +60,7 @@ export class Manager {
             throw new Error('Mnager::addJSONTypeToNamespace -> typeName already exists');
         }
 
-        if (this.checkAndAddTypeName(type, typeName, namespace)) {
+        if (this.checkAndAddJSONTypeName(type, typeName, namespace)) {
             this.jsonTypes[namespace][typeName] = type;
         }
     }
@@ -72,12 +73,12 @@ export class Manager {
         for (const typeName in namespaceObject) {
             if (!namespaceObject.hasOwnProperty || namespaceObject.hasOwnProperty(typeName)) {
                 const type = namespaceObject[typeName];
-                this.checkAndAddTypeName(type, typeName, namespace);
+                this.checkAndAddJSONTypeName(type, typeName, namespace);
             }
         }
     }
 
-    checkAndAddTypeName(type, typeName, namespace) {
+    checkAndAddJSONTypeName(type, typeName, namespace) {
         if (typeof type === "function") {
             const typeID = this.typeIDGen++;
             type.___photonsTypeID = typeID;
@@ -104,7 +105,7 @@ export class Manager {
     }
 
     getJSONTypePath(type) {
-        const typeNames = this.jsonTypeNames[type.___photonsTypeID];
+        const typeNames = this.getJSONTypeNames(type);
         if (typeNames) {
             return `${typeNames.namespace}.${typeNames.typeName}`;
         } else {
@@ -112,7 +113,7 @@ export class Manager {
         }
     }
 
-    parseNamespaceAndTypename(typeStr) {
+    parseJSONNamespaceAndTypename(typeStr) {
         const components = typeStr.split('.');
         const namespace = components[0];
         components.splice(0, 1);
@@ -123,8 +124,8 @@ export class Manager {
         };
     }
 
-    parseType(typeStr) {
-        const {namespace, typeName} = this.parseNamespaceAndTypename(typeStr);
+    parseJSONTypeString(typeStr) {
+        const {namespace, typeName} = this.parseJSONNamespaceAndTypename(typeStr);
         return this.getJSONType(namespace, typeName);
     }
 
@@ -146,7 +147,7 @@ export class Manager {
         traverseJSON(json, (node) => {
             if (node.type) {
                 if (node.type == 'Scalar') node.type = 0;
-                else node.type = this.parseType(node.type);
+                else node.type = this.parseJSONTypeString(node.type);
             }
         });
 
@@ -193,13 +194,43 @@ export class Manager {
     convertParticleSystemToJSON(particleSystem) {
         const scope = this;
         const particleSystemRenderer = particleSystem.getParticleSystemRenderer();
+        const particleSystemEmitter = particleSystem.getEmitter();
+
+        const particleSequenceGroup = particleSystem.getParticleSequences();
+        const sequences = particleSequenceGroup.getSequenceIDs().map((sequenceID) => {
+            const sequence = particleSequenceGroup.getSequence(sequenceID);
+            return {
+                'id': sequenceID,
+                'start': sequence.start,
+                'length': sequence.length
+            }
+        });
+
+        const initializers = [];
+        const initializerCount = particleSystem.getParticleStateInitializerCount();
+        for (let i = 0; i < initializerCount; i++) {
+            const initializer = particleSystem.getParticleStateInitializer(i);
+            if (initializer.constructor !== BaseParticleStateInitializer) {
+                initializers.push({
+                    'type': scope.getJSONTypePath(initializer.constructor),
+                    'params': initializer.toJSON(this)
+                });
+            }
+        }
+
         const json = {
             'maxParticleCount': particleSystem.getMaximumActiveParticles(),
             'simulateInWorldSpace': particleSystem.getSimulateInWorldSpace(),
             'renderer': {
                 'type': scope.getJSONTypePath(particleSystemRenderer.constructor),
                 'params': particleSystemRenderer.toJSON()
-            }
+            },
+            'emitter': {
+                'type': scope.getJSONTypePath(particleSystemEmitter.constructor),
+                'params': particleSystemEmitter.toJSON()
+            },
+            'sequences': sequences,
+            'initializers': initializers
         };
 
         return json;

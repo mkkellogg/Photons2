@@ -255,17 +255,11 @@ export class DemoScene {
                 {
                     'type': 'Photons.LifetimeInitializer',
                     'params': {
-                        'generator': {
-                            'type': 'Photons.RandomGenerator',
-                            'params': {
-                                'type': 'Scalar',
-                                'range': 0.0,
-                                'offset': 0.0,
-                                'uniformRange': 0.0,
-                                'uniformOffset': 0.0,
-                                'normalize': false
-                            }
-                        }
+                        'range': 0.0,
+                        'offset': 0.0,
+                        'uniformRange': 0.0,
+                        'uniformOffset': 0.0,
+                        'normalize': false
                     }
                 },
                 {
@@ -287,17 +281,11 @@ export class DemoScene {
                 {
                     'type': 'Photons.RotationalSpeedInitializer',
                     'params': {
-                        'generator': {
-                            'type': 'Photons.RandomGenerator',
-                            'params': {
-                                'type': 'Scalar',
-                                'range': Math.PI / 2.0,
-                                'offset': -Math.PI / 4.0,
-                                'uniformRange': 0.0,
-                                'uniformOffset': 0.0,
-                                'normalize': false
-                            }
-                        }
+                        'range': Math.PI / 2.0,
+                        'offset': -Math.PI / 4.0,
+                        'uniformRange': 0.0,
+                        'uniformOffset': 0.0,
+                        'normalize': false
                     }
                 },
                 {

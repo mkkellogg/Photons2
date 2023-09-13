@@ -24,4 +24,10 @@ export class ConstantParticleEmitter extends ContinuousParticleEmitter {
         emitter.emissionRate = params.emissionRate || 0.0;
         return emitter;
     }
+
+    toJSON() {
+        return {
+            'emissionRate': this.emissionRate
+        }
+    }
 }

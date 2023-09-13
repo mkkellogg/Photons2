@@ -15,4 +15,10 @@ export class RotationInitializer extends ParticleStateInitializer {
         const generator = params.generator.type.loadFromJSON(params.generator.params);
         return new RotationInitializer(generator);
     }
+
+    toJSON(typeStore) {
+        return {
+            'generator': this.generator.toJSON(typeStore)
+        };
+    }
 }

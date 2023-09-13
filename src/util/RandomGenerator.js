@@ -66,10 +66,29 @@ export class RandomGenerator extends Generator {
         return param;
     }
 
+    static getParameterJSON(param) {
+        if (param instanceof THREE.Vector2 || param instanceof THREE.Vector3 ||
+            param instanceof THREE.Vector4 || param instanceof THREE.Color) return param.toArray();
+        return param;
+    }
+
     static loadFromJSON(params) {
         return new RandomGenerator(params.type,
                                    RandomGenerator.loadJSONParameter(params.range, params.type),
                                    RandomGenerator.loadJSONParameter(params.offset, params.type),
                                    params.uniformRange || 0.0, params.uniformOffset || 0.0, params.normalize);
+    }
+
+    toJSON(typeStore) {
+        return {
+            'type': typeStore.getJSONTypePath(RandomGenerator),
+            'params': {
+                'type': typeStore.getJSONTypePath(this.range.constructor) || "Scalar",
+                'range': RandomGenerator.getParameterJSON(this.range),
+                'offset': RandomGenerator.getParameterJSON(this.offset),
+                'uniformRange': this.uniformRange,
+                'uniformOffset': this.uniformOffset
+            }
+        }
     }
 }

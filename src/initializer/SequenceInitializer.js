@@ -32,4 +32,9 @@ export class SequenceInitializer extends ParticleStateInitializer {
         return new SequenceInitializer(particleSystem.getParticleSequences(), params.reverse);
     }
 
+    toJSON() {
+        return {
+            'reverse': this.reverse
+        };
+    }
 }

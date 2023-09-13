@@ -17,4 +17,9 @@ export class SizeInitializer extends ParticleStateInitializer {
         return new SizeInitializer(generator);
     }
 
+    toJSON(typeStore) {
+        return {
+            'generator': this.generator.toJSON(typeStore)
+        };
+    }
 }

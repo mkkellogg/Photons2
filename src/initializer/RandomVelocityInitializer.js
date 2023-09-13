@@ -21,4 +21,12 @@ export class RandomVelocityInitializer extends ParticleStateInitializer {
                                              params.speedRange, params.speedOffset);
     }
 
+    toJSON() {
+        return {
+            'range': this.directionGenerator.range.toArray(),
+            'offset': this.directionGenerator.offset.toArray(),
+            'speedRange': this.speedGenerator.range,
+            'speedOffset': this.speedGenerator.offset
+        }
+    }
 }

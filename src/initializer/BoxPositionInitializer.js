@@ -18,4 +18,10 @@ export class BoxPositionInitializer extends ParticleStateInitializer {
                                           new THREE.Vector3().fromArray(params.offset));
     }
 
+    toJSON() {
+        return {
+            'range': this.randomGenerator.range.toArray(),
+            'offset': this.randomGenerator.offset.toArray()
+        }
+    }
 }

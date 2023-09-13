@@ -141,6 +141,10 @@ export class ParticleSystem {
         return initializer;
     }
 
+    getParticleStateInitializerCount() {
+        return this.particleStateInitializers.length;
+    }
+
     getParticleStateInitializer(index) {
         if (index >= this.particleStateInitializers.length) {
             throw new Error('ParticleSystem::getParticleStateInitializer() -> "index" is out of range.');
