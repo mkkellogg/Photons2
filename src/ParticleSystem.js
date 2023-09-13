@@ -30,7 +30,7 @@ export class ParticleSystem {
         this.activeParticleCount = 0;
         this.simulateInWorldSpace = true;
         this.emitterInitialized = false;
-        this.emitter = null;
+        this.particleEmitter = null;
         this.componentContainer = new ComponentContainer();
         this.particleStateInitializers = [];
         this.particleStateOperators = [];
@@ -51,8 +51,9 @@ export class ParticleSystem {
                 this.particleStates = new ParticleStateArray();
                 this.particleStates.init(this.maximumActiveParticles);
             }
-            this.addParticleStateOperator(BaseParticleStateOperator);
-            this.addParticleStateInitializer(BaseParticleStateInitializer);
+            this.addParticleStateInitializer(new BaseParticleStateInitializer());
+            this.addParticleStateOperator(new BaseParticleStateOperator());
+            this.initialized = true;
         } else {
             throw new Error('ParticleSystem::init() -> trying to intialize more than once.');
         }
@@ -120,25 +121,28 @@ export class ParticleSystem {
         return this.systemState;
     }
 
-    setEmitter(EmitterClass, ...args) {
-        this.particleEmitter = new EmitterClass(...args);
+    setEmitter(emitter) {
+        this.particleEmitter = emitter;
         this.particleEmitter.maximumActiveParticles = this.maximumActiveParticles;
         this.emitterInitialized = true;
         return this.particleEmitter;
     }
 
-    addComponent(ComponentClass, ...args) {
-        return this.componentContainer.addComponent(ComponentClass, ...args);
+    addComponent(component) {
+        this.componentContainer.addComponent(component);
     }
 
     getComponent(index) {
         return this.componentContainer.getComponent(index);
     }
 
-    addParticleStateInitializer(InitializerClass, ...args) {
-        const initializer = new InitializerClass(...args);
+    addParticleStateInitializer(initializer) {
         this.particleStateInitializers.push(initializer);
         return initializer;
+    }
+
+    getParticleStateInitializerCount() {
+        return this.particleStateInitializers.length;
     }
 
     getParticleStateInitializer(index) {
@@ -148,14 +152,17 @@ export class ParticleSystem {
         return this.particleStateInitializers[index];
     }
 
-    addParticleStateOperator(OperatorClass, ...args) {
-        const operator = new OperatorClass(...args);
+    addParticleStateOperator(operator) {
         this.particleStateOperators.push(operator);
         return operator;
     }
 
+    getParticleStateOperatorCount() {
+        return this.particleStateOperators.length;
+    }
+
     getParticleStateOperator(index) {
-        if (index >= this.articleStateOperators.length) {
+        if (index >= this.particleStateOperators.length) {
             throw new Error('ParticleSystem::getParticleStateOperator() -> "index" is out of range.');
         }
         return this.particleStateOperators[index];
@@ -180,6 +187,10 @@ export class ParticleSystem {
         return this.particleStates;
     }
 
+    getParticleSystemRenderer() {
+        return this.particleSystemRenderer;
+    }
+
     getSimulateInWorldSpace() {
         return this.simulateInWorldSpace;
     }
@@ -197,7 +208,7 @@ export class ParticleSystem {
     }
 
     getEmitter() {
-        return this.emitter;
+        return this.particleEmitter;
     }
 
     activateParticles(particleCount) {

@@ -22,4 +22,5 @@ export class Renderer {
             throw new Error('Renderer::init() -> trying to intialize more than once.');
         }
     }
+
 }

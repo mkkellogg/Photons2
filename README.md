@@ -43,7 +43,7 @@ import * as THREE from 'three';
 // Create atlas, in this case it only contains a single image
 const embersTexture = new THREE.TextureLoader().load('assets/textures/ember.png');
 const embersAtlas = new Photons.Atlas(embersTexture);
-embersAtlas.addTileArray(1, 0.0, 0.0, 1.0, 1.0);
+embersAtlas.addFrameSet(1, 0.0, 0.0, 1.0, 1.0);
 
 // Create the base parent object for the particle system
 const embersRoot = new THREE.Object3D();

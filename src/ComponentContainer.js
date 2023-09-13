@@ -4,10 +4,8 @@ export class ComponentContainer {
             this.components = [];
         }
 
-        addComponent(ComponentClass, ...args) {
-            const component = new ComponentClass(...args);
+        addComponent(component) {
             this.components.push(component);
-            return component;
         }
 
         update(currentTime, timeDelta) {

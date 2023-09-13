@@ -1,16 +1,18 @@
 import * as THREE from 'three';
 import { Renderer } from './Renderer.js';
 import { ParticleStateAttributeArray } from './ParticleStateAttributeArray.js';
+import { Atlas } from './Atlas.js';
 
 export class AnimatedSpriteRenderer extends Renderer {
 
-    constructor(atlas, interpolateAtlasFrames) {
+    constructor(atlas, interpolateAtlasFrames = false, blending = THREE.NormalBlending) {
         super();
         this.particleStateArray = null;
         this.material = null;
         this.mesh = null;
         this.atlas = atlas;
         this.interpolateAtlasFrames = !!interpolateAtlasFrames;
+        this.blending = blending;
     }
 
     setOwner(owner) {
@@ -26,7 +28,10 @@ export class AnimatedSpriteRenderer extends Renderer {
             this.particleStateArray = new ParticleStateAttributeArray();
             this.particleStateArray.init(particleCount);
             this.material = this.createMaterial(null, null, null, true, false);
+            this.material.blending = this.blending;
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
+            // TODO: At some point remove this and perform proper bounds calculations
+            this.mesh.frustumCulled = false;
             this.owner.add(this.mesh);
         }
     }
@@ -39,9 +44,9 @@ export class AnimatedSpriteRenderer extends Renderer {
 
         let shaderAtlas = [...Array(16).keys()].map(i => new THREE.Vector4());
         if (this.atlas) {
-            for (let i = 0; i < this.atlas.getTileArrayCount(); i++) {
-                const tileArray = this.atlas.getTileArray(i);
-                shaderAtlas[i] = new THREE.Vector4(tileArray.x, tileArray.y, tileArray.width, tileArray.height);
+            for (let i = 0; i < this.atlas.getFrameSetCount(); i++) {
+                const frameSet = this.atlas.getFrameSet(i);
+                shaderAtlas[i] = new THREE.Vector4(frameSet.x, frameSet.y, frameSet.width, frameSet.height);
             }
         }
 
@@ -49,7 +54,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         const interpolateAtlasFrames = this.interpolateAtlasFrames;
 
         const baseUniforms = {
-            'atlasTileArray': {
+            'atlasFrameSet': {
                 'type': 'v4v',
                 'value': shaderAtlas
             },
@@ -92,8 +97,8 @@ export class AnimatedSpriteRenderer extends Renderer {
 
         get VertexVars() {
             return [
-                'const int MAX_ATLAS_TILE_ARRAYS = 16; \n',
-                'uniform vec4 atlasTileArray[MAX_ATLAS_TILE_ARRAYS]; \n',
+                'const int MAX_ATLAS_FRAME_SETS = 16; \n',
+                'uniform vec4 atlasFrameSet[MAX_ATLAS_FRAME_SETS]; \n',
                 'uniform int interpolateAtlasFrames; \n',
                 'attribute float customIndex;\n',
                 'attribute vec4 worldPosition;\n',
@@ -133,23 +138,23 @@ export class AnimatedSpriteRenderer extends Renderer {
 
             shader += [
 
-                'void getUV(in int sequenceElement, in int sequenceNumber, in vec4 atlasTiles, out vec2 uv) { \n',
-                '   float atlasTileWidth = atlasTiles.z; \n',
-                '   float atlasTileHeight = atlasTiles.w; \n',
-                '   float atlasTileX = atlasTiles.x; \n',
-                '   float atlasTileY = atlasTiles.y; \n',
-                '   int firstRowSections = int((1.0 - atlasTileX) / atlasTileWidth); \n',
-                '   int maxRowSections = int(1.0 / atlasTileWidth); \n',
+                'void getUV(in int sequenceElement, in int sequenceNumber, in vec4 atlasFrames, out vec2 uv) { \n',
+                '   float atlasFrameWidth = atlasFrames.z; \n',
+                '   float atlasFrameHeight = atlasFrames.w; \n',
+                '   float atlasFrameX = atlasFrames.x; \n',
+                '   float atlasFrameY = atlasFrames.y; \n',
+                '   int firstRowSections = int((1.0 - atlasFrameX) / atlasFrameWidth); \n',
+                '   int maxRowSections = int(1.0 / atlasFrameWidth); \n',
 
-                '   float firstRowX = atlasTileX + atlasTileWidth * float(sequenceElement); \n',
-                '   float firstRowY = 1.0 - (atlasTileY + atlasTileHeight); \n',
+                '   float firstRowX = atlasFrameX + atlasFrameWidth * float(sequenceElement); \n',
+                '   float firstRowY = 1.0 - (atlasFrameY + atlasFrameHeight); \n',
 
                 '   int nRowSequenceElement = sequenceElement - firstRowSections; \n',
                 '   float SNOverHS = float(nRowSequenceElement) / float(maxRowSections);\n',
                 '   int nRowYTile = int(SNOverHS);\n',
                 '   int nRowXTile = int((SNOverHS - float(nRowYTile)) * float(maxRowSections));\n',
-                '   float nRowX = float(nRowXTile) * atlasTileWidth;\n',
-                '   float nRowY = 1.0 - ((float(nRowYTile) + 1.0) * (atlasTileHeight) + atlasTileY + atlasTileHeight);\n',
+                '   float nRowX = float(nRowXTile) * atlasFrameWidth;\n',
+                '   float nRowY = 1.0 - ((float(nRowYTile) + 1.0) * (atlasFrameHeight) + atlasFrameY + atlasFrameHeight);\n',
 
                 '   float nRow = step(float(firstRowSections), float(sequenceElement)); \n',
                 '   uv.x = nRow * nRowX + (1.0 - nRow) * firstRowX; \n',
@@ -174,19 +179,19 @@ export class AnimatedSpriteRenderer extends Renderer {
                 '   int sequenceNumber = int(sequenceElement.y);\n',
                 '   int sequenceStart = int(sequenceElement.z);\n',
                 '   int sequenceLength = int(sequenceElement.w);\n',
-                '   vec4 atlasTiles = atlasTileArray[sequenceNumber]; \n',
+                '   vec4 atlasFrames = atlasFrameSet[sequenceNumber]; \n',
 
                 '   vec2 uv1; \n',
                 '   vec2 uv2; \n',
                 '   vSequenceElementT = sequenceElementF - float(int(sequenceElementF)); \n',
                 '   int firstSequenceElement = int(sequenceElementF); \n',
                 '   int secondSequenceElement = clamp(firstSequenceElement + 1, sequenceStart, sequenceStart + sequenceLength - 1); \n',
-                '   getUV(firstSequenceElement, sequenceNumber, atlasTiles, uv1); \n',
+                '   getUV(firstSequenceElement, sequenceNumber, atlasFrames, uv1); \n',
                 '   if (interpolateAtlasFrames == 1 && firstSequenceElement != secondSequenceElement) { \n ',
-                '       getUV(secondSequenceElement, sequenceNumber, atlasTiles, uv2); \n',
+                '       getUV(secondSequenceElement, sequenceNumber, atlasFrames, uv2); \n',
                 '   } \n',
-                '   float atlasTileWidth = atlasTiles.z; \n',
-                '   float atlasTileHeight = atlasTiles.w; \n',
+                '   float atlasFrameWidth = atlasFrames.z; \n',
+                '   float atlasFrameHeight = atlasFrames.w; \n',
 
                 '   float rotMag = rotation; \n',
                 '   mat2 rotMat = mat2(cos(rotMag), -sin(rotMag), sin(rotMag), cos(rotMag)) * mat2(size.x, 0.0, 0.0, size.y);\n',
@@ -194,8 +199,8 @@ export class AnimatedSpriteRenderer extends Renderer {
                 '   float rightSide = step(2.0, customIndex); \n',
                 '   vec2 upperSideStep = step(vec2(customIndex, 3.0), vec2(0.0, customIndex));\n',
                 '   float upperSide = upperSideStep.x + upperSideStep.y;\n',
-                '   float uvXOffset = atlasTileWidth * rightSide; \n',
-                '   float uvYOffset = atlasTileHeight * upperSide; \n',
+                '   float uvXOffset = atlasFrameWidth * rightSide; \n',
+                '   float uvYOffset = atlasFrameHeight * upperSide; \n',
 
                 '   vec4 rotVecStep = step(vec4(customIndex, customIndex, 3.0, 2.0), vec4(0.0, 1.0, customIndex, customIndex)); \n',
 
@@ -255,4 +260,66 @@ export class AnimatedSpriteRenderer extends Renderer {
         }
     };
 
+    static loadFromJSON(params) {
+        const atlasJSON = params.atlas;
+        const atlasTexture = new THREE.TextureLoader().load(atlasJSON.texturePath);
+        const atlas = new Atlas(atlasTexture, atlasJSON.texturePath);
+        const framesets = atlasJSON.framesets;
+        for (let frameset of framesets) {
+            atlas.addFrameSet(frameset.length, frameset.x, frameset.y, frameset.width, frameset.height);
+        }
+        const renderer = new AnimatedSpriteRenderer(atlas, atlasJSON.interpolateFrames);
+        if (params.blending == 'Additive') {
+            renderer.blending = THREE.AdditiveBlending;
+        } else {
+            renderer.blending = THREE.NormalBlending;
+        }
+        return renderer;
+    }
+
+    toJSON(texturePathGenerator) {
+
+        const defaultTexturePathGenerator = (atlas) => {
+            if (atlas.texturePath) return atlas.texturePath;
+            const texture = atlas.getTexture();
+            const textureSource = texture.source;
+            if (textureSource) {
+                const textureData = textureSource.data;
+                if (textureData) {
+                    const baseURI = textureData.baseURI;
+                    const currentSrc = textureData.currentSrc;
+                    const baseURISubStrLoc = currentSrc.indexOf(baseURI);
+                    if (baseURISubStrLoc >= 0) {
+                        return currentSrc.substr(baseURI.length, currentSrc.length - baseURI.length);
+                    } else {
+                        return currentSrc;
+                    }
+                }
+            }
+        };
+
+        texturePathGenerator = texturePathGenerator || defaultTexturePathGenerator;
+
+        const frameSets = [];
+        for (let i = 0; i < this.atlas.getFrameSetCount(); i++) {
+            const frameSet = this.atlas.getFrameSet(i);
+            frameSets.push(frameSet);
+        }
+
+        let blending = 'Normal';
+        if (this.material.blending === THREE.AdditiveBlending) {
+            blending = 'Additive';
+        }
+
+        const json = {
+            'blending': blending,
+            'atlas': {
+                'interpolateFrames': this.interpolateAtlasFrames,
+                'texturePath': texturePathGenerator(this.atlas),
+                'framesets': frameSets
+            }
+        };
+
+        return json;
+    }
 }

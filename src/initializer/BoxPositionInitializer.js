@@ -12,4 +12,16 @@ export class BoxPositionInitializer extends ParticleStateInitializer {
     initializeState(state) {
         this.randomGenerator.generate(state.position);
     }
+
+    static loadFromJSON(particleSystem, params) {
+        return new BoxPositionInitializer(new THREE.Vector3().fromArray(params.range),
+                                          new THREE.Vector3().fromArray(params.offset));
+    }
+
+    toJSON() {
+        return {
+            'range': this.randomGenerator.range.toArray(),
+            'offset': this.randomGenerator.offset.toArray()
+        };
+    }
 }

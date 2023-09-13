@@ -15,6 +15,35 @@ export class ContinuousArray {
         }
     }
 
+    * [Symbol.iterator]() {
+        let index = 0;
+        while (index < this.getElementCount()) {
+            yield {
+                'element': this.elements[index],
+                'tValue': this.tValues[index]
+            };
+            index++;
+        }
+    }
+
+    getElementCount() {
+        return this.elements.length;
+    }
+
+    getElement(index) {
+        if (index >= this.getElementCount()) {
+            throw new Error('ContinuousArray::getElement() -> "index" is out of bounds.');
+        }
+        return this.elements[index];
+    }
+
+    getTValue(index) {
+        if (index >= this.getElementCount()) {
+            throw new Error('ContinuousArray::getTValue() -> "index" is out of bounds.');
+        }
+        return this.tValues[index];
+    }
+
     addElement(element, tValue) {
         this.elements.push(element);
         this.tValues.push(tValue);
@@ -47,7 +76,7 @@ export class ContinuousArray {
 
         return function(typeID) {
             switch (typeID) {
-                case BuiltinType.Scalar:
+                case BuiltinType.Default:
                     return (tValue, elements, tValues) => {
                         ContinuousArray.getInterpolationValuesForTValue(tValues, tValue, iResult);
                         return (1.0 - iResult.localT) * elements[iResult.lowerIndex] +

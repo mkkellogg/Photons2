@@ -2,9 +2,9 @@ import { ContinuousParticleEmitter } from './ContinuousParticleEmitter.js';
 
 export class ConstantParticleEmitter extends ContinuousParticleEmitter {
 
-    constructor() {
+    constructor(emissionRate = 0.0) {
         super();
-        this.emissionRate = 0.0;
+        this.emissionRate = emissionRate;
     }
 
     update(timeDelta) {
@@ -19,4 +19,15 @@ export class ConstantParticleEmitter extends ContinuousParticleEmitter {
         return 0;
     }
 
+    static loadFromJSON(params) {
+        const emitter = new ConstantParticleEmitter();
+        emitter.emissionRate = params.emissionRate || 0.0;
+        return emitter;
+    }
+
+    toJSON() {
+        return {
+            'emissionRate': this.emissionRate
+        };
+    }
 }

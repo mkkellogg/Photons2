@@ -2,8 +2,12 @@ import { InterpolatorOperator } from './InterpolatorOperator.js';
 
 export class OpacityInterpolatorOperator extends InterpolatorOperator {
 
-    constructor(relativeToInitialValue) {
+    constructor(relativeToInitialValue = false) {
         super(0, relativeToInitialValue);
+    }
+
+    addElementsFromParameters(elementParametersTValuePairs) {
+        super.addElements(elementParametersTValuePairs);
     }
 
     updateState(state) {
@@ -13,6 +17,24 @@ export class OpacityInterpolatorOperator extends InterpolatorOperator {
             state.alpha = this.getInterpolatedValue(state, state.alpha);
         }
         return true;
+    }
+
+
+    static loadFromJSON(particleSystem, params) {
+        return new OpacityInterpolatorOperator(params.relativeToInitialValue);
+    }
+
+    toJSON() {
+        const params = {
+            'relativeToInitialValue': this.relativeToInitialValue
+        };
+        const elements = [...this.interpolationElements].map((element) => {
+            return [element.element, element.tValue];
+        });
+        return {
+            'params': params,
+            'elements': elements
+        };
     }
 
 }

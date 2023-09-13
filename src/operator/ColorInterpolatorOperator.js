@@ -3,7 +3,7 @@ import { InterpolatorOperator } from './InterpolatorOperator.js';
 
 export class ColorInterpolatorOperator extends InterpolatorOperator {
 
-    constructor(relativeToInitialValue) {
+    constructor(relativeToInitialValue = false) {
         super(THREE.Color, relativeToInitialValue);
     }
 
@@ -22,11 +22,27 @@ export class ColorInterpolatorOperator extends InterpolatorOperator {
                                    state.initialColor.g * tempColor.g,
                                    state.initialColor.b * tempColor.b);
             } else {
-                state.color.setRGB(c.r, c.g, c.b);
+                state.color.copy(tempColor);
             }
             return true;
         };
 
     }();
 
+    static loadFromJSON(particleSystem, params) {
+        return new ColorInterpolatorOperator(params.relativeToInitialValue);
+    }
+
+    toJSON() {
+        const params = {
+            'relativeToInitialValue': this.relativeToInitialValue
+        };
+        const elements = [...this.interpolationElements].map((element) => {
+            return [element.element.toArray(), element.tValue];
+        });
+        return {
+            'params': params,
+            'elements': elements
+        };
+    }
 }

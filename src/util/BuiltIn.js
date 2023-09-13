@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 export class BuiltinType {
 
-    static Scalar = new BuiltinType('Scalar');
+    static Default = new BuiltinType('Default');
     static Vector2 = new BuiltinType('Vector2');
     static Vector3 = new BuiltinType('Vector3');
     static Vector4 = new BuiltinType('Vector4');
@@ -13,7 +13,7 @@ export class BuiltinType {
     }
 
     static getTypeID(type) {
-        let typeID = BuiltinType.Scalar;
+        let typeID = BuiltinType.Default;
         if (type === THREE.Vector2) {
             typeID = BuiltinType.Vector2;
         } else if (type === THREE.Vector3) {
@@ -24,5 +24,20 @@ export class BuiltinType {
             typeID = BuiltinType.Color;
         }
         return typeID;
+    }
+
+    static loadJSONParameter(param, type) {
+        switch (type) {
+            case THREE.Vector2:
+                return new THREE.Vector2().fromArray(param);
+            case THREE.Vector3:
+                return new THREE.Vector3().fromArray(param);
+            case THREE.Vector4:
+                return new THREE.Vector4().fromArray(param);
+            case THREE.Color:
+                return new THREE.Color().fromArray(param);
+        }
+
+        return param;
     }
 }

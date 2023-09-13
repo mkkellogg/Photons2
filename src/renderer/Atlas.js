@@ -1,4 +1,4 @@
-export class TileArrayDescriptor {
+export class FrameSetDescriptor {
 
     constructor(length, x, y, width, height) {
         this.length = length;
@@ -12,28 +12,33 @@ export class TileArrayDescriptor {
 
 export class Atlas {
 
-    constructor(texture) {
+    constructor(texture, texturePath) {
         this.texture = texture;
-        this.tileArrays = [];
+        this.texturePath = texturePath;
+        this.frameSets = [];
     }
 
     getTexture() {
         return this.texture;
     }
 
-    getTileArrayCount() {
-        return this.tileArrays.length;
+    getTexturePath() {
+        return this.texturePath;
     }
 
-    addTileArray(length, x, y, width, height) {
-        this.tileArrays.push(new TileArrayDescriptor(length, x, y, width, height));
+    getFrameSetCount() {
+        return this.frameSets.length;
     }
 
-    getTileArray(index) {
-        if (index >= this.tileArrays.length) {
-            throw new Error('Atlas::getTileArray -> "index" is out of range.');
+    addFrameSet(length, x, y, width, height) {
+        this.frameSets.push(new FrameSetDescriptor(length, x, y, width, height));
+    }
+
+    getFrameSet(index) {
+        if (index >= this.frameSets.length) {
+            throw new Error('Atlas::getFrameSet -> "index" is out of range.');
         }
-        return this.tileArrays[index];
+        return this.frameSets[index];
     }
 
 }
