@@ -55,7 +55,7 @@ export class DemoScene {
 
         const embersTexture = new THREE.TextureLoader().load('assets/textures/ember.png');
         const embersAtlas = new Photons.Atlas(embersTexture);
-        embersAtlas.addTileArray(1, 0.0, 0.0, 1.0, 1.0);
+        embersAtlas.addFrameSet(1, 0.0, 0.0, 1.0, 1.0);
         const embersRenderer = new Photons.AnimatedSpriteRenderer(embersAtlas, true);
 
         const embersParticleSystem = new Photons.ParticleSystem(embersRoot, embersRenderer, this.renderer);
@@ -107,7 +107,7 @@ export class DemoScene {
 
         const baseFlameTexture = new THREE.TextureLoader().load('assets/textures/base_flame.png');
         const baseFlameAtlas = new Photons.Atlas(baseFlameTexture);
-        baseFlameAtlas.addTileArray(18, 0.0, 0.0, 128.0 / 1024.0, 128.0 / 512.0);
+        baseFlameAtlas.addFrameSet(18, 0.0, 0.0, 128.0 / 1024.0, 128.0 / 512.0);
         const baseFlameRenderer = new Photons.AnimatedSpriteRenderer(baseFlameAtlas, true);
 
         const baseFlameParticleSystem = new Photons.ParticleSystem(baseFlameRoot, baseFlameRenderer, this.renderer);
@@ -164,7 +164,7 @@ export class DemoScene {
 
         const brightFlameTexture = new THREE.TextureLoader().load('assets/textures/bright_flame.png');
         const brightFlameAtlas = new Photons.Atlas(brightFlameTexture);
-        brightFlameAtlas.addTileArray(16, 0.0, 0.0, 212.0 / 1024.0, 256.0 / 1024.0);
+        brightFlameAtlas.addFrameSet(16, 0.0, 0.0, 212.0 / 1024.0, 256.0 / 1024.0);
         const brightFlameRenderer = new Photons.AnimatedSpriteRenderer(brightFlameAtlas, true);
 
         const brightFlameParticleSystem = new Photons.ParticleSystem(brightFlameRoot, brightFlameRenderer, this.renderer);
