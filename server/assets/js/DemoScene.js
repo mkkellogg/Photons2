@@ -11,8 +11,9 @@ export class DemoScene {
         this.renderer = renderer;
         this.particleSystems = [];
         this.manager = new Photons.Manager();
-        this.manager.addJSONNamespace('THREE', THREE);
-        this.manager.addJSONNamespace('Photons', Photons);
+        const jsonTypeStore = this.manager.getJSONTypeStore();
+        jsonTypeStore.addNamespace('THREE', THREE);
+        jsonTypeStore.addNamespace('Photons', Photons);
     }
 
     build () {
@@ -205,11 +206,17 @@ export class DemoScene {
 
         brightFlameParticleSystem.setSimulateInWorldSpace(true);
 
-        brightFlameParticleSystem.start();
-
-        return brightFlameParticleSystem;
-    }
+        //brightFlameParticleSystem.start();
+        //return brightFlameParticleSystem;
     
+        const brightFlameJSON = this.manager.convertParticleSystemToJSON(brightFlameParticleSystem);
+        const [brightFlameParticleSystem2, brightFlameRoot2] = this.manager.loadParticleSystemFromJSON(brightFlameJSON, this.renderer);
+        brightFlameRoot2.position.copy(position);
+        brightFlameParticleSystem2.start();
+        return brightFlameParticleSystem2;
+
+    }
+        
     setupSceneComponents () {
         const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
         this.scene.add(directionalLight) ;
