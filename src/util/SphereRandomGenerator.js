@@ -65,9 +65,9 @@ export class SphereRandomGenerator extends Generator {
                                          params.scaleZ, params.offsetX, params.offsetY, params.offsetZ);
     }
 
-    toJSON(typeStore) {
+    toJSON(jsonTypeStore) {
         return {
-            'type': typeStore.getJSONTypePath(SphereRandomGenerator),
+            'type': jsonTypeStore.getTypePath(SphereRandomGenerator),
             'params': {
                 'rangeTheta': this.rangeTheta,
                 'offsetTheta': this.offsetTheta,

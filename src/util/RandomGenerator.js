@@ -64,19 +64,19 @@ export class RandomGenerator extends Generator {
                                    params.uniformRange || 0.0, params.uniformOffset || 0.0, params.normalize);
     }
 
-    toJSON(typeStore) {
+    toJSON(jsonTypeStore) {
         const params = {
             'range': RandomGenerator.getParameterJSON(this.range),
             'offset': RandomGenerator.getParameterJSON(this.offset),
             'uniformRange': this.uniformRange,
             'uniformOffset': this.uniformOffset
         };
-        const type = typeStore.getJSONTypePath(this.range.constructor);
+        const type = jsonTypeStore.getTypePath(this.range.constructor);
         if (type !== undefined && type !== null) {
             params['type'] = type;
         }
         return {
-            'type': typeStore.getJSONTypePath(RandomGenerator),
+            'type': jsonTypeStore.getTypePath(RandomGenerator),
             'params': params
         };
     }
