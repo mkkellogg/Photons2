@@ -110,7 +110,6 @@ export class Manager {
     }
 
     convertParticleSystemToJSON(particleSystem) {
-        const scope = this;
         const particleSystemRenderer = particleSystem.getParticleSystemRenderer();
         const particleSystemEmitter = particleSystem.getEmitter();
 
@@ -130,8 +129,8 @@ export class Manager {
             const initializer = particleSystem.getParticleStateInitializer(i);
             if (initializer.constructor !== BaseParticleStateInitializer) {
                 initializers.push({
-                    'type': scope.jsonTypeStore.getTypePath(initializer.constructor),
-                    'params': initializer.toJSON(scope.jsonTypeStore)
+                    'type': this.jsonTypeStore.getTypePath(initializer.constructor),
+                    'params': initializer.toJSON(this.jsonTypeStore)
                 });
             }
         }
@@ -141,11 +140,11 @@ export class Manager {
         for (let i = 0; i < operatorCount; i++) {
             const operator = particleSystem.getParticleStateOperator(i);
             if (operator.constructor !== BaseParticleStateOperator) {
-                const json = operator.toJSON(scope.jsonTypeStore);
+                const json = operator.toJSON(this.jsonTypeStore);
                 const params = json.params || json;
                 const elements = json.params ? json.elements : null;
                 const operatorJSON = {
-                    'type': scope.jsonTypeStore.getTypePath(operator.constructor),
+                    'type': this.jsonTypeStore.getTypePath(operator.constructor),
                     'params': params
                 };
                 if (elements) {
@@ -159,11 +158,11 @@ export class Manager {
             'maxParticleCount': particleSystem.getMaximumActiveParticles(),
             'simulateInWorldSpace': particleSystem.getSimulateInWorldSpace(),
             'renderer': {
-                'type': scope.jsonTypeStore.getTypePath(particleSystemRenderer.constructor),
+                'type': this.jsonTypeStore.getTypePath(particleSystemRenderer.constructor),
                 'params': particleSystemRenderer.toJSON()
             },
             'emitter': {
-                'type': scope.jsonTypeStore.getTypePath(particleSystemEmitter.constructor),
+                'type': this.jsonTypeStore.getTypePath(particleSystemEmitter.constructor),
                 'params': particleSystemEmitter.toJSON()
             },
             'sequences': sequences,
