@@ -14,7 +14,7 @@
         "build-library": "npx rollup -c && mkdir -p ./build/server/assets/lib && cp ./build/photons* ./build/server/assets/lib/",
         "build": "npm run build-library && npm run build-server",
         "watch": "npx npm-watch ",
-        "start-server": "npx http-server ./build/server",
+        "server": "npx http-server ./build/server",
         "fix-styling": "npx stylelint **/*.scss --fix",
         "fix-js": "npx eslint src --fix",
         "lint": "npx eslint 'src/**/*.js' || true",
