@@ -30,7 +30,7 @@ export class SequenceOperator extends ParticleStateOperator {
         return true;
     }
 
-    static loadFromJSON(particleSystem, params) {
+    static fromJSON(particleSystem, params) {
         return new SequenceOperator(particleSystem.getParticleSequences(), params.speed, params.loop, params.reverse);
     }
 

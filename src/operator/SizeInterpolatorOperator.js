@@ -28,7 +28,7 @@ export class SizeInterpolatorOperator extends InterpolatorOperator {
 
     }();
 
-    static loadFromJSON(particleSystem, params) {
+    static fromJSON(particleSystem, params) {
         return new SizeInterpolatorOperator(params.relativeToInitialValue);
     }
 

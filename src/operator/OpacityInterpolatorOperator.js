@@ -20,7 +20,7 @@ export class OpacityInterpolatorOperator extends InterpolatorOperator {
     }
 
 
-    static loadFromJSON(particleSystem, params) {
+    static fromJSON(particleSystem, params) {
         return new OpacityInterpolatorOperator(params.relativeToInitialValue);
     }
 

@@ -17,7 +17,7 @@ export class RotationalSpeedInitializer extends ParticleStateInitializer {
         state.rotationalSpeed = this.generator.generate();
     }
 
-    static loadFromJSON(particleSystem, params) {
+    static fromJSON(particleSystem, params) {
         return new RotationalSpeedInitializer(params.range, params.offset, params.uniformRange, params.uniformOffset, params.normalize);
     }
 

@@ -12,8 +12,8 @@ export class SizeInitializer extends ParticleStateInitializer {
         state.initialSize.copy(state.size);
     }
 
-    static loadFromJSON(particleSystem, params) {
-        const generator = params.generator.type.loadFromJSON(params.generator.params);
+    static fromJSON(particleSystem, params) {
+        const generator = params.generator.type.fromJSON(params.generator.params);
         return new SizeInitializer(generator);
     }
 

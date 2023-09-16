@@ -28,7 +28,7 @@ export class SequenceInitializer extends ParticleStateInitializer {
         state.progressType = ParticleStateProgressType.Sequence;
     }
 
-    static loadFromJSON(particleSystem, params) {
+    static fromJSON(particleSystem, params) {
         return new SequenceInitializer(particleSystem.getParticleSequences(), params.reverse);
     }
 

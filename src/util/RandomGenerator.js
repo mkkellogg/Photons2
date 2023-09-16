@@ -57,7 +57,7 @@ export class RandomGenerator extends Generator {
         return param;
     }
 
-    static loadFromJSON(params) {
+    static fromJSON(params) {
         return new RandomGenerator(params.type,
                                    BuiltinType.loadJSONParameter(params.range, params.type),
                                    BuiltinType.loadJSONParameter(params.offset, params.type),

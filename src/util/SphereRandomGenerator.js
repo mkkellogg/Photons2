@@ -59,7 +59,7 @@ export class SphereRandomGenerator extends Generator {
         return clone;
     }
 
-    static loadFromJSON(params) {
+    static fromJSON(params) {
         return new SphereRandomGenerator(params.rangeTheta, params.offsetTheta, params.rangePhi, params.offsetPhi,
                                          params.rangeRadius, params.offsetRadius, params.scaleX, params.scaleY,
                                          params.scaleZ, params.offsetX, params.offsetY, params.offsetZ);

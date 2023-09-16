@@ -29,7 +29,7 @@ export class ColorInterpolatorOperator extends InterpolatorOperator {
 
     }();
 
-    static loadFromJSON(particleSystem, params) {
+    static fromJSON(particleSystem, params) {
         return new ColorInterpolatorOperator(params.relativeToInitialValue);
     }
 

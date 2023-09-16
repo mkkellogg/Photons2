@@ -285,4 +285,128 @@ export class ParticleSystem {
         this.particleStates.flushParticleStateToBuffers(destIndex);
     }
 
+    static fromJSON(json, jsonTypeStore, threeRenderer) {
+
+        const traverseJSON = (node, onVisit, visited) => {
+            visited = visited || {};
+            onVisit(node);
+            for (const key in node) {
+                if (node.hasOwnProperty(key)) {
+                    const val = node[key];
+                    if (typeof val == 'object') {
+                        traverseJSON(val, onVisit, visited);
+                    }
+                }
+            }
+        };
+
+        traverseJSON(json, (node) => {
+            if (node.type) {
+                node.type = jsonTypeStore.parseTypeString(node.type);
+            }
+        });
+
+        const maxParticleCount = json.maxParticleCount;
+        const simulateInWorldSpace = json.simulateInWorldSpace;
+
+        const rendererJSON = json.renderer;
+        const renderer = rendererJSON.type.fromJSON(rendererJSON.params);
+
+        const rootObject = new THREE.Object3D();
+        const particleSystem = new ParticleSystem(rootObject, renderer, threeRenderer);
+        particleSystem.init(maxParticleCount);
+        particleSystem.setSimulateInWorldSpace(simulateInWorldSpace);
+
+        const emitterJSON = json.emitter;
+        const emitter = emitterJSON.type.fromJSON(emitterJSON.params);
+        particleSystem.setEmitter(emitter);
+
+        if (json.sequences) {
+            for (const sequenceJSON of json.sequences) {
+                particleSystem.addParticleSequence(sequenceJSON.start, sequenceJSON.length, sequenceJSON.id);
+            }
+        }
+
+        if (json.initializers) {
+            for (const initializerJSON of json.initializers) {
+                particleSystem.addParticleStateInitializer(initializerJSON.type.fromJSON(particleSystem, initializerJSON.params));
+            }
+        }
+
+        if (json.operators) {
+            for (const operatorJSON of json.operators) {
+                const operator =
+                    particleSystem.addParticleStateOperator(operatorJSON.type.fromJSON(particleSystem, operatorJSON.params));
+                if (operatorJSON.elements) {
+                    operator.addElementsFromParameters(operatorJSON.elements);
+                }
+            }
+        }
+
+        return [particleSystem, rootObject];
+    }
+
+    toJSON(jsonTypeStore) {
+        const particleSystemRenderer = this.getParticleSystemRenderer();
+        const particleSystemEmitter = this.getEmitter();
+
+        const particleSequenceGroup = this.getParticleSequences();
+        const sequences = particleSequenceGroup.getSequenceIDs().map((sequenceID) => {
+            const sequence = particleSequenceGroup.getSequence(sequenceID);
+            return {
+                'id': sequenceID,
+                'start': sequence.start,
+                'length': sequence.length
+            };
+        });
+
+        const initializers = [];
+        const initializerCount = this.getParticleStateInitializerCount();
+        for (let i = 0; i < initializerCount; i++) {
+            const initializer = this.getParticleStateInitializer(i);
+            if (initializer.constructor !== BaseParticleStateInitializer) {
+                initializers.push({
+                    'type': jsonTypeStore.getTypePath(initializer.constructor),
+                    'params': initializer.toJSON(jsonTypeStore)
+                });
+            }
+        }
+
+        const operators = [];
+        const operatorCount = this.getParticleStateOperatorCount();
+        for (let i = 0; i < operatorCount; i++) {
+            const operator = this.getParticleStateOperator(i);
+            if (operator.constructor !== BaseParticleStateOperator) {
+                const json = operator.toJSON(jsonTypeStore);
+                const params = json.params || json;
+                const elements = json.params ? json.elements : null;
+                const operatorJSON = {
+                    'type': jsonTypeStore.getTypePath(operator.constructor),
+                    'params': params
+                };
+                if (elements) {
+                    operatorJSON['elements'] = elements;
+                }
+                operators.push(operatorJSON);
+            }
+        }
+
+        const json = {
+            'maxParticleCount': this.getMaximumActiveParticles(),
+            'simulateInWorldSpace': this.getSimulateInWorldSpace(),
+            'renderer': {
+                'type': jsonTypeStore.getTypePath(particleSystemRenderer.constructor),
+                'params': particleSystemRenderer.toJSON()
+            },
+            'emitter': {
+                'type': jsonTypeStore.getTypePath(particleSystemEmitter.constructor),
+                'params': particleSystemEmitter.toJSON()
+            },
+            'sequences': sequences,
+            'initializers': initializers,
+            'operators': operators
+        };
+
+        return json;
+    }
 }

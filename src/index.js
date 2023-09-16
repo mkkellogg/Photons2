@@ -28,6 +28,8 @@ import { SphereRandomGenerator } from './util/SphereRandomGenerator.js';
 
 import { FlickerLight } from './component/FlickerLight.js';
 
+import { JSONTypeStore } from './util/JSONTypeStore.js';
+
 export {
     ParticleSystem,
     ParticleSystemState,
@@ -53,5 +55,6 @@ export {
     ColorInterpolatorOperator,
     RandomGenerator,
     SphereRandomGenerator,
-    FlickerLight
+    FlickerLight,
+    JSONTypeStore
 };

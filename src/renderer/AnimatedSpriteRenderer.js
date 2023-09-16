@@ -260,7 +260,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         }
     };
 
-    static loadFromJSON(params) {
+    static fromJSON(params) {
         const atlasJSON = params.atlas;
         const atlasTexture = new THREE.TextureLoader().load(atlasJSON.texturePath);
         const atlas = new Atlas(atlasTexture, atlasJSON.texturePath);
