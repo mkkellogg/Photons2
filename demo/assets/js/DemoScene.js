@@ -206,14 +206,8 @@ export class DemoScene {
 
         brightFlameParticleSystem.setSimulateInWorldSpace(true);
 
-        //brightFlameParticleSystem.start();
-        //return brightFlameParticleSystem;
-
-        const brightFlameJSON = brightFlameParticleSystem.toJSON(this.jsonTypeStore);
-        const [brightFlameParticleSystem2, brightFlameRoot2] = Photons.ParticleSystem.fromJSON(brightFlameJSON, this.jsonTypeStore, this.renderer);
-        brightFlameRoot2.position.copy(position);
-        brightFlameParticleSystem2.start();
-        return brightFlameParticleSystem2;
+        brightFlameParticleSystem.start();
+        return brightFlameParticleSystem;
     }
   
     setupSceneComponents () {
