@@ -1,6 +1,6 @@
 # Photons 2 - JavaScript Particle System for Three.js
 
-![screenshot](./server/assets/images/example.gif)
+![screenshot](./demo/assets/images/example.gif)
  
 Basic particle system for the Three.js 3D graphics library implemented in JavaScript. This is a sequel/complete rewrite of Photons (https://github.com/mkkellogg/Photons), my original particle system for Three.js.
 
@@ -28,7 +28,7 @@ An "Operator" can be assigned to each attribute to vary its value over the lifet
 
 The current implementation also supports the concept of a texture atlas (spritesheet) so particle textures can be animated.
 
-The repository includes a demo page (`server/index.html`) which contains a demo of the particle system in action. The core of the relevant demo code is in `server/assets/js/main.js`.
+The repository includes a demo page (`demo/index.html`) which contains a demo of the particle system in action. The core of the relevant demo code is in `demo/js/main.js`.
 
 **Demo:** The particle system can be seen in action [here](http://projects.markkellogg.org/threejs/demo_particle_system.php).
 
