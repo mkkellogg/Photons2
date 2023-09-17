@@ -16,6 +16,7 @@ export class ParticleSystemState {
     constructor(name) {
       this.name = name;
     }
+
 }
 
 export class ParticleSystem {

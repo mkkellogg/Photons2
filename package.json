@@ -10,11 +10,11 @@
     "author": "Mark Kellogg",
     "type": "module",
     "scripts": {
-        "build-server": "mkdir -p ./build/server && cp -r ./server ./build/ && cp ./node_modules/three/build/three.module.js ./build/server/assets/lib/three.module.js",
-        "build-library": "npx rollup -c && mkdir -p ./build/server/assets/lib && cp ./build/photons* ./build/server/assets/lib/",
-        "build": "npm run build-library && npm run build-server",
+        "build-demo": "mkdir -p ./build/demo && cp -r ./demo ./build/ && cp ./node_modules/three/build/three.module.js ./build/demo/assets/lib/three.module.js",
+        "build-library": "npx rollup -c && mkdir -p ./build/demo/assets/lib && cp ./build/photons* ./build/demo/assets/lib/",
+        "build": "npm run build-library && npm run build-demo",
         "watch": "npx npm-watch ",
-        "server": "npx http-server ./build/server",
+        "demo": "npx http-server ./build/demo",
         "fix-styling": "npx stylelint **/*.scss --fix",
         "fix-js": "npx eslint src --fix",
         "lint": "npx eslint 'src/**/*.js' || true",
@@ -26,9 +26,9 @@
                 "src/**/*.js"
             ]
         },
-        "build-server": {
+        "build-demo": {
             "patterns": [
-                "server/**/*.*"
+                "demo/**/*.*"
             ]
         }
     },
