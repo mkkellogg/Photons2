@@ -1,5 +1,5 @@
-import { OrbitControls } from './OrbitControls.js';
-import { DemoScene } from './DemoScene.js';
+import { OrbitControls } from '../../OrbitControls.js';
+import { Scene } from './Scene.js';
 import * as THREE from 'three';
 
 const rootElement = document.querySelector('#root');
@@ -46,7 +46,7 @@ const initThreeJS = async () => {
 
     rootElement.appendChild(renderer.domElement);
 
-    demoScene = new DemoScene(scene, camera, renderer);
+    demoScene = new Scene(scene, camera, renderer);
     demoScene.build();
 };
 

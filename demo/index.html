@@ -5,19 +5,71 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>Photons Test Page</title>
-  <script type="importmap">
-    {
-        "imports": {
-            "three": "./assets/lib/three.module.js"
-        }
+  <title>Photons Demos</title>
+  <script>
+
+    function openDemo(demoName) {
+      window.location = demoName + '.html';
     }
+
   </script>
+  <style>
+
+    .body {
+      background-color: #aaaaaa;
+    }
+
+    .table-of-contents-container {
+      text-align: center;
+      margin: auto;
+    }
+
+    .table-of-contents-inner-container {
+      text-align: center;
+      margin: auto;
+      width: 400px;
+      border-radius: 5px;
+      border: #666666 1px solid;
+      background-color: #cccccc;
+    }
+
+    .table-of-contents {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .table-of-contents-entry {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      color: #111111;
+      font-size: 14pt;
+      font-weight: bold;
+      font-family: arial;
+      border-radius: 5px;
+      border: #aaaaaa 1px solid;
+      background-color: #eeeeee;
+    }
+
+    .table-of-contents-entry:hover {
+      color: #333333;
+      border-color: #8a9ba8;
+      background-color: #c7def0;
+      cursor: pointer;
+    }
+
+  </style>
 </head>
 
-<body>
-  <script type="module" src="js/main.js"></script>
-  <div id = "root">
+<body class="body">
+  <div class="table-of-contents-container">
+    <div class="table-of-contents-inner-container">
+      <div class="table-of-contents">
+        <div class="table-of-contents-entry" onclick="openDemo('graveyardtorch')">
+          Torch-lit Graveyard
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 

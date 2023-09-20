@@ -1,9 +1,9 @@
-import * as Photons from '../lib/photons.module.js';
+import * as Photons from '../../../lib/photons.module.js';
 import { FogMaterial } from './FogMaterial.js';
-import { GLTFLoader } from './GltfLoader.js';
+import { GLTFLoader } from '../../GltfLoader.js';
 import * as THREE from 'three';
 
-export class DemoScene {
+export class Scene {
 
     constructor (scene, camera, renderer) {
         this.scene = scene;
@@ -36,7 +36,7 @@ export class DemoScene {
             onVisit(node);
             if (node.children) {
                 for (let child of node.children) {
-                    DemoScene.traverseScene(child, onVisit, visited);
+                    Scene.traverseScene(child, onVisit, visited);
                 }
             }
         }
@@ -218,7 +218,7 @@ export class DemoScene {
         const modelLoader = new GLTFLoader();
         modelLoader.load("assets/models/pumpkin_graveyard/pumpkin_graveyard.gltf", (object) => {
             this.scene.add(object.scene);
-            DemoScene.traverseScene(object.scene, (node) => {
+            Scene.traverseScene(object.scene, (node) => {
                 if (node.isMesh) {
                     if (node.name == "Opaque") {
                         node.castShadow = true;
@@ -249,7 +249,7 @@ export class DemoScene {
         let torchPostPosition = new THREE.Vector3(-.31, 1, 1.65);
         modelLoader.load("assets/models/cartoon_torch/cartoon_torch.gltf", (object) => {
             this.scene.add(object.scene);
-            DemoScene.traverseScene(object.scene, (node) => {
+            Scene.traverseScene(object.scene, (node) => {
                 if (node.isMesh) {
                     node.castShadow = false;
                     node.receiveShadow = false;
