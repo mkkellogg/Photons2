@@ -1,10 +1,5 @@
-import * as THREE from 'three';
 import { Utils } from './util/Utils.js';
 import { ComponentContainer } from './ComponentContainer.js';
-import { ParticleSystem } from './ParticleSystem.js';
-import { BaseParticleStateInitializer } from './initializer/BaseParticleStateInitializer.js';
-import { BaseParticleStateOperator } from './operator/BaseParticleStateOperator.js';
-
 export class Manager {
 
     constructor() {

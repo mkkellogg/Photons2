@@ -31,5 +31,6 @@ module.exports = {
     "padded-blocks": ["off"],
     "indent": ["off"],
     "arrow-parens": ["off"],
+    "no-unused-vars": ["error"]
   },
 };
