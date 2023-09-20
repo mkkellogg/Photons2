@@ -174,7 +174,7 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
 
         this.positions = new THREE.BufferAttribute(positionsArray, 3);
         this.positions.dynamic = true;
-        this.geometry.setAttribute('worldPosition', this.positions);
+        this.geometry.setAttribute('particlePosition', this.positions);
 
         this.velocities = new THREE.BufferAttribute(velocitiesArray, 3);
         this.velocities.dynamic = true;

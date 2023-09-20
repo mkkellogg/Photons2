@@ -11,7 +11,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         this.material = null;
         this.mesh = null;
         this.atlas = atlas;
-        this.interpolateAtlasFrames = !!interpolateAtlasFrames;
+        this.interpolateAtlasFrames = interpolateAtlasFrames;
         this.blending = blending;
     }
 
@@ -23,8 +23,17 @@ export class AnimatedSpriteRenderer extends Renderer {
         return this.particleStateArray;
     }
 
-    init(particleCount) {
+    setSimulateInWorldSpace(simulateInWorldSpace) {
+        super.setSimulateInWorldSpace(simulateInWorldSpace);
+        if (this.material) {
+            this.material.uniforms.simulateInWorldSpace.value = simulateInWorldSpace ? 1 : 0;
+            this.material.uniformsNeedUpdate = true;
+        }
+    }
+
+    init(particleCount, simulateInWorldSpace = false) {
         if (super.init(particleCount)) {
+            this.setSimulateInWorldSpace(simulateInWorldSpace);
             this.particleStateArray = new ParticleStateAttributeArray();
             this.particleStateArray.init(particleCount);
             this.material = this.createMaterial(null, null, null, true, false);
@@ -52,6 +61,7 @@ export class AnimatedSpriteRenderer extends Renderer {
 
         const atlasTexture = this.atlas ? this.atlas.getTexture() : null;
         const interpolateAtlasFrames = this.interpolateAtlasFrames;
+        const simulateInWorldSpace = this.simulateInWorldSpace;
 
         const baseUniforms = {
             'atlasFrameSet': {
@@ -69,6 +79,9 @@ export class AnimatedSpriteRenderer extends Renderer {
                 'type': 'v2',
                 'value': new THREE.Vector2()
             },
+            'simulateInWorldSpace': {
+                'value': simulateInWorldSpace
+            }
         };
 
         customUniforms = customUniforms || {};
@@ -100,8 +113,9 @@ export class AnimatedSpriteRenderer extends Renderer {
                 'const int MAX_ATLAS_FRAME_SETS = 16; \n',
                 'uniform vec4 atlasFrameSet[MAX_ATLAS_FRAME_SETS]; \n',
                 'uniform int interpolateAtlasFrames; \n',
+                'uniform int simulateInWorldSpace; \n',
                 'attribute float customIndex;\n',
-                'attribute vec4 worldPosition;\n',
+                'attribute vec4 particlePosition;\n',
                 'attribute float rotation;\n',
                 'attribute vec2 size;\n',
                 'attribute vec4 sequenceElement;\n',
@@ -173,8 +187,13 @@ export class AnimatedSpriteRenderer extends Renderer {
                 '   const vec2 uLeft = vec2(-1.0, 1.0);\n',
                 '   const vec2 dLeft = vec2(-1.0, -1.0);\n',
                 '   const vec2 dRight = vec2(1.0, -1.0);\n',
-
-                '   vec4 viewPosition = viewMatrix * worldPosition;\n',
+                
+                '   vec4 viewPosition; \n',
+                '   if (simulateInWorldSpace == 1) { \n',
+                '       viewPosition = viewMatrix * particlePosition;\n',
+                '   } else { \n',
+                '       viewPosition = viewMatrix * modelMatrix * particlePosition;\n',
+                '   } \n',
                 '   float sequenceElementF = sequenceElement.x;\n',
                 '   int sequenceNumber = int(sequenceElement.y);\n',
                 '   int sequenceStart = int(sequenceElement.z);\n',
@@ -268,7 +287,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         for (let frameset of framesets) {
             atlas.addFrameSet(frameset.length, frameset.x, frameset.y, frameset.width, frameset.height);
         }
-        const renderer = new AnimatedSpriteRenderer(atlas, atlasJSON.interpolateFrames);
+        const renderer = new AnimatedSpriteRenderer(this.simulateInWorldSpace, atlas, atlasJSON.interpolateFrames);
         if (params.blending == 'Additive') {
             renderer.blending = THREE.AdditiveBlending;
         } else {

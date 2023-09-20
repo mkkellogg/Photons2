@@ -46,7 +46,7 @@ export class ParticleSystem {
             this.maximumActiveParticles = maximumActiveParticles;
             if (this.particleSystemRenderer) {
                 this.particleSystemRenderer.setOwner(this.owner);
-                this.particleSystemRenderer.init(this.maximumActiveParticles);
+                this.particleSystemRenderer.init(this.maximumActiveParticles, this.simulateInWorldSpace);
                 this.particleStates = this.particleSystemRenderer.getParticleStateArray();
             } else {
                 this.particleStates = new ParticleStateArray();
@@ -92,6 +92,7 @@ export class ParticleSystem {
             const saveAutoClear = threeRenderer.autoClear;
             threeRenderer.autoClear = false;
             this.owner.visible = true;
+            this.owner.matrixWorldNeedsUpdate = true;
             threeRenderer.render(this.owner, camera);
             this.owner.visible = false;
             threeRenderer.autoClear = saveAutoClear;
@@ -198,6 +199,9 @@ export class ParticleSystem {
 
     setSimulateInWorldSpace(simulateInWorldSpace) {
         this.simulateInWorldSpace = simulateInWorldSpace;
+        if (this.particleSystemRenderer) {
+            this.particleSystemRenderer.setSimulateInWorldSpace(this.simulateInWorldSpace);
+        }
     }
 
     addParticleSequence(start, length, id = 0) {

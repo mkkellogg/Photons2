@@ -4,6 +4,11 @@ export class Renderer {
         this.initialized = false;
         this.particleCount = 0;
         this.owner = null;
+        this.simulateInWorldSpace = false;
+    }
+
+    setSimulateInWorldSpace(simulateInWorldSpace) {
+        this.simulateInWorldSpace = simulateInWorldSpace;
     }
 
     getParticleStateArray() {
