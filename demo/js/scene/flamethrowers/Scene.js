@@ -17,7 +17,7 @@ export class Scene {
         this.jsonTypeStore.addNamespace('THREE', THREE);
         this.jsonTypeStore.addNamespace('Photons', Photons);
         this.startTime = performance.now() / 1000;
-        this.fireballRoot = null;
+        this.fireballRoots = [];
     }
 
     build () {
@@ -32,10 +32,16 @@ export class Scene {
         const revolutionTime = 15.0;
         const pf = elapsedTime / revolutionTime;
         const p = (pf - Math.floor(pf)) * TWOPI;
-        const tx = Math.cos(p);
-        const ty = Math.sin(p);
-        this.fireballRoot.position.set(tx, 1.0, -ty);
-        this.fireballRoot.quaternion.setFromAxisAngle(UP, p - PIOVERTWO);
+
+        const spacing = TWOPI / this.fireballRoots.length;
+
+        for (let i = 0; i < this.fireballRoots.length; i++) {
+            const a = p + spacing * i;
+            const tx = Math.cos(a);
+            const ty = Math.sin(a);
+            this.fireballRoots[i].position.set(tx, 1.0, -ty);
+            this.fireballRoots[i].quaternion.setFromAxisAngle(UP, a - PIOVERTWO);
+        }
 
         this.manager.update();
     }
@@ -60,13 +66,15 @@ export class Scene {
     setupParticleSystems (){
         let scale = 0.15;
         let fireballPosition = new THREE.Vector3(1.0, 1.0, 0.0);
-        this.fireballRoot = new THREE.Object3D();
-        const releaseMultiplier = 70;
-        const simulateInWorldSpace = true;
-        const animationSpeedMultiplier = 2.5;
-        this.manager.addParticleSystem(this.setupEmbers(this.fireballRoot, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
-        this.manager.addParticleSystem(this.setupBaseFlame(this.fireballRoot, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
-        this.manager.addParticleSystem(this.setupBrightFLame(this.fireballRoot, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
+        for (let i = 0; i < 2; i++) {
+            this.fireballRoots[i] = this.createFlameThrowerBody();
+            const releaseMultiplier = 70;
+            const simulateInWorldSpace = true;
+            const animationSpeedMultiplier = 2.5;
+            this.manager.addParticleSystem(this.setupEmbers(this.fireballRoots[i], simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
+            this.manager.addParticleSystem(this.setupBaseFlame(this.fireballRoots[i], simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
+            this.manager.addParticleSystem(this.setupBrightFLame(this.fireballRoots[i], simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
+        }
     }
 
     setupEmbers (root, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, position) {
@@ -236,5 +244,19 @@ export class Scene {
     }
   
     setupSceneComponents () {
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 3.5);
+        this.scene.add(directionalLight) ;
+        directionalLight.position.set(5, 5, 5);
+    }
+
+    createFlameThrowerBody () {
+        const geometry = new THREE.CylinderGeometry(0.1, 0.1, 0.5, 20, 10);
+        const mesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
+        const transform = new THREE.Matrix4();
+        transform.makeRotationX(Math.PI / 2.0);
+        geometry.applyMatrix4(transform);
+        transform.makeTranslation(0, 0, 0.2);
+        geometry.applyMatrix4(transform);
+        return mesh;
     }
 }

@@ -187,7 +187,7 @@ export class AnimatedSpriteRenderer extends Renderer {
                 '   const vec2 uLeft = vec2(-1.0, 1.0);\n',
                 '   const vec2 dLeft = vec2(-1.0, -1.0);\n',
                 '   const vec2 dRight = vec2(1.0, -1.0);\n',
-                
+
                 '   vec4 viewPosition; \n',
                 '   if (simulateInWorldSpace == 1) { \n',
                 '       viewPosition = viewMatrix * particlePosition;\n',
