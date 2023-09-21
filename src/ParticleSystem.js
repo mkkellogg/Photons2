@@ -243,7 +243,13 @@ export class ParticleSystem {
                 }
                 worldPosition.set(0, 0, 0, 1).applyMatrix4(this.owner.matrixWorld);
                 worldPosition3.set(worldPosition.x, worldPosition.y, worldPosition.z);
-                if (this.simulateInWorldSpace) particleState.position.add(worldPosition3);
+                if (this.simulateInWorldSpace) {
+                    particleState.position.add(worldPosition3);
+                    const vLength = particleState.velocity.length();
+                    particleState.velocity.transformDirection(this.owner.matrixWorld).multiplyScalar(vLength);
+                    const aLength = particleState.acceleration.length();
+                    particleState.acceleration.transformDirection(this.owner.matrixWorld).multiplyScalar(aLength);
+                }
                 this.particleStates.flushParticleStateToBuffers(index);
             }
         };

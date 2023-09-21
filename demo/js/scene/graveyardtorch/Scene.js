@@ -77,7 +77,7 @@ export class Scene {
         embersParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(
                                                          new THREE.Vector3(0.4 * scale, 0.5 * scale, 0.4 * scale),
                                                          new THREE.Vector3(-0.2 * scale, 0.8 * scale, -0.2 * scale),
-                                                         0.6 * scale, 0.8 * scale));
+                                                         0.6 * scale, 0.8 * scale, false));
 
         const embersOpacityOperator = embersParticleSystem.addParticleStateOperator(new Photons.OpacityInterpolatorOperator());
         embersOpacityOperator.addElements([[0.0, 0.0], [0.7, 0.25], [0.9, 0.75], [0.0, 1.0]]);
@@ -128,8 +128,10 @@ export class Scene {
         baseFlameParticleSystem.addParticleStateInitializer(new Photons.BoxPositionInitializer(
                                                             new THREE.Vector3(0.05 * scale, 0.0, 0.05 * scale),
                                                             new THREE.Vector3(-0.025 * scale, 0.0, -0.025 * scale)));
-        baseFlameParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(new THREE.Vector3(0.05 * scale, 0.4 * scale, 0.05 * scale),
-                                                            new THREE.Vector3(-0.025 * scale, 0.8 * scale, -0.025 * scale),  0.35 * scale, 0.5 * scale));
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(
+                                                            new THREE.Vector3(0.05 * scale, 0.4 * scale, 0.05 * scale),
+                                                            new THREE.Vector3(-0.025 * scale, 0.8 * scale, -0.025 * scale),
+                                                            0.35 * scale, 0.5 * scale, false));
         baseFlameParticleSystem.addParticleStateInitializer(new Photons.SequenceInitializer(baseFlameParticleSequences));
 
         baseFlameParticleSystem.addParticleStateOperator(new Photons.SequenceOperator(baseFlameParticleSequences, 0.07, false));
@@ -176,13 +178,17 @@ export class Scene {
         brightFlameParticleSystem.addParticleStateInitializer(new Photons.RotationInitializer(new Photons.RandomGenerator(0, Math.PI, -Math.PI / 2.0, 0.0, 0.0, false)));
         brightFlameParticleSystem.addParticleStateInitializer(new Photons.RotationalSpeedInitializer(Math.PI / 2.0, -Math.PI / 4.0, 0.0, 0.0, false));
         brightFlameParticleSystem.addParticleStateInitializer(new Photons.SizeInitializer(
-                                                              new Photons.RandomGenerator(THREE.Vector2, new THREE.Vector2(0.0, 0.0),
-                                                              new THREE.Vector2(0.0, 0.0), 0.2 * scale, 0.65 * scale, false)));
+                                                              new Photons.RandomGenerator(THREE.Vector2,
+                                                              new THREE.Vector2(0.0, 0.0),
+                                                              new THREE.Vector2(0.0, 0.0),
+                                                              0.2 * scale, 0.65 * scale, false)));
         brightFlameParticleSystem.addParticleStateInitializer(new Photons.BoxPositionInitializer(
                                                               new THREE.Vector3(0.1 * scale, 0.0, 0.1 * scale),
                                                               new THREE.Vector3(-0.05 * scale, 0.0, -0.05 * scale)));
-        brightFlameParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(new THREE.Vector3(0.02 * scale, 0.4 * scale, 0.02 * scale),
-                                                              new THREE.Vector3(-0.01 * scale, 0.4 * scale, -0.01 * scale),  0.1 * scale, .2 * scale));
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(
+                                                              new THREE.Vector3(0.02 * scale, 0.4 * scale, 0.02 * scale),
+                                                              new THREE.Vector3(-0.01 * scale, 0.4 * scale, -0.01 * scale),
+                                                              0.1 * scale, .2 * scale, false));
         brightFlameParticleSystem.addParticleStateInitializer(new Photons.SequenceInitializer(brightFlameParticleSequences));
 
         brightFlameParticleSystem.addParticleStateOperator(new Photons.SequenceOperator(brightFlameParticleSequences, 0.1, false));

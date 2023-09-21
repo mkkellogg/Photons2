@@ -4,14 +4,16 @@ import { ParticleStateInitializer } from './ParticleStateInitializer.js';
 
 export class RandomVelocityInitializer extends ParticleStateInitializer {
 
-    constructor(range, offset, speedRange, speedOffset) {
+    constructor(directionRange, directionOffset, speedRange, speedOffset, normalizeDirection = true) {
         super();
-        this.directionGenerator = new RandomGenerator(THREE.Vector3, range, offset, 0.0, 0.0, true);
+        this.directionGenerator = new RandomGenerator(THREE.Vector3, directionRange, directionOffset, 0.0, 0.0, true);
         this.speedGenerator = new RandomGenerator(0, speedRange, speedOffset, 0.0, 0.0, false);
+        this.normalizeDirection = normalizeDirection;
     }
 
     initializeState(state) {
         this.directionGenerator.generate(state.velocity);
+        if (this.normalizeDirection) state.velocity.normalize();
         state.velocity.multiplyScalar(this.speedGenerator.generate());
     }
 
