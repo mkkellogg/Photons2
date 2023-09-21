@@ -15,7 +15,7 @@ export class Scene {
         this.jsonTypeStore.addNamespace('THREE', THREE);
         this.jsonTypeStore.addNamespace('Photons', Photons);
         this.startTime = performance.now() / 1000;
-        this.torchRoot = null;
+        this.fireballRoot = null;
     }
 
     build () {
@@ -29,11 +29,11 @@ export class Scene {
         const currentTime = performance.now() / 1000;
         const elapsedTime = currentTime - this.startTime;
 
-        const revolutionTime = 15.0;
+        const revolutionTime = 10.0;
         const p = elapsedTime / revolutionTime * TWOPI;
         const tx = Math.cos(p);
         const ty = Math.sin(p);
-        this.torchRoot.position.set(tx, 1.0, ty);
+        this.fireballRoot.position.set(tx, 1.0, ty);
     }
 
     render() {
@@ -55,16 +55,17 @@ export class Scene {
 
     setupParticleSystems (){
         let scale = 0.15;
-        let torchPosition = new THREE.Vector3(1.0, 1.0, 0.0);
-        this.torchRoot = new THREE.Object3D();
-        const releaseMultiplier = 1;
+        let fireballPosition = new THREE.Vector3(1.0, 1.0, 0.0);
+        this.fireballRoot = new THREE.Object3D();
+        const releaseMultiplier = 5;
         const simulateInWorldSpace = true;
-        this.manager.addParticleSystem(this.setupEmbers(this.torchRoot, simulateInWorldSpace, releaseMultiplier, scale, torchPosition));
-        this.manager.addParticleSystem(this.setupBaseFlame(this.torchRoot, simulateInWorldSpace, releaseMultiplier, scale, torchPosition));
-        this.manager.addParticleSystem(this.setupBrightFLame(this.torchRoot, simulateInWorldSpace, releaseMultiplier, scale, torchPosition));
+        const animationSpeedMultiplier = 2.5;
+        this.manager.addParticleSystem(this.setupEmbers(this.fireballRoot, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
+        this.manager.addParticleSystem(this.setupBaseFlame(this.fireballRoot, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
+        this.manager.addParticleSystem(this.setupBrightFLame(this.fireballRoot, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
     }
 
-    setupEmbers (root, simulateInWorldSpace, releaseMultiplier, scale, position) {
+    setupEmbers (root, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, position) {
         const embersRoot = root || new THREE.Object3D();
         position = position || new THREE.Vector3();
         embersRoot.position.copy(position);
@@ -84,15 +85,17 @@ export class Scene {
                                                                      new THREE.Vector2(0.0, 0.0),
                                                                      new THREE.Vector2(scale * 0.15, scale  * 0.15),
                                                                      0.0, 0.0, false);
-        embersParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(3.0, 1.0, 0.0, 0.0, false));
+        embersParticleSystem.addParticleStateInitializer(new Photons.LifetimeInitializer(3.0 * animationSpeedMultiplier, 1.0 * animationSpeedMultiplier, 0.0, 0.0, false));
         embersParticleSystem.addParticleStateInitializer(new Photons.SizeInitializer(sizeInitializerGenerator));
         embersParticleSystem.addParticleStateInitializer(new Photons.BoxPositionInitializer(
                                                          new THREE.Vector3(0.05 * scale, 0.0, 0.05 * scale),
                                                          new THREE.Vector3(-0.025 * scale, 0.0, -0.025 * scale)));
+
+        const vFactor = animationSpeedMultiplier * scale;
         embersParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(
-                                                         new THREE.Vector3(0.4 * scale, 0.5 * scale, 0.4 * scale),
-                                                         new THREE.Vector3(-0.2 * scale, 0.8 * scale, -0.2 * scale),
-                                                         0.6 * scale, 0.8 * scale));
+                                                         new THREE.Vector3(0.4 * vFactor, 0.4 * vFactor, 0.4 * vFactor),
+                                                         new THREE.Vector3(-0.2 * vFactor, 0.4 * vFactor, -0.2 * vFactor),
+                                                         0.2 * vFactor, 0.3 * vFactor));
 
         const embersOpacityOperator = embersParticleSystem.addParticleStateOperator(new Photons.OpacityInterpolatorOperator());
         embersOpacityOperator.addElements([[0.0, 0.0], [0.7, 0.25], [0.9, 0.75], [0.0, 1.0]]);
@@ -101,7 +104,7 @@ export class Scene {
         embersColorOperator.addElementsFromParameters([[[1.0, 0.7, 0.0], 0.0], [[1.0, 0.6, 0.0], 0.5], [[1.0, 0.4, 0.0], 1.0]]);
 
         const acceleratorOperatorGenerator = new Photons.SphereRandomGenerator(Math.PI * 2.0, 0.0, Math.PI,
-                                                                              -Math.PI / 2, 20.0, -8,
+                                                                              -Math.PI / 2, 5.0, -2,
                                                                               scale, scale, scale,
                                                                               0.0, 0.0, 0.0);
 
@@ -113,7 +116,7 @@ export class Scene {
         return embersParticleSystem;
     }
     
-    setupBaseFlame (root, simulateInWorldSpace, releaseMultiplier, scale, position) {
+    setupBaseFlame (root, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, position) {
         const baseFlameRoot = root || new THREE.Object3D();
         position = position || new THREE.Vector3();
         baseFlameRoot.position.copy(position);
@@ -144,11 +147,15 @@ export class Scene {
         baseFlameParticleSystem.addParticleStateInitializer(new Photons.BoxPositionInitializer(
                                                             new THREE.Vector3(0.05 * scale, 0.0, 0.05 * scale),
                                                             new THREE.Vector3(-0.025 * scale, 0.0, -0.025 * scale)));
-        baseFlameParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(new THREE.Vector3(0.05 * scale, 0.4 * scale, 0.05 * scale),
-                                                            new THREE.Vector3(-0.025 * scale, 0.8 * scale, -0.025 * scale),  0.35 * scale, 0.5 * scale));
+        const vFactor = animationSpeedMultiplier * scale;
+        baseFlameParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(
+                                                            new THREE.Vector3(0.02 * vFactor, 0.2 * vFactor, 0.02 * vFactor),
+                                                            new THREE.Vector3(-0.01 * vFactor, 0.2 * vFactor, -0.01 * vFactor),
+                                                            0.05 * vFactor, .1 * vFactor));
+
         baseFlameParticleSystem.addParticleStateInitializer(new Photons.SequenceInitializer(baseFlameParticleSequences));
 
-        baseFlameParticleSystem.addParticleStateOperator(new Photons.SequenceOperator(baseFlameParticleSequences, 0.07, false));
+        baseFlameParticleSystem.addParticleStateOperator(new Photons.SequenceOperator(baseFlameParticleSequences, 0.07 * animationSpeedMultiplier, false));
 
         const baseFlameOpacityOperator = baseFlameParticleSystem.addParticleStateOperator(new Photons.OpacityInterpolatorOperator());
         baseFlameOpacityOperator.addElements([[0.0, 0.0], [0.3, 0.25], [0.3, 0.5], [0.0, 1.0]]);
@@ -161,7 +168,7 @@ export class Scene {
 
         baseFlameParticleSystem.addParticleStateOperator(new Photons.AccelerationOperator(
                                                          new Photons.RandomGenerator(THREE.Vector3, new THREE.Vector3(0.0, 0.0, 0.0),
-                                                                                                    new THREE.Vector3(0.0, 1.5 * scale, 0.0),
+                                                                                                    new THREE.Vector3(0.0, 0.5 * scale, 0.0),
                                                                                                     0.0, 0.0, false)));
 
         baseFlameParticleSystem.setSimulateInWorldSpace(simulateInWorldSpace);
@@ -170,7 +177,7 @@ export class Scene {
         return baseFlameParticleSystem;
     }
     
-    setupBrightFLame (root, simulateInWorldSpace, releaseMultiplier, scale, position) {
+    setupBrightFLame (root, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, position) {
         const brightFlameRoot = root || new THREE.Object3D();
         position = position || new THREE.Vector3();
         brightFlameRoot.position.copy(position);
@@ -198,11 +205,15 @@ export class Scene {
         brightFlameParticleSystem.addParticleStateInitializer(new Photons.BoxPositionInitializer(
                                                               new THREE.Vector3(0.1 * scale, 0.0, 0.1 * scale),
                                                               new THREE.Vector3(-0.05 * scale, 0.0, -0.05 * scale)));
-        brightFlameParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(new THREE.Vector3(0.02 * scale, 0.4 * scale, 0.02 * scale),
-                                                              new THREE.Vector3(-0.01 * scale, 0.4 * scale, -0.01 * scale),  0.1 * scale, .2 * scale));
+        
+        const vFactor = animationSpeedMultiplier * scale;
+        brightFlameParticleSystem.addParticleStateInitializer(new Photons.RandomVelocityInitializer(
+                                                              new THREE.Vector3(0.02 * vFactor, 0.2 * vFactor, 0.02 * vFactor),
+                                                              new THREE.Vector3(-0.01 * vFactor, 0.2 * vFactor, -0.01 * vFactor),
+                                                              0.05 * vFactor, .1 * vFactor));
         brightFlameParticleSystem.addParticleStateInitializer(new Photons.SequenceInitializer(brightFlameParticleSequences));
 
-        brightFlameParticleSystem.addParticleStateOperator(new Photons.SequenceOperator(brightFlameParticleSequences, 0.1, false));
+        brightFlameParticleSystem.addParticleStateOperator(new Photons.SequenceOperator(brightFlameParticleSequences, 0.1 * animationSpeedMultiplier, false));
 
         const brightFlameOpacityOperator = brightFlameParticleSystem.addParticleStateOperator(new Photons.OpacityInterpolatorOperator());
         brightFlameOpacityOperator.addElements([[0.0, 0.0], [0.6, 0.2], [0.5, 0.75], [0.0, 1.0]]);
@@ -218,7 +229,7 @@ export class Scene {
         brightFlameParticleSystem.addParticleStateOperator(new Photons.AccelerationOperator(
                                                            new Photons.RandomGenerator(THREE.Vector3,
                                                                                        new THREE.Vector3(0.0, 0.0, 0.0),
-                                                                                       new THREE.Vector3(0.0, 1.5 * scale, 0.0),
+                                                                                       new THREE.Vector3(0.0, 0.5 * scale, 0.0),
                                                                                        0.0, 0.0, false)));
 
         brightFlameParticleSystem.setSimulateInWorldSpace(simulateInWorldSpace);
