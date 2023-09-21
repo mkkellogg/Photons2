@@ -74,6 +74,7 @@ export class ParticleSystem {
 
     update(currentTime, timeDelta) {
         if (this.systemState == ParticleSystemState.Running) {
+            this.owner.updateMatrixWorld();
             currentTime = (currentTime == undefined || currentTime == null) ? Utils.currentTime() : currentTime;
             timeDelta = (timeDelta == undefined || timeDelta == null) ? currentTime - this.lastUpdateTime : timeDelta;
             if (this.emitterInitialized && this.systemState == ParticleSystemState.Running) {
