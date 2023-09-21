@@ -32,6 +32,18 @@ The repository includes demo pages in the `/demo` folder and the core of the rel
 
 **Demo:** The particle system can be seen in action [here](http://projects.markkellogg.org/threejs/demo_particle_system.php).
 
+
+# Installation
+
+To install all necessary node modules:
+
+`npm install`
+
+To run the demo locally:
+
+`npm run demo`
+
+
 # Sample code
 
 To set up a particle system:
