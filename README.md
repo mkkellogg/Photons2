@@ -28,7 +28,7 @@ An "Operator" can be assigned to each attribute to vary its value over the lifet
 
 The current implementation also supports the concept of a texture atlas (spritesheet) so particle textures can be animated.
 
-The repository includes a demo page (`demo/index.html`) which contains a demo of the particle system in action. The core of the relevant demo code is in `demo/js/main.js`.
+The repository includes demo pages in the `/demo` folder and the core of the relevant demo code is in folders under `demo/js/scene`.
 
 **Demo:** The particle system can be seen in action [here](http://projects.markkellogg.org/threejs/demo_particle_system.php).
 
