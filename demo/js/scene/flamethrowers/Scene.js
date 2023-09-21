@@ -17,7 +17,7 @@ export class Scene {
         this.jsonTypeStore.addNamespace('THREE', THREE);
         this.jsonTypeStore.addNamespace('Photons', Photons);
         this.startTime = performance.now() / 1000;
-        this.fireballRoots = [];
+        this.flameThrowerRoots = [];
     }
 
     build () {
@@ -33,14 +33,14 @@ export class Scene {
         const pf = elapsedTime / revolutionTime;
         const p = (pf - Math.floor(pf)) * TWOPI;
 
-        const spacing = TWOPI / this.fireballRoots.length;
+        const spacing = TWOPI / this.flameThrowerRoots.length;
 
-        for (let i = 0; i < this.fireballRoots.length; i++) {
+        for (let i = 0; i < this.flameThrowerRoots.length; i++) {
             const a = p + spacing * i;
             const tx = Math.cos(a);
             const ty = Math.sin(a);
-            this.fireballRoots[i].position.set(tx, 1.0, -ty);
-            this.fireballRoots[i].quaternion.setFromAxisAngle(UP, a - PIOVERTWO);
+            this.flameThrowerRoots[i].position.set(tx, 1.0, -ty);
+            this.flameThrowerRoots[i].quaternion.setFromAxisAngle(UP, a - PIOVERTWO);
         }
 
         this.manager.update();
@@ -65,15 +65,18 @@ export class Scene {
 
     setupParticleSystems (){
         let scale = 0.15;
-        let fireballPosition = new THREE.Vector3(1.0, 1.0, 0.0);
+        let fireballPosition = new THREE.Vector3(0.0, 0.0, 0.0);
         for (let i = 0; i < 2; i++) {
-            this.fireballRoots[i] = this.createFlameThrowerBody();
+            const flameThrowerRoot = this.createFlameThrowerBody();
+            this.flameThrowerRoots[i] = flameThrowerRoot;
+            const particleSystemRoot = flameThrowerRoot.children[1];
+            this.scene.add(flameThrowerRoot);
             const releaseMultiplier = 70;
             const simulateInWorldSpace = true;
             const animationSpeedMultiplier = 2.5;
-            this.manager.addParticleSystem(this.setupEmbers(this.fireballRoots[i], simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
-            this.manager.addParticleSystem(this.setupBaseFlame(this.fireballRoots[i], simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
-            this.manager.addParticleSystem(this.setupBrightFLame(this.fireballRoots[i], simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
+            this.manager.addParticleSystem(this.setupEmbers(particleSystemRoot, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
+            this.manager.addParticleSystem(this.setupBaseFlame(particleSystemRoot, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
+            this.manager.addParticleSystem(this.setupBrightFLame(particleSystemRoot, simulateInWorldSpace, releaseMultiplier, animationSpeedMultiplier, scale, fireballPosition));
         }
     }
 
@@ -244,19 +247,28 @@ export class Scene {
     }
   
     setupSceneComponents () {
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 3.5);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 4.5);
         this.scene.add(directionalLight) ;
         directionalLight.position.set(5, 5, 5);
     }
 
     createFlameThrowerBody () {
+        const root = new THREE.Object3D();
         const geometry = new THREE.CylinderGeometry(0.1, 0.1, 0.5, 20, 10);
-        const mesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
+        const material = new THREE.MeshStandardMaterial( {
+            color: 0xAAAAAA,
+            roughness: 0.4,
+            metalness: 0.6,
+        } );
+        const mesh = new THREE.Mesh(geometry, material);
         const transform = new THREE.Matrix4();
         transform.makeRotationX(Math.PI / 2.0);
         geometry.applyMatrix4(transform);
         transform.makeTranslation(0, 0, 0.2);
         geometry.applyMatrix4(transform);
-        return mesh;
+        root.add(mesh);
+        const particleSystemRoot = new THREE.Object3D();
+        root.add(particleSystemRoot);
+        return root;
     }
 }
