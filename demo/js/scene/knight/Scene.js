@@ -342,7 +342,7 @@ export class Scene {
         material.roughness = 0.1;
         material.metalness = 0.2;
         material.color.setRGB(.25, .25, .25);
-        const baseColorLoadPromise = new Promise((resolve, reject) => {
+        const baseColorLoadPromise = new Promise((resolve) => {
             textureLoader.load( 'assets/textures/stone_floor/basecolor.jpg', 
                 function ( texture ) {
                     texture.wrapS = THREE.RepeatWrapping;
@@ -356,7 +356,7 @@ export class Scene {
                 });
         });
 
-        const normalMapLoadPromise = new Promise((resolve, reject) => {
+        const normalMapLoadPromise = new Promise((resolve) => {
             textureLoader.load( 'assets/textures/stone_floor/normal.jpg', 
                 function ( texture ) {
                     texture.wrapS = THREE.RepeatWrapping;
@@ -370,8 +370,6 @@ export class Scene {
                 });
         });
      
-       // const geometry = new THREE.PlaneGeometry(10, 10, 32, 32);
-        //geometry.rotateX(-Math.PI / 2);
         const geometry = new THREE.CylinderGeometry( 4, 4, .1, 32 ); 
         const mesh = new THREE.Mesh( geometry, material );
         mesh.receiveShadow = true;
