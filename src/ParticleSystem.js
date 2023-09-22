@@ -234,7 +234,7 @@ export class ParticleSystem {
         }
     }
 
-    activateParticle = function(index) {
+    activateParticle(index) {
         if (this.systemState == ParticleSystemState.Running) {
             const particleState = this.particleStates.getState(index);
             particleState.age = 0.0;
