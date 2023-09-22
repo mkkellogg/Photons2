@@ -272,25 +272,25 @@ export class Scene {
     }
 
     setupSceneComponents() {
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 5.5);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, .5);
         this.scene.add(directionalLight);
-        directionalLight.position.set(5, 5, 5);
-
+        directionalLight.position.set(5, 2, 5);
 
         function createMetalMaterial(oldMaterial) {
             const newMaterial = new THREE.MeshStandardMaterial({
                 color: 0xAAAAAA,
                 roughness: 0.3,
-                metalness: 0.8,
+                metalness: 0.85,
                 map: oldMaterial.map
             });
             return newMaterial;
         }
 
-        const loader = new FBXLoader();
+        const fbxLoader = new FBXLoader();
+        const textureLoader = new THREE.TextureLoader();
 
-        const loadPromise = new Promise((resolve, reject) => {
-            loader.load('assets/models/knight/idlebattle.fbx', (object) => {
+        const modelLoadPromise = new Promise((resolve, reject) => {
+            fbxLoader.load('assets/models/knight/idlebattle.fbx', (object) => {
 
                 this.mixer = new THREE.AnimationMixer(object);
                 const action = this.mixer.clipAction(object.animations[0]);
@@ -302,14 +302,32 @@ export class Scene {
                         child.receiveShadow = true;
                         if (child.name == 'warrior') {
                             child.material[0] = createMetalMaterial(child.material[0]);
+                            child.material.forEach((material) => {material.shadowSide = THREE.DoubleSide});
+                            child.receiveShadow = false;
                         } else if (child.name == 'shield' || child.name == 'sword') {
                             child.material = createMetalMaterial(child.material);
+                            child.material.shadowSide = THREE.DoubleSide
                             if (child.name == 'sword') {
                                 this.sword = child;
+
                                 const lightParent = new THREE.Object3D();
                                 this.sword.add(lightParent);
                                 lightParent.position.set(0, 0, 100);
-                                this.manager.addComponent(new Photons.FlickerLight(lightParent, 50, 3, new THREE.Color().setRGB(1, .8, .4), 0, 1.0, false));
+
+                                const flickerLightShadows = {
+                                    'mapSize': 1024,
+                                    'cameraNear': 0.01,
+                                    'cameraFar': 500,
+                                    'bias': .000009,
+                                    'edgeRadius': 5
+                                };
+                                const flameFlickerLight = new Photons.FlickerLight(lightParent,  20, 3, new THREE.Color().setRGB(1, .8, .4), 0, 1.0, flickerLightShadows);
+                                const flameLight = flameFlickerLight.getLight();
+                                flameLight.distance = 4;
+                                flameLight.decay = 1.5;
+                                flameLight.castShadow = true;
+
+                                this.manager.addComponent(flameFlickerLight);
                             }
                         }
                     }
@@ -320,6 +338,45 @@ export class Scene {
             });
         });
 
-        return loadPromise;
+        const material = new THREE.MeshStandardMaterial();
+        material.roughness = 0.1;
+        material.metalness = 0.2;
+        material.color.setRGB(.25, .25, .25);
+        const baseColorLoadPromise = new Promise((resolve, reject) => {
+            textureLoader.load( 'assets/textures/stone_floor/basecolor.jpg', 
+                function ( texture ) {
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.x = 4;
+                    texture.repeat.y = 4;
+                    material.map = texture;
+                    material.roughness = 0.9;
+                    material.needsUpdate = true;
+                    resolve();
+                });
+        });
+
+        const normalMapLoadPromise = new Promise((resolve, reject) => {
+            textureLoader.load( 'assets/textures/stone_floor/normal.jpg', 
+                function ( texture ) {
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.x = 4;
+                    texture.repeat.y = 4;
+                    material.normalMap = texture;
+                    material.normalScale.set(8, 8);
+                    material.needsUpdate = true;
+                    resolve();
+                });
+        });
+     
+       // const geometry = new THREE.PlaneGeometry(10, 10, 32, 32);
+        //geometry.rotateX(-Math.PI / 2);
+        const geometry = new THREE.CylinderGeometry( 4, 4, .1, 32 ); 
+        const mesh = new THREE.Mesh( geometry, material );
+        mesh.receiveShadow = true;
+        this.scene.add( mesh );
+
+        return Promise.all([baseColorLoadPromise, normalMapLoadPromise, modelLoadPromise]);
     }
 }

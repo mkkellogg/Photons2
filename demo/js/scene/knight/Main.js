@@ -40,7 +40,11 @@ const initThreeJS = async () => {
     controls.maxPolarAngle = (0.9 * Math.PI) / 2;
     controls.enableDamping = true;
     controls.dampingFactor = 0.15;
-    controls.target.set(-0.2541900499948175, 0.3691053582677349, -0.30497185048955555);
+    controls.target.set(-0.4140248468582617, 0.35856040954405105, 0.1755408848688926);
+
+
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 3.0;
 
     window.addEventListener('resize', onResize, false);
 
