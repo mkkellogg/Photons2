@@ -39,7 +39,7 @@ export class ParticleSystem {
         this.systemState = ParticleSystemState.NotStarted;
         this.particleSequences = new ParticleSequenceGroup();
         this.onUpdateCallback = null;
-        this.transformDirectionInWorldSpace = true;
+        this.transformInitialDirectionInWorldSpace = true;
     }
 
     init(maximumActiveParticles) {
@@ -206,8 +206,8 @@ export class ParticleSystem {
         }
     }
 
-    setTransformDirectionInWorldSpace(transformDirectionInWorldSpace) {
-        this.transformDirectionInWorldSpace = transformDirectionInWorldSpace;
+    setTransformInitialDirectionInWorldSpace(transformInitialDirectionInWorldSpace) {
+        this.transformInitialDirectionInWorldSpace = transformInitialDirectionInWorldSpace;
     }
 
     addParticleSequence(start, length, id = 0) {
@@ -245,7 +245,7 @@ export class ParticleSystem {
             if (this.simulateInWorldSpace) {
                 particleState.position.applyMatrix4(this.owner.matrixWorld);
                 const vLength = particleState.velocity.length();
-                if (this.transformDirectionInWorldSpace) {
+                if (this.transformInitialDirectionInWorldSpace) {
                     particleState.velocity.transformDirection(this.owner.matrixWorld).multiplyScalar(vLength);
                     const aLength = particleState.acceleration.length();
                     particleState.acceleration.transformDirection(this.owner.matrixWorld).multiplyScalar(aLength);

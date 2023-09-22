@@ -116,7 +116,7 @@ export class Scene {
         embersParticleSystem.addParticleStateOperator(new Photons.AccelerationOperator(acceleratorOperatorGenerator));
 
         embersParticleSystem.setSimulateInWorldSpace(simulateInWorldSpace);
-        embersParticleSystem.setTransformDirectionInWorldSpace(false);
+        embersParticleSystem.setTransformInitialDirectionInWorldSpace(false);
         embersParticleSystem.start();
 
         return embersParticleSystem;
@@ -188,7 +188,7 @@ export class Scene {
                 0.0, 0.0, false)));
 
         baseFlameParticleSystem.setSimulateInWorldSpace(simulateInWorldSpace);
-        baseFlameParticleSystem.setTransformDirectionInWorldSpace(false);
+        baseFlameParticleSystem.setTransformInitialDirectionInWorldSpace(false);
         baseFlameParticleSystem.start();
 
         return baseFlameParticleSystem;
@@ -266,7 +266,7 @@ export class Scene {
                 0.0, 0.0, false)));
 
         brightFlameParticleSystem.setSimulateInWorldSpace(simulateInWorldSpace);
-        brightFlameParticleSystem.setTransformDirectionInWorldSpace(false);
+        brightFlameParticleSystem.setTransformInitialDirectionInWorldSpace(false);
         brightFlameParticleSystem.start();
         return brightFlameParticleSystem;
     }
