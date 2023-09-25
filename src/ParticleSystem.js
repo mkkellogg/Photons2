@@ -90,25 +90,17 @@ export class ParticleSystem {
         }
     }
 
-    render = function () {
-
-        const tempBoundingBox = new THREE.Box3();
-
-        return function(threeRenderer, camera) {
-            if (this.getVisible()) {
-                tempBoundingBox.copy(this.boundingBox).applyMatrix4(this.owner.matrixWorld);
-                this.particleSystemRenderer.setBoundingBox(tempBoundingBox);
-                const saveAutoClear = threeRenderer.autoClear;
-                threeRenderer.autoClear = false;
-                this.owner.visible = true;
-                this.owner.matrixWorldNeedsUpdate = true;
-                threeRenderer.render(this.owner, camera);
-                this.owner.visible = false;
-                threeRenderer.autoClear = saveAutoClear;
-            }
-        };
-
-    }();
+    render(threeRenderer, camera) {
+        if (this.getVisible()) {
+            const saveAutoClear = threeRenderer.autoClear;
+            threeRenderer.autoClear = false;
+            this.owner.visible = true;
+            this.owner.matrixWorldNeedsUpdate = true;
+            threeRenderer.render(this.owner, camera);
+            this.owner.visible = false;
+            threeRenderer.autoClear = saveAutoClear;
+        }
+    }
 
     start() {
         if (this.systemState == ParticleSystemState.NotStarted || this.systemState == ParticleSystemState.Paused) {
@@ -242,6 +234,7 @@ export class ParticleSystem {
                 positionTransform.copy(this.owner.matrixWorld).invert();
             }
             this.particleStates.computeBoundingBox(this.boundingBox, positionTransform);
+            this.particleSystemRenderer.setBoundingBox(this.boundingBox);
         };
 
     }();
