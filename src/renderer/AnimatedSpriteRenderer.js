@@ -13,6 +13,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         this.atlas = atlas;
         this.interpolateAtlasFrames = interpolateAtlasFrames;
         this.blending = blending;
+        this.boundingBox = new THREE.Box3();
     }
 
     setOwner(owner) {
@@ -31,6 +32,19 @@ export class AnimatedSpriteRenderer extends Renderer {
         }
     }
 
+    setBoundingBox(boundingBox) {
+        this.boundingBox.copy(boundingBox);
+        if (this.mesh) {
+            this.updateMeshBoundingBox();
+        }
+    }
+
+    updateMeshBoundingBox() {
+        const geometry = this.particleStateArray.getGeometry();
+        if (!geometry.boundingBox) geometry.boundingBox = new THREE.Box3();
+        geometry.boundingBox.copy(this.boundingBox);
+    }
+
     init(particleCount, simulateInWorldSpace = false) {
         if (super.init(particleCount)) {
             this.setSimulateInWorldSpace(simulateInWorldSpace);
@@ -39,8 +53,7 @@ export class AnimatedSpriteRenderer extends Renderer {
             this.material = this.createMaterial(null, null, null, true, false);
             this.material.blending = this.blending;
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
-            // TODO: At some point remove this and perform proper bounds calculations
-            this.mesh.frustumCulled = false;
+            this.updateMeshBoundingBox();
             this.owner.add(this.mesh);
         }
     }

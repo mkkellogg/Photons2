@@ -40,6 +40,7 @@ export class ParticleSystem {
         this.particleSequences = new ParticleSequenceGroup();
         this.onUpdateCallback = null;
         this.transformInitialDirectionInWorldSpace = true;
+        this.boundingBox = new THREE.Box3();
     }
 
     init(maximumActiveParticles) {
@@ -89,17 +90,25 @@ export class ParticleSystem {
         }
     }
 
-    render(threeRenderer, camera) {
-        if (this.getVisible()) {
-            const saveAutoClear = threeRenderer.autoClear;
-            threeRenderer.autoClear = false;
-            this.owner.visible = true;
-            this.owner.matrixWorldNeedsUpdate = true;
-            threeRenderer.render(this.owner, camera);
-            this.owner.visible = false;
-            threeRenderer.autoClear = saveAutoClear;
-        }
-    }
+    render = function () {
+
+        const tempBoundingBox = new THREE.Box3();
+
+        return function(threeRenderer, camera) {
+            if (this.getVisible()) {
+                tempBoundingBox.copy(this.boundingBox).applyMatrix4(this.owner.matrixWorld);
+                this.particleSystemRenderer.setBoundingBox(tempBoundingBox);
+                const saveAutoClear = threeRenderer.autoClear;
+                threeRenderer.autoClear = false;
+                this.owner.visible = true;
+                this.owner.matrixWorldNeedsUpdate = true;
+                threeRenderer.render(this.owner, camera);
+                this.owner.visible = false;
+                threeRenderer.autoClear = saveAutoClear;
+            }
+        };
+
+    }();
 
     start() {
         if (this.systemState == ParticleSystemState.NotStarted || this.systemState == ParticleSystemState.Paused) {
@@ -222,6 +231,21 @@ export class ParticleSystem {
         return this.particleEmitter;
     }
 
+    updateBoundingBox = function () {
+
+        const tempMatrix4 = new THREE.Matrix4();
+
+        return function () {
+            let positionTransform = null;
+            if (this.transformInitialDirectionInWorldSpace) {
+                positionTransform = tempMatrix4;
+                positionTransform.copy(this.owner.matrixWorld).invert();
+            }
+            this.particleStates.computeBoundingBox(this.boundingBox, positionTransform);
+        };
+
+    }();
+
     activateParticles(particleCount) {
         if (this.systemState == ParticleSystemState.Running) {
             const newActiveParticleCount = Utils.clamp(this.activeParticleCount + particleCount,
@@ -231,6 +255,9 @@ export class ParticleSystem {
             }
             this.activeParticleCount = newActiveParticleCount;
             this.particleStates.setActiveParticleCount(this.activeParticleCount);
+            if (newActiveParticleCount > 0) {
+                this.updateBoundingBox();
+            }
         }
     }
 

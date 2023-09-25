@@ -136,4 +136,25 @@ export class ParticleStateArray {
         return this.particleStates[index];
     }
 
+    computeBoundingBox(outBox = new THREE.Box3(), positionTransform = null) {
+        const tempPos = new THREE.Vector3();
+        const min = outBox.min;
+        const max = outBox.max;
+        for (let i = 0; i < this.activeParticleCount; i++) {
+            const particleState = this.getState(i);
+            let pos = particleState.position;
+            if (positionTransform) {
+                tempPos.copy(pos);
+                tempPos.applyMatrix4(positionTransform);
+                pos = tempPos;
+            }
+            if (i == 0 || pos.x < min.x) min.x = pos.x;
+            if (i == 0 || pos.x > max.x) max.x = pos.x;
+            if (i == 0 || pos.y < min.y) min.y = pos.y;
+            if (i == 0 || pos.y > max.y) max.y = pos.y;
+            if (i == 0 || pos.z < min.z) min.z = pos.z;
+            if (i == 0 || pos.z > max.z) max.z = pos.z;
+        }
+        return outBox;
+    }
 }
