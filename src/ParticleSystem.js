@@ -40,6 +40,8 @@ export class ParticleSystem {
         this.particleSequences = new ParticleSequenceGroup();
         this.onUpdateCallback = null;
         this.transformInitialDirectionInWorldSpace = true;
+        this.boundingBox = new THREE.Box3();
+        this.boundingSphere = new THREE.Sphere();
     }
 
     init(maximumActiveParticles) {
@@ -83,6 +85,9 @@ export class ParticleSystem {
                 if (particlesToEmit > 0) this.activateParticles(particlesToEmit);
                 this.advanceActiveParticles(timeDelta);
                 if (this.onUpdateCallback) this.onUpdateCallback(this.activeParticleCount);
+
+                // TODO: Be more efficient about re-computing bounds
+                this.updateBounds();
             }
             this.componentContainer.update(currentTime, timeDelta);
             this.lastUpdateTime = currentTime;
@@ -221,6 +226,27 @@ export class ParticleSystem {
     getEmitter() {
         return this.particleEmitter;
     }
+
+    updateBounds = function() {
+
+        const tempMatrix4 = new THREE.Matrix4();
+
+        return function() {
+            let positionTransform = null;
+            if (this.transformInitialDirectionInWorldSpace) {
+                positionTransform = tempMatrix4;
+                positionTransform.copy(this.owner.matrixWorld).invert();
+            }
+            if (this.particleSystemRenderer.calculatingBoundingSphereFromBox()) {
+                this.particleStates.computeBoundingBox(this.boundingBox, positionTransform);
+                this.particleSystemRenderer.setBoundingBox(this.boundingBox);
+            } else {
+                this.particleStates.computeBoundingSphere(this.boundingSphere, positionTransform);
+                this.particleSystemRenderer.setBoundingSphere(this.boundingSphere);
+            }
+        };
+
+    }();
 
     activateParticles(particleCount) {
         if (this.systemState == ParticleSystemState.Running) {
