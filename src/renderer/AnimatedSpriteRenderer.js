@@ -35,15 +35,15 @@ export class AnimatedSpriteRenderer extends Renderer {
     setBoundingBox(boundingBox) {
         this.boundingBox.copy(boundingBox);
         if (this.mesh) {
-            this.updateMeshBoundingBox();
+            this.updateMeshBounds();
         }
     }
 
-    updateMeshBoundingBox = function () {
+    updateMeshBounds = function() {
 
         const tempCenter = new THREE.Vector3();
 
-        return function () {
+        return function() {
             const geometry = this.particleStateArray.getGeometry();
             if (!geometry.boundingBox) geometry.boundingBox = new THREE.Box3();
             geometry.boundingBox.copy(this.boundingBox);
@@ -72,7 +72,7 @@ export class AnimatedSpriteRenderer extends Renderer {
             this.material = this.createMaterial(null, null, null, true, false);
             this.material.blending = this.blending;
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
-            this.updateMeshBoundingBox();
+            this.updateMeshBounds();
             this.owner.add(this.mesh);
         }
     }

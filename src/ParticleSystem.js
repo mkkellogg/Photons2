@@ -223,11 +223,11 @@ export class ParticleSystem {
         return this.particleEmitter;
     }
 
-    updateBoundingBox = function () {
+    updateBoundingBox = function() {
 
         const tempMatrix4 = new THREE.Matrix4();
 
-        return function () {
+        return function() {
             let positionTransform = null;
             if (this.transformInitialDirectionInWorldSpace) {
                 positionTransform = tempMatrix4;
