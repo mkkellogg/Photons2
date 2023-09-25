@@ -85,6 +85,9 @@ export class ParticleSystem {
                 if (particlesToEmit > 0) this.activateParticles(particlesToEmit);
                 this.advanceActiveParticles(timeDelta);
                 if (this.onUpdateCallback) this.onUpdateCallback(this.activeParticleCount);
+
+                // TODO: Be more efficient about re-computing bounds
+                this.updateBounds();
             }
             this.componentContainer.update(currentTime, timeDelta);
             this.lastUpdateTime = currentTime;
@@ -254,9 +257,6 @@ export class ParticleSystem {
             }
             this.activeParticleCount = newActiveParticleCount;
             this.particleStates.setActiveParticleCount(this.activeParticleCount);
-            if (newActiveParticleCount > 0) {
-                this.updateBounds();
-            }
         }
     }
 
