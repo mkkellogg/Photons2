@@ -136,25 +136,76 @@ export class ParticleStateArray {
         return this.particleStates[index];
     }
 
-    computeBoundingBox(outBox = new THREE.Box3(), positionTransform = null) {
+    computeBoundingBox = function() {
+
         const tempPos = new THREE.Vector3();
-        const min = outBox.min;
-        const max = outBox.max;
-        for (let i = 0; i < this.activeParticleCount; i++) {
-            const particleState = this.getState(i);
-            let pos = particleState.position;
-            if (positionTransform) {
-                tempPos.copy(pos);
-                tempPos.applyMatrix4(positionTransform);
-                pos = tempPos;
+
+        return function(outBox = new THREE.Box3(), positionTransform = null) {
+            const min = outBox.min;
+            const max = outBox.max;
+            for (let i = 0; i < this.activeParticleCount; i++) {
+                const particleState = this.getState(i);
+                let pos = particleState.position;
+                if (positionTransform) {
+                    tempPos.copy(pos);
+                    tempPos.applyMatrix4(positionTransform);
+                    pos = tempPos;
+                }
+                const maxExtent = Math.max(particleState.size.x, particleState.size.y);
+                const lowerX = pos.x - maxExtent;
+                const upperX = pos.x + maxExtent;
+                const lowerY = pos.y - maxExtent;
+                const upperY = pos.y + maxExtent;
+                const lowerZ = pos.x - maxExtent;
+                const upperZ = pos.x + maxExtent;
+                if (i == 0 || pos.x < lowerX) min.x = lowerX;
+                if (i == 0 || pos.x > upperX) max.x = upperX;
+                if (i == 0 || pos.y < lowerY) min.y = lowerY;
+                if (i == 0 || pos.y > upperY) max.y = upperY;
+                if (i == 0 || pos.z < lowerZ) min.z = lowerZ;
+                if (i == 0 || pos.z > upperZ) max.z = upperZ;
             }
-            if (i == 0 || pos.x < min.x) min.x = pos.x;
-            if (i == 0 || pos.x > max.x) max.x = pos.x;
-            if (i == 0 || pos.y < min.y) min.y = pos.y;
-            if (i == 0 || pos.y > max.y) max.y = pos.y;
-            if (i == 0 || pos.z < min.z) min.z = pos.z;
-            if (i == 0 || pos.z > max.z) max.z = pos.z;
-        }
-        return outBox;
-    }
+            return outBox;
+        };
+
+    }();
+
+    computeBoundingSphere = function() {
+
+        const tempCenter = new THREE.Vector3();
+        const tempVector = new THREE.Vector3();
+        const tempPos = new THREE.Vector3();
+
+        return function(outSphere = new THREE.Sphere(), positionTransform = null) {
+            let radius = 0;
+            for (let i = 0; i < this.activeParticleCount; i++) {
+                const particleState = this.getState(i);
+                let pos = particleState.position;
+                if (positionTransform) {
+                    tempPos.copy(pos);
+                    tempPos.applyMatrix4(positionTransform);
+                    pos = tempPos;
+                }
+                const maxExtent = Math.max(particleState.size.x, particleState.size.y);
+                if (i == 0) {
+                    tempCenter.copy(pos);
+                    radius = maxExtent;
+                } else {
+                    tempVector.copy(pos).sub(tempCenter);
+                    const distFromCenter = tempVector.length();
+                    if (distFromCenter > radius) {
+                        const diff = distFromCenter - radius;
+                        const adjustDiff = diff / 2;
+                        tempVector.normalize().multiplyScalar(adjustDiff);
+                        tempCenter.add(tempVector);
+                        radius += adjustDiff;
+                    }
+                }
+            }
+            outSphere.center.copy(tempCenter);
+            outSphere.radius = radius;
+            return outSphere;
+        };
+
+    }();
 }

@@ -41,6 +41,7 @@ export class ParticleSystem {
         this.onUpdateCallback = null;
         this.transformInitialDirectionInWorldSpace = true;
         this.boundingBox = new THREE.Box3();
+        this.boundingSphere = new THREE.Sphere();
     }
 
     init(maximumActiveParticles) {
@@ -223,7 +224,7 @@ export class ParticleSystem {
         return this.particleEmitter;
     }
 
-    updateBoundingBox = function() {
+    updateBounds = function() {
 
         const tempMatrix4 = new THREE.Matrix4();
 
@@ -233,8 +234,13 @@ export class ParticleSystem {
                 positionTransform = tempMatrix4;
                 positionTransform.copy(this.owner.matrixWorld).invert();
             }
-            this.particleStates.computeBoundingBox(this.boundingBox, positionTransform);
-            this.particleSystemRenderer.setBoundingBox(this.boundingBox);
+            if (this.particleSystemRenderer.calculatingBoundingSphereFromBox()) {
+                this.particleStates.computeBoundingBox(this.boundingBox, positionTransform);
+                this.particleSystemRenderer.setBoundingBox(this.boundingBox);
+            } else {
+                this.particleStates.computeBoundingSphere(this.boundingSphere, positionTransform);
+                this.particleSystemRenderer.setBoundingSphere(this.boundingSphere);
+            }
         };
 
     }();
@@ -249,7 +255,7 @@ export class ParticleSystem {
             this.activeParticleCount = newActiveParticleCount;
             this.particleStates.setActiveParticleCount(this.activeParticleCount);
             if (newActiveParticleCount > 0) {
-                this.updateBoundingBox();
+                this.updateBounds();
             }
         }
     }
