@@ -28,4 +28,7 @@ export class Renderer {
         }
     }
 
+    render() {
+    }
+
 }

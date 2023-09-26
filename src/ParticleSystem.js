@@ -95,12 +95,12 @@ export class ParticleSystem {
     }
 
     render(threeRenderer, camera) {
-        if (this.getVisible()) {
+        if (this.getVisible() && this.particleSystemRenderer) {
             const saveAutoClear = threeRenderer.autoClear;
             threeRenderer.autoClear = false;
             this.owner.visible = true;
             this.owner.matrixWorldNeedsUpdate = true;
-            threeRenderer.render(this.owner, camera);
+            this.particleSystemRenderer.render(this.owner, threeRenderer, camera);
             this.owner.visible = false;
             threeRenderer.autoClear = saveAutoClear;
         }

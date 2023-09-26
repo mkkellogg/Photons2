@@ -1,6 +1,7 @@
 import * as Photons from '../../../lib/photons.module.js';
 import { FogMaterial } from './FogMaterial.js';
 import { GLTFLoader } from '../../GltfLoader.js';
+import { LoadingSpinner } from '../../LoadingSpinner.js';
 import * as THREE from 'three';
 
 export class Scene {
@@ -17,8 +18,12 @@ export class Scene {
     }
 
     build() {
-        this.setupParticleSystems();
-        this.setupSceneComponents();
+        const loadingSpinner = new LoadingSpinner();
+        loadingSpinner.show();
+        this.setupSceneComponents().then(() => {
+            loadingSpinner.hide();
+            this.setupParticleSystems();
+        });
     }
 
     update() {
@@ -259,9 +264,31 @@ export class Scene {
         directionalLight.position.set(5, 5, 5);
 
         const modelLoader = new GLTFLoader();
-        modelLoader.load("assets/models/pumpkin_graveyard/pumpkin_graveyard.gltf", (object) => {
-            this.scene.add(object.scene);
-            Scene.traverseScene(object.scene, (node) => {
+        const graveyardLoadPromise = new Promise((resolve, reject) => {
+            modelLoader.load("assets/models/pumpkin_graveyard/pumpkin_graveyard.gltf",
+            (object) => {
+                resolve(object);
+            },
+            null,
+            (err) => {
+                reject(err);
+            });
+        });
+        const torchLoadPromise = new Promise((resolve, reject) => {
+            modelLoader.load("assets/models/cartoon_torch/cartoon_torch.gltf",
+            (object) => {
+                resolve(object);
+            },
+            null,
+            (err) => {
+                reject(err);
+            });
+        });
+
+        return Promise.all([graveyardLoadPromise, torchLoadPromise])
+        .then(([graveyardObject, torchObject]) => {
+            this.scene.add(graveyardObject.scene);
+            Scene.traverseScene(graveyardObject.scene, (node) => {
                 if (node.isMesh) {
                     if (node.name == "Opaque") {
                         node.castShadow = true;
@@ -275,7 +302,7 @@ export class Scene {
                     }
                 }
             });
-            object.scene.scale.set(0.75, 0.75, 0.75);
+            graveyardObject.scene.scale.set(0.75, 0.75, 0.75);
             const fogParent = new THREE.Object3D();
             const fogGeometry = new THREE.PlaneGeometry(1, 1);
             const fogMaterial = new FogMaterial({
@@ -289,19 +316,18 @@ export class Scene {
             fogParent.add(fogPlane);
             fogParent.position.y += 1.0;
             this.scene.add(fogParent);
-        });
 
-        let torchPostPosition = new THREE.Vector3(-.31, 1, 1.65);
-        modelLoader.load("assets/models/cartoon_torch/cartoon_torch.gltf", (object) => {
-            this.scene.add(object.scene);
-            Scene.traverseScene(object.scene, (node) => {
+
+            let torchPostPosition = new THREE.Vector3(-.31, 1, 1.65);
+            this.scene.add(torchObject.scene);
+            Scene.traverseScene(torchObject.scene, (node) => {
                 if (node.isMesh) {
                     node.castShadow = false;
                     node.receiveShadow = false;
                 }
             });
-            object.scene.scale.set(1.2, 1.15, 1.2);
-            object.scene.position.copy(torchPostPosition);
+            torchObject.scene.scale.set(1.2, 1.15, 1.2);
+            torchObject.scene.position.copy(torchPostPosition);
 
             const lightParent = new THREE.Object3D();
             this.scene.add(lightParent);
@@ -315,7 +341,7 @@ export class Scene {
                 'bias': .000009,
                 'edgeRadius': 3
             };
-            this.manager.addComponent(new Photons.FlickerLight(lightParent, 10, 2, new THREE.Color().setRGB(1, .8, .4), 0, 1.0, flickerLightShadows));
+            this.manager.addComponent(new Photons.FlickerLight(lightParent, 10, 2, new THREE.Color().setRGB(1, .8, .4), 0, 1.0, flickerLightShadows));            
         });
     }
 }
