@@ -1,6 +1,7 @@
 import * as Photons from '../../../lib/photons.module.js';
 import { FogMaterial } from './FogMaterial.js';
 import { GLTFLoader } from '../../GltfLoader.js';
+import { LoadingSpinner } from '../../LoadingSpinner.js';
 import * as THREE from 'three';
 
 export class Scene {
@@ -17,7 +18,10 @@ export class Scene {
     }
 
     build() {
+        const loadingSpinner = new LoadingSpinner();
+        loadingSpinner.show();
         this.setupSceneComponents().then(() => {
+            loadingSpinner.hide();
             this.setupParticleSystems();
         });
     }

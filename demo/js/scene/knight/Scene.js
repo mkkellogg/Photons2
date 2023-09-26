@@ -1,5 +1,6 @@
 import * as Photons from '../../../lib/photons.module.js';
 import { FBXLoader } from '../../FBXLoader.js';
+import { LoadingSpinner } from '../../LoadingSpinner.js';
 import * as THREE from 'three';
 
 export class Scene {
@@ -19,7 +20,10 @@ export class Scene {
     }
 
     build() {
+        const loadingSpinner = new LoadingSpinner();
+        loadingSpinner.show();
         this.setupSceneComponents().then(() => {
+            loadingSpinner.hide();
             this.setupParticleSystems();
         });
     }
@@ -333,15 +337,14 @@ export class Scene {
                     }
                 });
 
-                this.scene.add(object);
-                resolve();
+                resolve(object);
             });
         });
 
-        const material = new THREE.MeshStandardMaterial();
-        material.roughness = 0.1;
-        material.metalness = 0.2;
-        material.color.setRGB(.25, .25, .25);
+        const groundMaterial = new THREE.MeshStandardMaterial();
+        groundMaterial.roughness = 0.1;
+        groundMaterial.metalness = 0.2;
+        groundMaterial.color.setRGB(.25, .25, .25);
         const baseColorLoadPromise = new Promise((resolve) => {
             textureLoader.load( 'assets/textures/stone_floor/basecolor.jpg', 
                 function ( texture ) {
@@ -349,10 +352,10 @@ export class Scene {
                     texture.wrapT = THREE.RepeatWrapping;
                     texture.repeat.x = 4;
                     texture.repeat.y = 4;
-                    material.map = texture;
-                    material.roughness = 0.9;
-                    material.needsUpdate = true;
-                    resolve();
+                    groundMaterial.map = texture;
+                    groundMaterial.roughness = 0.9;
+                    groundMaterial.needsUpdate = true;
+                    resolve(texture);
                 });
         });
 
@@ -363,18 +366,20 @@ export class Scene {
                     texture.wrapT = THREE.RepeatWrapping;
                     texture.repeat.x = 4;
                     texture.repeat.y = 4;
-                    material.normalMap = texture;
-                    material.normalScale.set(8, 8);
-                    material.needsUpdate = true;
-                    resolve();
+                    groundMaterial.normalMap = texture;
+                    groundMaterial.normalScale.set(8, 8);
+                    groundMaterial.needsUpdate = true;
+                    resolve(texture);
                 });
         });
-     
-        const geometry = new THREE.CylinderGeometry( 4, 4, .1, 32 ); 
-        const mesh = new THREE.Mesh( geometry, material );
-        mesh.receiveShadow = true;
-        this.scene.add( mesh );
 
-        return Promise.all([baseColorLoadPromise, normalMapLoadPromise, modelLoadPromise]);
+        return Promise.all([baseColorLoadPromise, normalMapLoadPromise, modelLoadPromise])
+        .then(([baseColorTexture, normalTexture, knightModelObject]) => {
+            const cylinderGeometry = new THREE.CylinderGeometry( 4, 4, .1, 32 ); 
+            const groundMesh = new THREE.Mesh(cylinderGeometry, groundMaterial);
+            groundMesh.receiveShadow = true;
+            this.scene.add(groundMesh);
+            this.scene.add(knightModelObject);
+        });
     }
 }

@@ -52,11 +52,16 @@ export class AnimatedSpriteRenderer extends Renderer {
         }
     }
 
+    render(owner, threeRenderer, camera){
+        threeRenderer.render(owner, camera);
+    }
+
     updateMeshBounds = function() {
 
         const tempCenter = new THREE.Vector3();
 
         return function() {
+
             const geometry = this.particleStateArray.getGeometry();
 
             if (this.calculateBoundingSphereFromBox) {
@@ -90,6 +95,7 @@ export class AnimatedSpriteRenderer extends Renderer {
             this.material = this.createMaterial(null, null, null, true, false);
             this.material.blending = this.blending;
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
+            this.mesh.frustumCulled = false;
             this.updateMeshBounds();
             this.owner.add(this.mesh);
         }
