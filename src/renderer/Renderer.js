@@ -28,7 +28,7 @@ export class Renderer {
         }
     }
 
-    render(){
+    render() {
     }
 
 }

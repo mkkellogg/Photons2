@@ -156,14 +156,14 @@ export class ParticleStateArray {
                 const upperX = pos.x + maxExtent;
                 const lowerY = pos.y - maxExtent;
                 const upperY = pos.y + maxExtent;
-                const lowerZ = pos.x - maxExtent;
-                const upperZ = pos.x + maxExtent;
-                if (i == 0 || pos.x < lowerX) min.x = lowerX;
-                if (i == 0 || pos.x > upperX) max.x = upperX;
-                if (i == 0 || pos.y < lowerY) min.y = lowerY;
-                if (i == 0 || pos.y > upperY) max.y = upperY;
-                if (i == 0 || pos.z < lowerZ) min.z = lowerZ;
-                if (i == 0 || pos.z > upperZ) max.z = upperZ;
+                const lowerZ = pos.z - maxExtent;
+                const upperZ = pos.z + maxExtent;
+                if (i == 0 || pos.x < min.x) min.x = lowerX;
+                if (i == 0 || pos.x > max.x) max.x = upperX;
+                if (i == 0 || pos.y < min.y) min.y = lowerY;
+                if (i == 0 || pos.y > max.y) max.y = upperY;
+                if (i == 0 || pos.z < min.z) min.z = lowerZ;
+                if (i == 0 || pos.z > max.z) max.z = upperZ;
             }
             return outBox;
         };
@@ -192,7 +192,7 @@ export class ParticleStateArray {
                     radius = maxExtent;
                 } else {
                     tempVector.copy(pos).sub(tempCenter);
-                    const distFromCenter = tempVector.length();
+                    const distFromCenter = tempVector.length() + maxExtent;
                     if (distFromCenter > radius) {
                         const diff = distFromCenter - radius;
                         const adjustDiff = diff / 2;
@@ -204,6 +204,7 @@ export class ParticleStateArray {
             }
             outSphere.center.copy(tempCenter);
             outSphere.radius = radius;
+
             return outSphere;
         };
 

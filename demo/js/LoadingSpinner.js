@@ -35,8 +35,6 @@ export class LoadingSpinner {
             }
 
             .loader {
-                
-
                 width: 120px;        /* the size */
                 padding: 15px;       /* the border thickness */
                 background: #07e8d6; /* the color */
@@ -58,6 +56,7 @@ export class LoadingSpinner {
             @keyframes load {
                 to{transform: rotate(1turn)}
             }
+
         `;
         document.getElementsByTagName('head')[0].appendChild(style);
     }

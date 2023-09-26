@@ -17,6 +17,7 @@ export class Scene {
         this.jsonTypeStore = new Photons.JSONTypeStore();
         this.jsonTypeStore.addNamespace('THREE', THREE);
         this.jsonTypeStore.addNamespace('Photons', Photons);
+        this.currentRenderSlot = 1;
     }
 
     build() {
@@ -76,7 +77,7 @@ export class Scene {
         const embersTexture = new THREE.TextureLoader().load(texturePath);
         const embersAtlas = new Photons.Atlas(embersTexture, texturePath);
         embersAtlas.addFrameSet(1, 0.0, 0.0, 1.0, 1.0);
-        const embersRenderer = new Photons.AnimatedSpriteRenderer(embersAtlas, true, THREE.AdditiveBlending);
+        const embersRenderer = new Photons.AnimatedSpriteRenderer(embersAtlas, true, THREE.AdditiveBlending, true, this.currentRenderSlot++);
 
         const embersParticleSystem = new Photons.ParticleSystem(embersRoot, embersRenderer, this.renderer);
         embersParticleSystem.init(150 * emissionFactor);
@@ -134,7 +135,7 @@ export class Scene {
         const baseFlameTexture = new THREE.TextureLoader().load(texturePath);
         const baseFlameAtlas = new Photons.Atlas(baseFlameTexture, texturePath);
         baseFlameAtlas.addFrameSet(18, 0.0, 0.0, 128.0 / 1024.0, 128.0 / 512.0);
-        const baseFlameRenderer = new Photons.AnimatedSpriteRenderer(baseFlameAtlas, true);
+        const baseFlameRenderer = new Photons.AnimatedSpriteRenderer(baseFlameAtlas, true, THREE.NormalBlending, true, this.currentRenderSlot++);
 
         const baseFlameParticleSystem = new Photons.ParticleSystem(baseFlameRoot, baseFlameRenderer, this.renderer);
         baseFlameParticleSystem.init(50 * emissionFactor);
@@ -206,7 +207,7 @@ export class Scene {
         const brightFlameTexture = new THREE.TextureLoader().load(texturePath);
         const brightFlameAtlas = new Photons.Atlas(brightFlameTexture, texturePath);
         brightFlameAtlas.addFrameSet(16, 0.0, 0.0, 212.0 / 1024.0, 256.0 / 1024.0);
-        const brightFlameRenderer = new Photons.AnimatedSpriteRenderer(brightFlameAtlas, true);
+        const brightFlameRenderer = new Photons.AnimatedSpriteRenderer(brightFlameAtlas, true, THREE.NormalBlending, true, this.currentRenderSlot++);
 
         const brightFlameParticleSystem = new Photons.ParticleSystem(brightFlameRoot, brightFlameRenderer, this.renderer);
         brightFlameParticleSystem.init(20 * emissionFactor);

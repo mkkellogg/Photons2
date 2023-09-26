@@ -5,7 +5,8 @@ import { Atlas } from './Atlas.js';
 
 export class AnimatedSpriteRenderer extends Renderer {
 
-    constructor(atlas, interpolateAtlasFrames = false, blending = THREE.NormalBlending, calculateBoundingSphereFromBox = true) {
+    constructor(atlas, interpolateAtlasFrames = false,
+                blending = THREE.NormalBlending, calculateBoundingSphereFromBox = true, renderOrder) {
         super();
         this.particleStateArray = null;
         this.material = null;
@@ -16,6 +17,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         this.boundingBox = new THREE.Box3();
         this.boundingSphere = new THREE.Sphere();
         this.calculateBoundingSphereFromBox = calculateBoundingSphereFromBox;
+        this.renderOrder = renderOrder;
     }
 
     setOwner(owner) {
@@ -52,7 +54,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         }
     }
 
-    render(owner, threeRenderer, camera){
+    render(owner, threeRenderer, camera) {
         threeRenderer.render(owner, camera);
     }
 
@@ -67,7 +69,6 @@ export class AnimatedSpriteRenderer extends Renderer {
             if (this.calculateBoundingSphereFromBox) {
                 if (!geometry.boundingBox) geometry.boundingBox = new THREE.Box3();
                 geometry.boundingBox.copy(this.boundingBox);
-
                 if (!geometry.boundingSphere) {
                     geometry.boundingSphere = new THREE.Sphere();
                 }
@@ -77,8 +78,9 @@ export class AnimatedSpriteRenderer extends Renderer {
                 const extentX = this.boundingBox.max.x - tempCenter.x;
                 const extentY = this.boundingBox.max.y - tempCenter.y;
                 const extentZ = this.boundingBox.max.z - tempCenter.z;
+                const maxExtent = Math.max(Math.max(extentX, extentY), extentZ);
                 geometry.boundingSphere.center.copy(tempCenter);
-                geometry.boundingSphere.radius = Math.max(Math.max(extentX, extentY), extentZ);
+                geometry.boundingSphere.radius = Math.sqrt(2 * maxExtent * maxExtent);
             } else {
                 if (!geometry.boundingSphere) geometry.boundingSphere = new THREE.Sphere();
                 geometry.boundingSphere.copy(this.boundingSphere);
@@ -95,7 +97,8 @@ export class AnimatedSpriteRenderer extends Renderer {
             this.material = this.createMaterial(null, null, null, true, false);
             this.material.blending = this.blending;
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
-            this.mesh.frustumCulled = false;
+            this.mesh.frustumCulled = true;
+            if (this.renderOrder !== undefined) this.mesh.renderOrder = this.renderOrder;
             this.updateMeshBounds();
             this.owner.add(this.mesh);
         }
@@ -152,7 +155,7 @@ export class AnimatedSpriteRenderer extends Renderer {
             vertexShader: vertexShader,
             fragmentShader: fragmentShader,
             transparent: true,
-            alphaTest: 0.5,
+            alphaTest: 1.0,
             blending: THREE.NormalBlending,
             blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
             blendSrcAlpha: THREE.SrcAlphaFactor,
