@@ -154,7 +154,7 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         super.allocate(particleCount);
 
         const createAttributeBuffer = (bufferArray, componentCount) => {
-            if(this.instanced) {
+            if (this.instanced) {
                 return new THREE.InstancedBufferAttribute(bufferArray, componentCount);
             } else {
                 return new THREE.BufferAttribute(bufferArray, componentCount);
@@ -163,13 +163,30 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
 
         const vertexCount = this.verticesPerParticle * this.particleCount;
 
-        if (this.instanced) { 
+        if (this.instanced) {
             const baseGeometry = new THREE.BufferGeometry();
 
             const basePositionsArray = new Float32Array(18);
             this.basePositions = new THREE.BufferAttribute(basePositionsArray, 3);
             baseGeometry.setAttribute('position', this.basePositions);
             this.basePositions.needsUpdate = true;
+            this.basePositions.setXYZ(0, -1.0, 1.0, 0.0);
+            this.basePositions.setXYZ(1, -1.0, -1.0, 0.0);
+            this.basePositions.setXYZ(2, 1.0, 1.0, 0.0);
+            this.basePositions.setXYZ(3, -1.0, -1.0, 0.0);
+            this.basePositions.setXYZ(4, 1.0, -1.0, 0.0);
+            this.basePositions.setXYZ(5, 1.0, 1.0, 0.0);
+
+            const baseUVsArray = new Float32Array(12);
+            this.baseUVs = new THREE.BufferAttribute(baseUVsArray, 2);
+            baseGeometry.setAttribute('baseUV', this.baseUVs);
+            this.baseUVs.needsUpdate = true;
+            this.baseUVs.setXY(0, 0.0, 1.0);
+            this.baseUVs.setXY(1, 0.0, 0.0);
+            this.baseUVs.setXY(2, 1.0, 1.0);
+            this.baseUVs.setXY(3, 0.0, 0.0);
+            this.baseUVs.setXY(4, 1.0, 0.0);
+            this.baseUVs.setXY(5, 1.0, 1.0);
 
             const customIndexesArray = new Float32Array(6);
             this.customIndexes = new THREE.BufferAttribute(customIndexesArray, 1);

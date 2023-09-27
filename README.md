@@ -60,7 +60,7 @@ embersAtlas.addFrameSet(1, 0.0, 0.0, 1.0, 1.0);
 
 // Create the renderer and pass to the particle system during construction. The particle system will perform
 // additional initialization on the renderer.
-const embersRenderer = new Photons.AnimatedSpriteRenderer(embersAtlas, true, THREE.AdditiveBlending);
+const embersRenderer = new Photons.AnimatedSpriteRenderer(true, embersAtlas, true, THREE.AdditiveBlending);
 
 // Create the base parent object for the particle system
 const embersRoot = new THREE.Object3D();
