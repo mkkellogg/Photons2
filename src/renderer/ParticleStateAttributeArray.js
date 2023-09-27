@@ -5,8 +5,6 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
 
     constructor() {
         super();
-        this.verticesPerParticles = 6;
-        this.vertexCount = 0;
         this.geometry = null;
         this.progressTypes = null;
         this.lifetimes = null;
@@ -22,24 +20,39 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         this.colors = null;
         this.initialSizes = null;
         this.initialColors = null;
+        this.instanced = false;
+        this.verticesPerParticle = 6;
     }
 
-    init(particleCount) {
+    init(particleCount, instanced = false) {
+        this.instanced = instanced;
+        if (this.instanced) {
+            this.verticesPerParticle = 1;
+        } else {
+            this.verticesPerParticle = 6;
+        }
         super.init(particleCount);
         this.allocate(particleCount);
     }
 
     setParticleCount(particleCount) {
         super.setParticleCount(particleCount);
-        this.vertexCount = particleCount * this.verticesPerParticles;
     }
 
     setActiveParticleCount(activeParticleCount) {
         super.setActiveParticleCount(activeParticleCount);
         if (activeParticleCount > 0) {
-            this.geometry.setDrawRange(0, this.verticesPerParticles * activeParticleCount);
+            if (this.instanced) {
+                this.geometry.instanceCount = activeParticleCount;
+            } else {
+                this.geometry.setDrawRange(0, this.verticesPerParticle * activeParticleCount);
+            }
         } else {
-            this.geometry.setDrawRange(0, 0);
+            if (this.instanced) {
+                this.geometry.instanceCount = 0;
+            } else {
+                this.geometry.setDrawRange(0, 0);
+            }
         }
     }
 
@@ -49,9 +62,9 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         }
         const particleState = this.getState(index);
 
-        const offset = index * this.verticesPerParticles;
+        const offset = index * this.verticesPerParticle;
 
-        for (let i = 0; i < this.verticesPerParticles; i++) {
+        for (let i = 0; i < this.verticesPerParticle; i++) {
             this.lifetimes.setX(offset + i, particleState.lifetime);
             this.lifetimes.needsUpdate = true;
 
@@ -138,115 +151,136 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
     }
 
     allocate(particleCount) {
-
         super.allocate(particleCount);
 
-        this.geometry = new THREE.BufferGeometry();
+        const createAttributeBuffer = (bufferArray, componentCount) => {
+            if(this.instanced) {
+                return new THREE.InstancedBufferAttribute(bufferArray, componentCount);
+            } else {
+                return new THREE.BufferAttribute(bufferArray, componentCount);
+            }
+        };
 
-        const lifetimesArray = new Float32Array(this.vertexCount);
-        const agesArray = new Float32Array(this.vertexCount);
-        const sequenceElementsArray = new Float32Array(this.vertexCount * 4);
-        const positionsArray = new Float32Array(this.vertexCount * 3);
-        const velocitiesArray = new Float32Array(this.vertexCount * 3);
-        const accelerationsArray = new Float32Array(this.vertexCount * 3);
-        const normalsArray = new Float32Array(this.vertexCount * 3);
-        const rotationsArray = new Float32Array(this.vertexCount);
-        const rotationalSpeedsArray = new Float32Array(this.vertexCount);
-        const sizesArray = new Float32Array(this.vertexCount * 2);
-        const colorsArray = new Float32Array(this.vertexCount * 3);
-        const alphasArray = new Float32Array(this.vertexCount);
-        const initialSizesArray = new Float32Array(this.vertexCount * 2);
-        const initialColorsArray = new Float32Array(this.vertexCount * 3);
-        const initialAlphasArray = new Float32Array(this.vertexCount);
-        const customIndexesArray = new Float32Array(this.vertexCount);
+        const vertexCount = this.verticesPerParticle * this.particleCount;
 
-        this.lifetimes = new THREE.BufferAttribute(lifetimesArray, 1);
-        this.lifetimes.dynamic = true;
-        this.geometry.setAttribute('lifetime', this.lifetimes);
+        if (this.instanced) { 
+            const baseGeometry = new THREE.BufferGeometry();
 
-        this.ages = new THREE.BufferAttribute(agesArray, 1);
-        this.ages.dynamic = true;
-        this.geometry.setAttribute('age', this.ages);
+            const basePositionsArray = new Float32Array(18);
+            this.basePositions = new THREE.BufferAttribute(basePositionsArray, 3);
+            baseGeometry.setAttribute('position', this.basePositions);
+            this.basePositions.needsUpdate = true;
 
-        this.sequenceElements = new THREE.BufferAttribute(sequenceElementsArray, 4);
-        this.sequenceElements.dynamic = true;
-        this.geometry.setAttribute('sequenceElement', this.sequenceElements);
+            const customIndexesArray = new Float32Array(6);
+            this.customIndexes = new THREE.BufferAttribute(customIndexesArray, 1);
+            baseGeometry.setAttribute('customIndex', this.customIndexes);
+            this.customIndexes.needsUpdate = true;
 
-        this.positions = new THREE.BufferAttribute(positionsArray, 3);
+            this.customIndexes.setX(0, 0);
+            this.customIndexes.setX(1, 1);
+            this.customIndexes.setX(2, 3);
+            this.customIndexes.setX(3, 1);
+            this.customIndexes.setX(4, 2);
+            this.customIndexes.setX(5, 3);
+
+            this.geometry = new THREE.InstancedBufferGeometry().copy(baseGeometry);
+            this.geometry.instanceCount = 0;
+        } else {
+            this.geometry = new THREE.BufferGeometry();
+
+            const customIndexesArray = new Float32Array(vertexCount);
+            this.customIndexes = new THREE.BufferAttribute(customIndexesArray, 1);
+            this.customIndexes.dynamic = true;
+            this.geometry.setAttribute('customIndex', this.customIndexes);
+            this.customIndexes.needsUpdate = true;
+
+            for (let p = 0; p < this.particleCount; p++) {
+                const offset = p * this.verticesPerParticle;
+                this.customIndexes.setX(offset, 0);
+                this.customIndexes.setX(offset + 1, 1);
+                this.customIndexes.setX(offset + 2, 3);
+                this.customIndexes.setX(offset + 3, 1);
+                this.customIndexes.setX(offset + 4, 2);
+                this.customIndexes.setX(offset + 5, 3);
+            }
+        }
+
+        const lifetimesArray = new Float32Array(vertexCount);
+        const agesArray = new Float32Array(vertexCount);
+        const sequenceElementsArray = new Float32Array(vertexCount * 4);
+        const positionsArray = new Float32Array(vertexCount * 3);
+        const velocitiesArray = new Float32Array(vertexCount * 3);
+        const accelerationsArray = new Float32Array(vertexCount * 3);
+        const normalsArray = new Float32Array(vertexCount * 3);
+        const rotationsArray = new Float32Array(vertexCount);
+        const rotationalSpeedsArray = new Float32Array(vertexCount);
+        const sizesArray = new Float32Array(vertexCount * 2);
+        const colorsArray = new Float32Array(vertexCount * 3);
+        const alphasArray = new Float32Array(vertexCount);
+        const initialSizesArray = new Float32Array(vertexCount * 2);
+        const initialColorsArray = new Float32Array(vertexCount * 3);
+        const initialAlphasArray = new Float32Array(vertexCount);
+
+        this.positions = createAttributeBuffer(positionsArray, 3);
         this.positions.dynamic = true;
         this.geometry.setAttribute('particlePosition', this.positions);
 
-        this.velocities = new THREE.BufferAttribute(velocitiesArray, 3);
+        this.lifetimes = createAttributeBuffer(lifetimesArray, 1);
+        this.lifetimes.dynamic = true;
+        this.geometry.setAttribute('lifetime', this.lifetimes);
+
+        this.ages = createAttributeBuffer(agesArray, 1);
+        this.ages.dynamic = true;
+        this.geometry.setAttribute('age', this.ages);
+
+        this.sequenceElements = createAttributeBuffer(sequenceElementsArray, 4);
+        this.sequenceElements.dynamic = true;
+        this.geometry.setAttribute('sequenceElement', this.sequenceElements);
+
+        this.velocities = createAttributeBuffer(velocitiesArray, 3);
         this.velocities.dynamic = true;
         this.geometry.setAttribute('velocity', this.velocities);
 
-        this.accelerations = new THREE.BufferAttribute(accelerationsArray, 3);
+        this.accelerations = createAttributeBuffer(accelerationsArray, 3);
         this.accelerations.dynamic = true;
         this.geometry.setAttribute('acceleration', this.accelerations);
 
-        this.normals = new THREE.BufferAttribute(normalsArray, 3);
+        this.normals = createAttributeBuffer(normalsArray, 3);
         this.normals.dynamic = true;
         this.geometry.setAttribute('normal', this.normals);
 
-        this.rotations = new THREE.BufferAttribute(rotationsArray, 1);
+        this.rotations = createAttributeBuffer(rotationsArray, 1);
         this.rotations.dynamic = true;
         this.geometry.setAttribute('rotation', this.rotations);
 
-        this.rotationalSpeeds = new THREE.BufferAttribute(rotationalSpeedsArray, 1);
+        this.rotationalSpeeds = createAttributeBuffer(rotationalSpeedsArray, 1);
         this.rotationalSpeeds.dynamic = true;
         this.geometry.setAttribute('rotationalSpeed', this.rotationalSpeeds);
 
-        this.sizes = new THREE.BufferAttribute(sizesArray, 2);
+        this.sizes = createAttributeBuffer(sizesArray, 2);
         this.sizes.dynamic = true;
         this.geometry.setAttribute('size', this.sizes);
 
-        this.colors = new THREE.BufferAttribute(colorsArray, 3);
+        this.colors = createAttributeBuffer(colorsArray, 3);
         this.colors.dynamic = true;
         this.geometry.setAttribute('color', this.colors);
 
-        this.alphas = new THREE.BufferAttribute(alphasArray, 1);
+        this.alphas = createAttributeBuffer(alphasArray, 1);
         this.alphas.dynamic = true;
         this.geometry.setAttribute('alpha', this.alphas);
 
-        this.initialSizes = new THREE.BufferAttribute(initialSizesArray, 2);
+        this.initialSizes = createAttributeBuffer(initialSizesArray, 2);
         this.initialSizes.dynamic = true;
         this.geometry.setAttribute('initialSize', this.initialSizes);
 
-        this.initialColors = new THREE.BufferAttribute(initialColorsArray, 3);
+        this.initialColors = createAttributeBuffer(initialColorsArray, 3);
         this.initialColors.dynamic = true;
         this.geometry.setAttribute('initialColor', this.initialColors);
 
-        this.initialAlphas = new THREE.BufferAttribute(initialAlphasArray, 1);
+        this.initialAlphas = createAttributeBuffer(initialAlphasArray, 1);
         this.initialAlphas.dynamic = true;
         this.geometry.setAttribute('initialAlpha', this.initialAlphas);
 
-        this.customIndexes = new THREE.BufferAttribute(customIndexesArray, 1);
-        this.customIndexes.dynamic = true;
-        this.geometry.setAttribute('customIndex', this.customIndexes);
-        this.customIndexes.needsUpdate = true;
-
-        /*
-
-        Billboard vertex order
-
-        0    3
-        *----*
-        |    |
-        |    |
-        *----*
-        1    2
-
-        */
-
-        for (let p = 0; p < this.particleCount; p++) {
-            const offset = p * this.verticesPerParticles;
-            this.customIndexes.setX(offset, 0);
-            this.customIndexes.setX(offset + 1, 1);
-            this.customIndexes.setX(offset + 2, 3);
-            this.customIndexes.setX(offset + 3, 1);
-            this.customIndexes.setX(offset + 4, 2);
-            this.customIndexes.setX(offset + 5, 3);
-        }
     }
 
     dispose() {

@@ -5,9 +5,10 @@ import { Atlas } from './Atlas.js';
 
 export class AnimatedSpriteRenderer extends Renderer {
 
-    constructor(atlas, interpolateAtlasFrames = false,
+    constructor(instanced, atlas, interpolateAtlasFrames = false,
                 blending = THREE.NormalBlending, calculateBoundingSphereFromBox = true, renderOrder) {
         super();
+        this.instanced = instanced;
         this.particleStateArray = null;
         this.material = null;
         this.mesh = null;
@@ -89,11 +90,10 @@ export class AnimatedSpriteRenderer extends Renderer {
 
     }();
 
-    init(particleCount, simulateInWorldSpace = false) {
+    init(particleCount) {
         if (super.init(particleCount)) {
-            this.setSimulateInWorldSpace(simulateInWorldSpace);
             this.particleStateArray = new ParticleStateAttributeArray();
-            this.particleStateArray.init(particleCount);
+            this.particleStateArray.init(particleCount, this.instanced);
             this.material = this.createMaterial(null, null, null, true, false);
             this.material.blending = this.blending;
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
@@ -346,7 +346,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         for (let frameset of framesets) {
             atlas.addFrameSet(frameset.length, frameset.x, frameset.y, frameset.width, frameset.height);
         }
-        const renderer = new AnimatedSpriteRenderer(this.simulateInWorldSpace, atlas, atlasJSON.interpolateFrames);
+        const renderer = new AnimatedSpriteRenderer(params.instanced, atlas, atlasJSON.interpolateFrames);
         if (params.blending == 'Additive') {
             renderer.blending = THREE.AdditiveBlending;
         } else {
@@ -390,6 +390,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         }
 
         const json = {
+            'instanced': this.instanced,
             'blending': blending,
             'atlas': {
                 'interpolateFrames': this.interpolateAtlasFrames,

@@ -50,6 +50,7 @@ export class ParticleSystem {
             if (this.particleSystemRenderer) {
                 this.particleSystemRenderer.setOwner(this.owner);
                 this.particleSystemRenderer.init(this.maximumActiveParticles, this.simulateInWorldSpace);
+                this.particleSystemRenderer.setSimulateInWorldSpace(this.simulateInWorldSpace);
                 this.particleStates = this.particleSystemRenderer.getParticleStateArray();
             } else {
                 this.particleStates = new ParticleStateArray();
