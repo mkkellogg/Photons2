@@ -207,7 +207,6 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
 
             const customIndexesArray = new Float32Array(vertexCount);
             this.customIndexes = new THREE.BufferAttribute(customIndexesArray, 1);
-            this.customIndexes.dynamic = true;
             this.geometry.setAttribute('customIndex', this.customIndexes);
             this.customIndexes.needsUpdate = true;
 
@@ -239,63 +238,63 @@ export class ParticleStateAttributeArray extends ParticleStateArray {
         const initialAlphasArray = new Float32Array(vertexCount);
 
         this.positions = createAttributeBuffer(positionsArray, 3);
-        this.positions.dynamic = true;
+        this.positions.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('particlePosition', this.positions);
 
         this.lifetimes = createAttributeBuffer(lifetimesArray, 1);
-        this.lifetimes.dynamic = true;
+        this.lifetimes.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('lifetime', this.lifetimes);
 
         this.ages = createAttributeBuffer(agesArray, 1);
-        this.ages.dynamic = true;
+        this.ages.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('age', this.ages);
 
         this.sequenceElements = createAttributeBuffer(sequenceElementsArray, 4);
-        this.sequenceElements.dynamic = true;
+        this.sequenceElements.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('sequenceElement', this.sequenceElements);
 
         this.velocities = createAttributeBuffer(velocitiesArray, 3);
-        this.velocities.dynamic = true;
+        this.velocities.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('velocity', this.velocities);
 
         this.accelerations = createAttributeBuffer(accelerationsArray, 3);
-        this.accelerations.dynamic = true;
+        this.accelerations.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('acceleration', this.accelerations);
 
         this.normals = createAttributeBuffer(normalsArray, 3);
-        this.normals.dynamic = true;
+        this.normals.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('normal', this.normals);
 
         this.rotations = createAttributeBuffer(rotationsArray, 1);
-        this.rotations.dynamic = true;
+        this.rotations.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('rotation', this.rotations);
 
         this.rotationalSpeeds = createAttributeBuffer(rotationalSpeedsArray, 1);
-        this.rotationalSpeeds.dynamic = true;
+        this.rotationalSpeeds.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('rotationalSpeed', this.rotationalSpeeds);
 
         this.sizes = createAttributeBuffer(sizesArray, 2);
-        this.sizes.dynamic = true;
+        this.sizes.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('size', this.sizes);
 
         this.colors = createAttributeBuffer(colorsArray, 3);
-        this.colors.dynamic = true;
+        this.colors.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('color', this.colors);
 
         this.alphas = createAttributeBuffer(alphasArray, 1);
-        this.alphas.dynamic = true;
+        this.alphas.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('alpha', this.alphas);
 
         this.initialSizes = createAttributeBuffer(initialSizesArray, 2);
-        this.initialSizes.dynamic = true;
+        this.initialSizes.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('initialSize', this.initialSizes);
 
         this.initialColors = createAttributeBuffer(initialColorsArray, 3);
-        this.initialColors.dynamic = true;
+        this.initialColors.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('initialColor', this.initialColors);
 
         this.initialAlphas = createAttributeBuffer(initialAlphasArray, 1);
-        this.initialAlphas.dynamic = true;
+        this.initialAlphas.setUsage(THREE.DynamicDrawUsage);
         this.geometry.setAttribute('initialAlpha', this.initialAlphas);
 
     }
