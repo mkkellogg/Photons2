@@ -5,9 +5,10 @@ import { Atlas } from './Atlas.js';
 
 export class AnimatedSpriteRenderer extends Renderer {
 
-    constructor(atlas, interpolateAtlasFrames = false,
+    constructor(instanced, atlas, interpolateAtlasFrames = false,
                 blending = THREE.NormalBlending, calculateBoundingSphereFromBox = true, renderOrder) {
         super();
+        this.instanced = instanced;
         this.particleStateArray = null;
         this.material = null;
         this.mesh = null;
@@ -89,11 +90,10 @@ export class AnimatedSpriteRenderer extends Renderer {
 
     }();
 
-    init(particleCount, simulateInWorldSpace = false) {
+    init(particleCount) {
         if (super.init(particleCount)) {
-            this.setSimulateInWorldSpace(simulateInWorldSpace);
             this.particleStateArray = new ParticleStateAttributeArray();
-            this.particleStateArray.init(particleCount);
+            this.particleStateArray.init(particleCount, this.instanced);
             this.material = this.createMaterial(null, null, null, true, false);
             this.material.blending = this.blending;
             this.mesh = new THREE.Mesh(this.particleStateArray.getGeometry(), this.material);
@@ -121,6 +121,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         const atlasTexture = this.atlas ? this.atlas.getTexture() : null;
         const interpolateAtlasFrames = this.interpolateAtlasFrames;
         const simulateInWorldSpace = this.simulateInWorldSpace;
+        const instanced = this.instanced ? 1 : 0;
 
         const baseUniforms = {
             'atlasFrameSet': {
@@ -140,6 +141,9 @@ export class AnimatedSpriteRenderer extends Renderer {
             },
             'simulateInWorldSpace': {
                 'value': simulateInWorldSpace
+            },
+            'instanced': {
+                'value': instanced
             }
         };
 
@@ -173,6 +177,8 @@ export class AnimatedSpriteRenderer extends Renderer {
                 'uniform vec4 atlasFrameSet[MAX_ATLAS_FRAME_SETS]; \n',
                 'uniform int interpolateAtlasFrames; \n',
                 'uniform int simulateInWorldSpace; \n',
+                'uniform int instanced; \n',
+                'attribute vec2 baseUV;\n',
                 'attribute float customIndex;\n',
                 'attribute vec4 particlePosition;\n',
                 'attribute float rotation;\n',
@@ -274,20 +280,33 @@ export class AnimatedSpriteRenderer extends Renderer {
                 '   float rotMag = rotation; \n',
                 '   mat2 rotMat = mat2(cos(rotMag), -sin(rotMag), sin(rotMag), cos(rotMag)) * mat2(size.x, 0.0, 0.0, size.y);\n',
 
-                '   float rightSide = step(2.0, customIndex); \n',
-                '   vec2 upperSideStep = step(vec2(customIndex, 3.0), vec2(0.0, customIndex));\n',
-                '   float upperSide = upperSideStep.x + upperSideStep.y;\n',
+                '   float rightSide; \n',
+                '   float upperSide; \n',
+
+                '   if (instanced != 1) { \n',
+                '       rightSide = step(2.0, customIndex); \n',
+                '       vec2 upperSideStep = step(vec2(customIndex, 3.0), vec2(0.0, customIndex));\n',
+                '       upperSide = upperSideStep.x + upperSideStep.y;\n',
+                '   }  else { \n',
+                '       rightSide = baseUV.x; \n',
+                '       upperSide = baseUV.y; \n',
+                '   } \n',
+
                 '   float uvXOffset = atlasFrameWidth * rightSide; \n',
                 '   float uvYOffset = atlasFrameHeight * upperSide; \n',
 
-                '   vec4 rotVecStep = step(vec4(customIndex, customIndex, 3.0, 2.0), vec4(0.0, 1.0, customIndex, customIndex)); \n',
+                '   vec2 rotVec; \n',
 
-                '   float uLeftV = rotVecStep.x; \n',
-                '   float dLeftV = rotVecStep.y - rotVecStep.x; \n',
-                '   float uRightV = rotVecStep.z; \n',
-                '   float dRightV = rotVecStep.w - rotVecStep.z; \n',
-
-                '   vec2 rotVec = uLeft * uLeftV + dLeft * dLeftV + dRight * dRightV + uRight * uRightV; \n',
+                '   if (instanced != 1) { \n',
+                '       vec4 rotVecStep = step(vec4(customIndex, customIndex, 3.0, 2.0), vec4(0.0, 1.0, customIndex, customIndex)); \n',
+                '       float uLeftV = rotVecStep.x; \n',
+                '       float dLeftV = rotVecStep.y - rotVecStep.x; \n',
+                '       float uRightV = rotVecStep.z; \n',
+                '       float dRightV = rotVecStep.w - rotVecStep.z; \n',
+                '       rotVec = uLeft * uLeftV + dLeft * dLeftV + dRight * dRightV + uRight * uRightV; \n',
+                '   }  else { \n',
+                '       rotVec = position.xy; \n ',
+                '   } \n',
 
                 '   gl_Position = projectionMatrix * (vec4(rotMat * rotVec, 0.0, 0.0) + viewPosition);\n',
                 '   vUV1 = vec2(uv1.x + uvXOffset, uv1.y + uvYOffset);\n',
@@ -346,7 +365,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         for (let frameset of framesets) {
             atlas.addFrameSet(frameset.length, frameset.x, frameset.y, frameset.width, frameset.height);
         }
-        const renderer = new AnimatedSpriteRenderer(this.simulateInWorldSpace, atlas, atlasJSON.interpolateFrames);
+        const renderer = new AnimatedSpriteRenderer(params.instanced, atlas, atlasJSON.interpolateFrames);
         if (params.blending == 'Additive') {
             renderer.blending = THREE.AdditiveBlending;
         } else {
@@ -390,6 +409,7 @@ export class AnimatedSpriteRenderer extends Renderer {
         }
 
         const json = {
+            'instanced': this.instanced,
             'blending': blending,
             'atlas': {
                 'interpolateFrames': this.interpolateAtlasFrames,
